@@ -33,9 +33,9 @@ class EventPlayerGrid(EventPlayerBaseGrid):
     correct one.
     """
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Extend and link to data source."""
-        super(EventPlayerGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         self.make_header(resultsrow.ResultsDBrowNewPlayer.header_specification)
         appsys = self.appsyspanel.get_appsys()
         db = appsys.get_results_database()

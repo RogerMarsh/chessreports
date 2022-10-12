@@ -23,9 +23,9 @@ class ECFEventGrid(ECFEventBaseGrid):
 
     """Grid for events to be submitted to ECF for grading."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Extend and note sibling grids."""
-        super(ECFEventGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         self.make_header(ResultsDBrowEvent.header_specification)
         ds = DataSource(
             self.appsyspanel.get_appsys().get_results_database(),

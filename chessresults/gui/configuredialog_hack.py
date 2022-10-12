@@ -22,7 +22,7 @@ class ConfigureDialogHack(ConfigureDialog):
 
     def __init__(
         self,
-        parent,
+        master=None,
         configuration="",
         dialog_title="Text editor dialogue",
         dialog_cancel_hint="Quit without applying changes",
@@ -33,10 +33,10 @@ class ConfigureDialogHack(ConfigureDialog):
         """Create a configuration file text editor dialogue."""
 
         # Skip to ConfigureDialog superclass' __init__() method.
-        super(ConfigureDialog, self).__init__()
+        super(ConfigureDialog, self).__init__(**kargs)
 
         self._config_text = None
-        self.dialog = tkinter.Toplevel(parent)
+        self.dialog = tkinter.Toplevel(master=master, cnf={})
 
         # Removed compared with solentware_misc version.
         # self.restore_focus = self.dialog.focus_get()
@@ -44,7 +44,7 @@ class ConfigureDialogHack(ConfigureDialog):
         self.dialog.wm_title(dialog_title)
         self.configuration = tkinter.Text(master=self.dialog)
         self.configuration.insert(tkinter.END, configuration)
-        buttons_frame = tkinter.Frame(master=self.dialog)
+        buttons_frame = tkinter.Frame(master=self.dialog, cnf={})
         buttons_frame.pack(side=tkinter.BOTTOM, fill=tkinter.X)
 
         buttonrow = buttons_frame.pack_info()["side"] in ("top", "bottom")

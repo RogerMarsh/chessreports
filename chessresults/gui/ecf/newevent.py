@@ -33,7 +33,7 @@ class NewEvent(panel.PlainPanel):
         )
         self.create_buttons()
 
-        self.newevent = tkinter.Frame(master=self.get_widget())
+        self.newevent = tkinter.Frame(master=self.get_widget(), cnf={})
         self.newevent.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
 
         self.newevent.grid_columnconfigure(0, uniform="col", weight=3)

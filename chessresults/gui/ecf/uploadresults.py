@@ -81,9 +81,9 @@ class _UploadResults:
 
     def __init__(self):
         """Build the user interface."""
-        root = tkinter.Toplevel()
+        root = tkinter.Toplevel(cnf={})
         # root.wm_resizable(width=tkinter.FALSE, height=tkinter.FALSE)
-        frame = tkinter.ttk.Frame(master=root)
+        frame = tkinter.ttk.Frame(master=root, cnf={})
         frame.pack(expand=tkinter.TRUE, fill=tkinter.BOTH)
         frame.grid_rowconfigure(0)
         frame.grid_rowconfigure(1)

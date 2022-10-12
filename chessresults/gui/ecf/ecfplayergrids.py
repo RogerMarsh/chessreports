@@ -24,9 +24,9 @@ class NewPersonGrid(ECFPlayerGrid):
 
     """Grid for players with no ECF grading code recorded."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Extend, customise record selection widget, and note sibling grids."""
-        super(NewPersonGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         self.make_header(ecfmaprow.ECFmapDBrowNewPerson.header_specification)
         ds = dataclient.DataSource(
             self.appsyspanel.get_appsys().get_results_database(),
@@ -57,9 +57,9 @@ class PersonGrid(ECFPlayerGrid):
 
     """Grid for players linked to ECF grading code."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Extend, customise record selection widget, and note sibling grids."""
-        super(PersonGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         self.make_header(ecfmaprow.ECFmapDBrowPerson.header_specification)
         ds = dataclient.DataSource(
             self.appsyspanel.get_appsys().get_results_database(),
@@ -90,9 +90,9 @@ class ECFPersonGrid(ECFPlayerGrid):
 
     """Grid for players on master list with ECF grading codes."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Extend, customise record selection widget, and note sibling grids."""
-        super(ECFPersonGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         self.make_header(ecfrow.ECFrefDBrowECFPlayer.header_specification)
         ds = dataclient.DataSource(
             self.appsyspanel.get_appsys().get_results_database(),
@@ -110,9 +110,9 @@ class NewPlayerClubGrid(ECFPlayerGrid):
 
     """Grid for players with no ECF club affiliation recorded."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Extend, customise record selection widget, and note sibling grids."""
-        super(NewPlayerClubGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         self.make_header(ecfmaprow.ECFmapDBrowNewPlayer.header_specification)
         ds = dataclient.DataSource(
             self.appsyspanel.get_appsys().get_results_database(),
@@ -143,9 +143,9 @@ class PlayerECFDetailGrid(ECFPlayerGrid):
 
     """Grid for ECF detail of identified players."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Extend, customise record selection widget, and note sibling grids."""
-        super(PlayerECFDetailGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         self.make_header(ecfmaprow.ECFmapDBrowPlayer.header_specification)
         ds = dataclient.DataSource(
             self.appsyspanel.get_appsys().get_results_database(),
@@ -163,9 +163,9 @@ class ECFClubCodeGrid(ECFPlayerGrid):
 
     """Grid for ECF clubs available for affiliation."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Extend, customise record selection widget, and note sibling grids."""
-        super(ECFClubCodeGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         self.make_header(ecfrow.ECFrefDBrowECFClub.header_specification)
         ds = dataclient.DataSource(
             self.appsyspanel.get_appsys().get_results_database(),

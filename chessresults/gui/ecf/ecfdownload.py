@@ -21,7 +21,7 @@ class ECFDownloadDialogue(ModalDialogueGo):
 
     """
 
-    def __init__(self, *args, text="data", scroll=False, **kargs):
+    def __init__(self, parent=None, text="data", scroll=False, **kargs):
         text = "".join(
             (
                 "Click 'Download' to download the '",
@@ -50,8 +50,8 @@ if __name__ == "__main__":
 
         def do(self):
             d = ECFDownloadDialogue(
-                self,
-                "Test",
+                parent=self,
+                title="Test",
                 side=tkinter.LEFT,
                 scroll=False,
                 height=5,
@@ -73,8 +73,8 @@ if __name__ == "__main__":
 
         def doit(root=root):
             d = ECFDownloadDialogue(
-                root,
-                "Test",
+                parent=root,
+                title="Test",
                 side=tkinter.LEFT,
                 scroll=False,
                 height=5,

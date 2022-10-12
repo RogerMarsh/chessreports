@@ -24,9 +24,9 @@ class OGDPersonGrid(ECFOGDPlayerGrid):
 
     """Grid for players linked to ECF grading code on Online Grading Database."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Extend, customise record selection widget, and note sibling grids."""
-        super(OGDPersonGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         self.make_header(
             ecfgcodemaprow.ECFmapOGDrowPlayer.header_specification
         )
@@ -59,9 +59,9 @@ class ECFOGDPersonGrid(ECFOGDPlayerGrid):
 
     """Grid for players on Online Grading Database with ECF grading codes."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Extend, customise record selection widget, and note sibling grids."""
-        super(ECFOGDPersonGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         self.make_header(ecfogdrow.ECFrefOGDrowPlayer.header_specification)
         ds = dataclient.DataSource(
             self.appsyspanel.get_appsys().get_results_database(),

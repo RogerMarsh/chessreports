@@ -60,7 +60,7 @@ class Leagues(leagues_database.Leagues):
 
     show_master_list_grading_codes = True
 
-    def __init__(self, master=None, cnf=dict(), **kargs):
+    def __init__(self, master=None, cnf=None, **kargs):
         """Extend and define the results database results frame."""
         super(Leagues, self).__init__(master=master, cnf=cnf, **kargs)
 
@@ -406,7 +406,7 @@ class Leagues(leagues_database.Leagues):
         # I have no idea what is going on so cannot fix problem.
         try:
             edited_text = ConfigureDialog(
-                self.get_widget(),
+                master=self.get_widget(),
                 configuration=config_text,
                 dialog_title="Edit ECF URL Defaults",
             ).config_text

@@ -27,9 +27,9 @@ class AliasLinkGrid(playergrids.PlayerGrid):
 
     """Grid for all players with grading code link."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Custom PlayerGrid for the playeralias index."""
-        super(AliasLinkGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         dr = self.appsyspanel.get_appsys().get_data_register()
         self.make_header(
             aliaslinkrow.ResultsDBrowAliasLink.header_specification

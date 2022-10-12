@@ -215,8 +215,8 @@ class Control(control_database.Control):
             return
         if dlg.download_pressed():
             dialogue_result = dialogue.ModalEntryApply(
-                self.appsys,
-                title,
+                parent=self.appsys,
+                title=title,
                 body=(
                     (
                         "URL",
@@ -454,7 +454,7 @@ class Control(control_database.Control):
         try:
             namelist = ziparchive.namelist()
             if len(namelist):
-                frame = tkinter.Frame(master=self.get_widget())
+                frame = tkinter.Frame(master=self.get_widget(), cnf={})
                 listbox = tkinter.Listbox(master=frame)
                 yscrollbar = tkinter.Scrollbar(
                     master=frame,

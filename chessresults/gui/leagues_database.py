@@ -63,7 +63,7 @@ class Leagues(leagues_validate.Leagues):
     _state_dbopen_report_event = "leagues_database_state_dbopen_report_event"
     _state_joineventplayers = "leagues_database_state_joineventplayers"
 
-    def __init__(self, master=None, cnf=dict(), **kargs):
+    def __init__(self, master=None, cnf=None, **kargs):
         """Extend and define the results database results frame."""
         super(Leagues, self).__init__(master=master, cnf=cnf, **kargs)
         self.database = None

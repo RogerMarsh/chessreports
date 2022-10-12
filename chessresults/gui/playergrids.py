@@ -17,20 +17,13 @@ from . import resultsrow
 from ..core import filespec
 
 
-# DataGridReadOnly placed first, in base class list, to keep things going.
-# Changing the argument to DataGridReadOnly from positional to keyword will
-# probably allow the original order to be restored and a single call of
-# super().__init__ to replace the two specific __init__ calls.
-class PlayerGrid(DataGridReadOnly, gridbindings.SelectorGridBindings):
+class PlayerGrid(gridbindings.SelectorGridBindings, DataGridReadOnly):
 
     """Base class for grid widgets used on new player and player pages."""
 
-    def __init__(self, panel, focus_selector=None, **kwargs):
+    def __init__(self, **kwargs):
         """Extend and bind grid navigation within page commands to events."""
-        DataGridReadOnly.__init__(self, panel)
-        gridbindings.SelectorGridBindings.__init__(
-            self, focus_selector=focus_selector, **kwargs
-        )
+        super().__init__(**kwargs)
         self.bindings(function=self.on_focus_in)
 
     def show_popup_menu_no_row(self, event=None):
@@ -46,9 +39,9 @@ class AliasGrid(PlayerGrid):
 
     """Grid for all players."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Custom PlayerGrid for the playeralias index."""
-        super(AliasGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         dr = self.appsyspanel.get_appsys().get_data_register()
         self.make_header(resultsrow.ResultsDBrowAlias.header_specification)
         ds = dataclient.DataSource(
@@ -65,9 +58,9 @@ class IdentityGrid(PlayerGrid):
 
     """Grid for identified players."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Custom PlayerGrid for the playeridentity index."""
-        super(IdentityGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         dr = self.appsyspanel.get_appsys().get_data_register()
         self.make_header(resultsrow.ResultsDBrowIdentity.header_specification)
         ds = dataclient.DataSource(
@@ -84,9 +77,9 @@ class NewGrid(PlayerGrid):
 
     """Grid for new players."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Custom PlayerGrid for the playernew index."""
-        super(NewGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         dr = self.appsyspanel.get_appsys().get_data_register()
         self.make_header(resultsrow.ResultsDBrowNewPlayer.header_specification)
         ds = dataclient.DataSource(
@@ -100,12 +93,12 @@ class NewGrid(PlayerGrid):
 
     def bookmark_down(self):
         """Extend to adjust Identified grid."""
-        super(NewGrid, self).bookmark_down()
+        super().bookmark_down()
         # not implemented
         # self.appsyspanel.playergrid.display_identified_players_for_selection()
 
     def bookmark_up(self):
         """Extend to adjust Identified grid."""
-        super(NewGrid, self).bookmark_up()
+        super().bookmark_up()
         # not implemented
         # self.appsyspanel.playergrid.display_identified_players_for_selection()

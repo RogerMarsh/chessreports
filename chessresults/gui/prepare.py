@@ -91,7 +91,7 @@ class Prepare(ExceptionHandler):
                         )
                     )
                 )
-                fbuttons = tkinter.Frame(master=self.root)
+                fbuttons = tkinter.Frame(master=self.root, cnf={})
                 bquit = tkinter.Button(
                     master=fbuttons,
                     text="Quit",
@@ -109,7 +109,7 @@ class Prepare(ExceptionHandler):
                 )
             else:
                 self.folder = folder
-                toplevel = tkinter.Toplevel(master=self.root)
+                toplevel = tkinter.Toplevel(master=self.root, cnf={})
                 toplevel.wm_title(string="Import Files")
                 text = tkinter.Text(master=toplevel)
                 text.insert(
@@ -143,7 +143,7 @@ class Prepare(ExceptionHandler):
                         "different to the Pin before import.",
                     )
                 )
-                fbuttons = tkinter.Frame(master=self.root)
+                fbuttons = tkinter.Frame(master=self.root, cnf={})
                 bquit = tkinter.Button(
                     master=fbuttons,
                     text="Quit",
@@ -235,9 +235,9 @@ class Prepare(ExceptionHandler):
                 report.append("      ".join((p, "exists")))
             else:
                 report.append(p)
-        toplevel = tkinter.Toplevel(master=self.root)
+        toplevel = tkinter.Toplevel(master=self.root, cnf={})
         toplevel.wm_title(string="Save Files")
-        fbuttons = tkinter.Frame(master=toplevel)
+        fbuttons = tkinter.Frame(master=toplevel, cnf={})
         bcancel = tkinter.Button(
             master=fbuttons,
             text="Cancel",

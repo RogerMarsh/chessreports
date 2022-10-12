@@ -16,18 +16,13 @@ from .resultsrow import ResultsDBrowEvent
 from ..core import filespec
 
 
-# DataGridReadOnly placed first, in base class list, to keep things going.
-# Changing the argument to DataGridReadOnly from positional to keyword will
-# probably allow the original order to be restored and a single call of
-# super().__init__ to replace the two specific __init__ calls.
-class EventBaseGrid(DataGridReadOnly, gridbindings.GridBindings):
+class EventBaseGrid(gridbindings.GridBindings, DataGridReadOnly):
 
     """Base class for grid widgets used on event page."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Extend and bind grid navigation within page commands to events"""
-        DataGridReadOnly.__init__(self, panel)
-        gridbindings.GridBindings.__init__(self, **kwargs)
+        super().__init__(**kwargs)
         self.bindings()
 
     def show_popup_menu_no_row(self, event=None):
@@ -43,9 +38,9 @@ class EventGrid(EventBaseGrid):
 
     """Grid for events recorded."""
 
-    def __init__(self, panel, **kwargs):
+    def __init__(self, **kwargs):
         """Extend and note sibling grids."""
-        super(EventGrid, self).__init__(panel, **kwargs)
+        super().__init__(**kwargs)
         self.make_header(ResultsDBrowEvent.header_specification)
         ds = DataSource(
             self.appsyspanel.get_appsys().get_results_database(),
