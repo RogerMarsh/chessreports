@@ -43,11 +43,11 @@ class ECFDetailDialog(ExceptionHandler):
         super(ECFDetailDialog, self).__init__()
         self.edit_ctrl = []
         self.yes = False
-        self.dialog = tkinter.Toplevel(master=parent, cnf={})
+        self.dialog = tkinter.Toplevel(master=parent)
         self.restore_focus = self.dialog.focus_get()
         self.dialog.wm_title(title)
         self.header = tkinter.Label(master=self.dialog, text=header)
-        self.buttons_frame = tkinter.Frame(master=self.dialog, cnf={})
+        self.buttons_frame = tkinter.Frame(master=self.dialog)
         self.buttons_frame.pack(side=tkinter.BOTTOM, fill=tkinter.X)
 
         buttonrow = self.buttons_frame.pack_info()["side"] in ("top", "bottom")
@@ -88,7 +88,7 @@ class ECFDetailDialog(ExceptionHandler):
 
         self.header.pack(side=tkinter.TOP, fill=tkinter.X)
 
-        self.edit_frame = tkinter.Frame(master=self.dialog, cnf={})
+        self.edit_frame = tkinter.Frame(master=self.dialog)
         self.edit_frame.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
 
         for c in range(2):

@@ -85,7 +85,7 @@ class Feedback(panel.PlainPanel):
         toppane.add(applypane)
         toppane.paneconfigure(feedbackpane, stretch=tkinter.FIRST)
 
-        rf = tkinter.Frame(master=pw, cnf={})
+        rf = tkinter.Frame(master=pw)
         self.tasklog = tasklog.TaskLog(
             # threadqueue=self.get_appsys().get_thread_queue(),
             logwidget=tasklog.LogText(

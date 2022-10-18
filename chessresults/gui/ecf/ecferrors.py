@@ -17,10 +17,10 @@ class ECFErrorFrame(ExceptionHandler):
     def __init__(self, parent, title, header, reports, cnf=dict(), **kargs):
         """Create the error reports and display them."""
         super(ECFErrorFrame, self).__init__()
-        self.document = document = tkinter.Toplevel(master=parent, cnf={})
+        self.document = document = tkinter.Toplevel(master=parent)
         document.wm_title(title)
         caption = tkinter.Label(master=document, text=header)
-        buttons_frame = tkinter.Frame(master=document, cnf={})
+        buttons_frame = tkinter.Frame(master=document)
         buttons_frame.pack(side=tkinter.BOTTOM, fill=tkinter.X)
 
         buttonrow = buttons_frame.pack_info()["side"] in ("top", "bottom")
@@ -45,7 +45,7 @@ class ECFErrorFrame(ExceptionHandler):
             self.buttons_frame.grid_rowconfigure(len(b * 2), weight=1)
 
         caption.pack(side=tkinter.TOP, fill=tkinter.X)
-        section = tkinter.Frame(master=document, cnf={})
+        section = tkinter.Frame(master=document)
         section.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=tkinter.TRUE)
         section.grid_rowconfigure(0, weight=1)
 
@@ -68,7 +68,7 @@ class ErrorReport(ExceptionHandler):
     def __init__(self, parent, report, cnf=dict(), **kargs):
         """Create an error report."""
         super().__init__()
-        self.frame = frame = tkinter.Frame(master=parent, cnf={})
+        self.frame = frame = tkinter.Frame(master=parent)
         frame.pack(fill=tkinter.BOTH, expand=tkinter.TRUE)
         frame.grid_rowconfigure(0, weight=0)
         frame.grid_rowconfigure(1, weight=1)

@@ -309,7 +309,7 @@ class Identities(ExceptionHandler):
             self.root = None
         elif self.root is not None:
             self.root.wm_title(string=filename)
-            fbuttons = tkinter.Frame(master=self.root, cnf={})
+            fbuttons = tkinter.Frame(master=self.root)
             bbreak = tkinter.Button(
                 master=fbuttons,
                 text="Break",
@@ -341,7 +341,7 @@ class Identities(ExceptionHandler):
             )
             bsubmit.pack(side=tkinter.LEFT, expand=tkinter.TRUE)
             fbuttons.pack(side=tkinter.BOTTOM, fill=tkinter.X)
-            fplayers = tkinter.Frame(master=self.root, cnf={})
+            fplayers = tkinter.Frame(master=self.root)
             fplayers.pack(
                 side=tkinter.TOP, expand=tkinter.TRUE, fill=tkinter.BOTH
             )
@@ -552,7 +552,7 @@ class IdListbox(tkinter.Listbox, ExceptionHandler):
 
     def __init__(self, master, lblabel):
 
-        self.frame = f = tkinter.Frame(master=master, cnf={})
+        self.frame = f = tkinter.Frame(master=master)
         tkinter.Label(master=f, text=lblabel).pack(
             side=tkinter.TOP, fill=tkinter.X
         )
@@ -643,7 +643,7 @@ class MatchListbox(tkinter.Frame, ExceptionHandler):
         self.lists = []
         tkinter.Label(master=self, text=caption).pack()
         for l in labels:
-            frame = tkinter.Frame(self, cnf={})
+            frame = tkinter.Frame(self)
             frame.pack(
                 side=tkinter.LEFT, expand=tkinter.YES, fill=tkinter.BOTH
             )
@@ -683,7 +683,7 @@ class MatchListbox(tkinter.Frame, ExceptionHandler):
             ):
                 lb.bind(sequence, self.try_event(function))
 
-        frame = tkinter.Frame(self, cnf={})
+        frame = tkinter.Frame(self)
         frame.pack(side=tkinter.LEFT, fill=tkinter.Y)
         tkinter.Label(frame, borderwidth=1).pack(fill=tkinter.X)
         sb = tkinter.Scrollbar(

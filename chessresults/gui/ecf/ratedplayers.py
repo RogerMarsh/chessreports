@@ -115,7 +115,7 @@ class RatedPlayers(logpanel.WidgetAndLogPanel):
         """
         self.resultsdbfolder = tkinter.Label(master=self.get_widget(), text="")
         self.resultsdbfolder.pack(side=tkinter.TOP, fill=tkinter.X)
-        tf = tkinter.Frame(master=self.get_widget(), cnf={})
+        tf = tkinter.Frame(master=self.get_widget())
         header = tkinter.Text(
             master=tf,
             wrap=tkinter.WORD,

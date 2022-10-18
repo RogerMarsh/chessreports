@@ -111,7 +111,7 @@ class Control(control_database.Control):
         # Go with 'zip' logic for speed of implementation, not UI convenience.
         namelist = os.path.basename(filepath)
         if len(namelist):
-            frame = tkinter.Frame(master=self.get_widget(), cnf={})
+            frame = tkinter.Frame(master=self.get_widget())
             listbox = tkinter.Listbox(master=frame)
             yscrollbar = tkinter.Scrollbar(
                 master=frame,
@@ -160,7 +160,7 @@ class Control(control_database.Control):
         try:
             namelist = ziparchive.namelist()
             if len(namelist):
-                frame = tkinter.Frame(master=self.get_widget(), cnf={})
+                frame = tkinter.Frame(master=self.get_widget())
                 listbox = tkinter.Listbox(master=frame)
                 yscrollbar = tkinter.Scrollbar(
                     master=frame,

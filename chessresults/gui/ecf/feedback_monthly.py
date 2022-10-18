@@ -103,7 +103,7 @@ class FeedbackMonthly(panel.PlainPanel):
         toppane.add(applypane)
         pw.paneconfigure(toppane, stretch=tkinter.FIRST)
 
-        rf = tkinter.Frame(master=pw, cnf={})
+        rf = tkinter.Frame(master=pw)
         self.tasklog = tasklog.TaskLog(
             # threadqueue=self.get_appsys().get_thread_queue(),
             logwidget=tasklog.LogText(
