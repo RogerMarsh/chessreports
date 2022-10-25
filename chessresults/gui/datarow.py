@@ -8,7 +8,7 @@ ChessResults.
 
 from solentware_grid.gui.datarow import DataRow
 
-from solentware_misc.gui.exceptionhandler import ExceptionHandler
+from solentware_bind.gui.exceptionhandler import ExceptionHandler
 
 
 class DataRow(ExceptionHandler, DataRow):

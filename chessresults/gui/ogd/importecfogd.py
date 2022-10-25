@@ -14,7 +14,9 @@ import tkinter.messagebox
 from solentware_grid.datagrid import DataGridReadOnly
 from solentware_grid.core.dataclient import DataSource
 
-from solentware_misc.gui import logpanel, tasklog, exceptionhandler
+from solentware_bind.gui import exceptionhandler
+
+from solentware_misc.gui import logpanel, tasklog
 
 from ...minorbases.textapi import TextapiError
 from ...core.ogd import ecfogddb

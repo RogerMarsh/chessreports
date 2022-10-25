@@ -8,7 +8,8 @@
 import tkinter
 import os
 
-from solentware_misc.gui.exceptionhandler import ExceptionHandler
+from solentware_bind.gui.exceptionhandler import ExceptionHandler
+
 from solentware_misc.core.utilities import AppSysPersonName
 
 from chessvalidate.core.gameresults import (

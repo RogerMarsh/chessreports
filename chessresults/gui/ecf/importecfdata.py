@@ -15,7 +15,9 @@ from solentware_grid.datagrid import DataGridReadOnly
 from solentware_grid.core.dataclient import DataSource
 
 from solentware_misc.core import utilities
-from solentware_misc.gui import logpanel, tasklog, exceptionhandler
+from solentware_misc.gui import logpanel, tasklog
+
+from solentware_bind.gui import exceptionhandler
 
 from ...core import filespec
 from ...minorbases.dbaseapi import dBaseapiError

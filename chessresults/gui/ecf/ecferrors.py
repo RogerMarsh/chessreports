@@ -7,7 +7,7 @@
 
 import tkinter
 
-from solentware_misc.gui.exceptionhandler import ExceptionHandler
+from solentware_bind.gui.exceptionhandler import ExceptionHandler
 
 
 class ECFErrorFrame(ExceptionHandler):

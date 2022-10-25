@@ -11,7 +11,8 @@ from solentware_grid.datagrid import DataGridReadOnly
 from solentware_grid.core import dataclient
 
 from solentware_misc.core.utilities import AppSysPersonNameParts
-from solentware_misc.gui import gridbindings
+
+from solentware_bind.gui import gridbindings
 
 from . import resultsrow
 from ..core import filespec

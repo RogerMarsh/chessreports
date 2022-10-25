@@ -25,7 +25,8 @@ import bz2
 from functools import reduce
 
 from solentware_misc.core.utilities import AppSysPersonName
-from solentware_misc.gui.exceptionhandler import ExceptionHandler
+from solentware_bind.gui.exceptionhandler import ExceptionHandler
+from solentware_bind.gui.bindings import Bindings
 
 from ..core import constants
 from ..core import importreports
@@ -552,6 +553,7 @@ class IdListbox(tkinter.Listbox, ExceptionHandler):
 
     def __init__(self, master, lblabel):
 
+        self._bindings = Bindings()
         self.frame = f = tkinter.Frame(master=master)
         tkinter.Label(master=f, text=lblabel).pack(
             side=tkinter.TOP, fill=tkinter.X
@@ -576,7 +578,7 @@ class IdListbox(tkinter.Listbox, ExceptionHandler):
             ("<space>", self._space),
             ("<Control-backslash>", self._clear_selection),
         ):
-            self.bind(sequence, self.try_event(function))
+            self._bindings.bind(self, sequence, function=function)
 
     def _button_1(self, event):
         self._remove_select_color(event)
@@ -638,6 +640,7 @@ class MatchListbox(tkinter.Frame, ExceptionHandler):
 
     def __init__(self, master, caption, labels):
 
+        self._bindings = Bindings()
         tkinter.Frame.__init__(self, master)
 
         self.lists = []
@@ -681,7 +684,7 @@ class MatchListbox(tkinter.Frame, ExceptionHandler):
                 # auto-scroll dragging button-1 breaks list synchronization
                 ("<Leave>", lambda e: "break"),
             ):
-                lb.bind(sequence, self.try_event(function))
+                self._bindings.bind(lb, sequence, function=function)
 
         frame = tkinter.Frame(self)
         frame.pack(side=tkinter.LEFT, fill=tkinter.Y)

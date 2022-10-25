@@ -15,7 +15,7 @@ import tkinter
 import tkinter.messagebox
 import tkinter.filedialog
 
-from solentware_misc.gui.exceptionhandler import ExceptionHandler
+from solentware_bind.gui.exceptionhandler import ExceptionHandler
 
 from ..core import constants as cc
 

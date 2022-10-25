@@ -12,14 +12,13 @@ from solentware_base.core.record import KeydBaseIII, Value, RecorddBaseIII
 
 from solentware_grid.gui.datarow import (
     DataHeader,
+    DataRow,
     GRID_COLUMNCONFIGURE,
     GRID_CONFIGURE,
     WIDGET_CONFIGURE,
     WIDGET,
     ROW,
 )
-
-from ..datarow import DataRow
 
 
 class dBaseDataHeader(DataHeader):

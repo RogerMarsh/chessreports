@@ -8,6 +8,7 @@
 import tkinter
 
 from solentware_grid.gui.datarow import (
+    DataRow,
     GRID_COLUMNCONFIGURE,
     GRID_CONFIGURE,
     WIDGET_CONFIGURE,
@@ -15,7 +16,6 @@ from solentware_grid.gui.datarow import (
     ROW,
 )
 
-from ..datarow import DataRow
 from ...core.ecf.ecfrecord import ECFrefDBrecordECFdate
 
 

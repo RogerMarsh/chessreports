@@ -11,7 +11,8 @@ import json
 import urllib.request
 import os
 
-from solentware_misc.gui.exceptionhandler import ExceptionHandler, FOCUS_ERROR
+from solentware_bind.gui.exceptionhandler import ExceptionHandler, FOCUS_ERROR
+
 from solentware_misc.core.getconfigurationitem import get_configuration_item
 
 from ...core import (

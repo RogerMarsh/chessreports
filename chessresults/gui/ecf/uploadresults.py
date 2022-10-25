@@ -27,6 +27,8 @@ try:
 except ModuleNotFoundError:
     requests = None
 
+from solentware_bind.gui.bindings import Bindings
+
 from ...core.ecf import feedback_html
 from ...core import configuration
 from ...core import constants
@@ -81,6 +83,7 @@ class _UploadResults:
 
     def __init__(self):
         """Build the user interface."""
+        self._bindings = Bindings()
         root = tkinter.Toplevel()
         # root.wm_resizable(width=tkinter.FALSE, height=tkinter.FALSE)
         frame = tkinter.ttk.Frame(master=root)
@@ -195,7 +198,9 @@ class _UploadResults:
         self._bind_for_scrolling_only(text)
         for w in (root, frame, text):
             for wc in w.winfo_children():
-                wc.bind("<ButtonPress-3>", self.show_menu)
+                self._bindings.bind(
+                    wc, "<ButtonPress-3>", function=self.show_menu
+                )
         un_entry.focus_set()
         self.root = root
         self.frame = frame
@@ -588,15 +593,15 @@ class _UploadResults:
         return fb
 
     def _bind_for_scrolling_only(self, widget):
-        widget.bind("<KeyPress>", "break")
-        widget.bind("<Home>", "continue")
-        widget.bind("<Left>", "continue")
-        widget.bind("<Up>", "continue")
-        widget.bind("<Right>", "continue")
-        widget.bind("<Down>", "continue")
-        widget.bind("<Prior>", "continue")
-        widget.bind("<Next>", "continue")
-        widget.bind("<End>", "continue")
+        self._bindings.bind(widget, "<KeyPress>", function=lambda e: "break")
+        self._bindings.bind(widget, "<Home>", function=lambda e: "continue")
+        self._bindings.bind(widget, "<Left>", function=lambda e: "continue")
+        self._bindings.bind(widget, "<Up>", function=lambda e: "continue")
+        self._bindings.bind(widget, "<Right>", function=lambda e: "continue")
+        self._bindings.bind(widget, "<Down>", function=lambda e: "continue")
+        self._bindings.bind(widget, "<Prior>", function=lambda e: "continue")
+        self._bindings.bind(widget, "<Next>", function=lambda e: "continue")
+        self._bindings.bind(widget, "<End>", function=lambda e: "continue")
 
     # Moved from SubmitResults because ECF responses do not happen as
     # expected from description.  It seems necessary to be able to save
