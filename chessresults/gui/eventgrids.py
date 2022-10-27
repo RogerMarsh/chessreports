@@ -9,8 +9,7 @@ import tkinter
 
 from solentware_grid.datagrid import DataGridReadOnly
 from solentware_grid.core.dataclient import DataSource
-
-from solentware_bind.gui import gridbindings
+from solentware_grid.gui import gridbindings
 
 from .resultsrow import ResultsDBrowEvent
 from ..core import filespec
