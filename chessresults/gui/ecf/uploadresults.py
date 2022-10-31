@@ -75,6 +75,8 @@ _RESULTS_OFFICER_ADDRESS = "RESULTS OFFICER ADDRESS"
 
 
 class UploadResultsError(Exception):
+    """Exception class for uploadresults module."""
+
     pass
 
 

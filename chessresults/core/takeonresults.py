@@ -28,6 +28,7 @@ class TakeonResults(object):
     """Class for importing results data."""
 
     def __init__(self, folder):
+        """Initialise data structures for results import."""
         super(TakeonResults, self).__init__()
         self.folder = folder
         self.files = set()
@@ -36,6 +37,7 @@ class TakeonResults(object):
         self.textlines = []
 
     def empty_extract(self):
+        """Clear the match name and text lists."""
         self.matchnames[:] = []
         self.textlines[:] = []
         return False
@@ -46,7 +48,6 @@ class TakeonResults(object):
         Provide rules in context and keymap arguments.
 
         """
-
         if keymap is None:
             keymap = dict()
 
@@ -149,6 +150,8 @@ class TakeonSubmissionFile(TakeonResults):
         return text
 
     def translate_results_format(self):
+        """Translate the imported data into internal format."""
+
         def set_match(data, key, value):
             field = "_".join(
                 (
@@ -221,6 +224,8 @@ class TakeonLeagueDumpFile(TakeonResults):
                     self.files.add(fn)
 
     def translate_results_format(self):
+        """Translate the imported data into internal format."""
+
         def get_match(data, key, value):
             data[key] = value
 

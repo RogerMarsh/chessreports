@@ -37,7 +37,6 @@ _REFRESH_FILE_FIELD = {
 
 
 class RatedPlayers(logpanel.WidgetAndLogPanel):
-
     """The 'players_ratings' panel for a Results database."""
 
     _btn_closeratedplayers = "ratedplayers_close"
@@ -53,7 +52,6 @@ class RatedPlayers(logpanel.WidgetAndLogPanel):
         **kargs
     ):
         """Extend and define the 'players_ratings' database update panel."""
-
         self.datafilename, self.downloaddate, self.all_players = datafile
 
         super().__init__(

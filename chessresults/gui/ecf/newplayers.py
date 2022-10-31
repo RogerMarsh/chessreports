@@ -33,7 +33,6 @@ from ...basecore.ecfdataimport import copy_single_ecf_players_post_2020_rules
 
 
 class NewPlayers(newplayers_database.NewPlayers):
-
     """New Players panel for Results database with ECF monthly rating.
 
     Customise user interface for use with ECF monthly rating system.

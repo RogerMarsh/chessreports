@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database Event panel class.
-"""
+"""Results database Event panel class."""
 
 import tkinter.messagebox
 
@@ -24,7 +23,6 @@ from ..taskpanel import TaskPanel
 
 
 class Events(events_database.Events):
-
     """The Events panel for a Results database."""
 
     _btn_performance = "events_performance"

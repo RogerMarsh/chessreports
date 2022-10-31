@@ -13,7 +13,6 @@ from .. import control_database
 
 
 class Control(control_database.Control):
-
     """The Control panel for a Results database."""
 
     def __init__(self, parent=None, cnf=dict(), **kargs):

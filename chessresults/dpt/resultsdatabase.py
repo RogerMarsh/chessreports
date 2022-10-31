@@ -2,8 +2,7 @@
 # Copyright 2009 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database using DPT database via dptdb.dptapi.
-"""
+"""Results database using DPT database via dptdb.dptapi."""
 
 import os
 import shutil
@@ -22,7 +21,11 @@ class ResultsDatabase(database.Database, dpt_database.Database):
     _knownnames_modulename = "chessresults.dpt.knownnames"
 
     def __init__(self, databasefolder, **kargs):
+        """Set sysprint, file specification from kargs, and delegate.
 
+        The default for sysprint, if not present in kargs, is "CONSOLE".
+
+        """
         try:
             sysprint = kargs.pop("sysprint")
         except KeyError:
@@ -41,8 +44,11 @@ class ResultsDatabase(database.Database, dpt_database.Database):
         return super().delete_database(names)
 
     def open_database(self, files=None):
-        """Return '' if all files are opened in Normal mode (FISTAT == 0),
-        or a message explaining why it remains closed.
+        """Return "" if all files are opened normally, or an error message.
+
+        'FISTAT == 0' is the condition for normal opening of a file.
+
+        The file remains closed if an error message is given.
         """
         super().open_database(files=files)
         fistat = dict()

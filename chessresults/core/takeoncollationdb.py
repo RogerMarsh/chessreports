@@ -19,11 +19,10 @@ from . import resultsrecord
 
 
 class TakeonCollationDB(collationdb.CollationDB):
-
     """Results extracted from a file of imported games."""
 
     def __init__(self, collation, database):
-
+        """Extend to handle collation merges and players into database."""
         super().__init__(collation.games, database)
         self.merges = collation.merges
         self.players = collation.players

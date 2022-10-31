@@ -47,7 +47,6 @@ _submission_player_re = re.compile(r"#Name=([^#]*)(?:#|/Z)", flags=re.DOTALL)
 
 
 class FeedbackMonthly(panel.PlainPanel):
-
     """The Feedback panel for a Results database with monthly rating emails."""
 
     _btn_closefeedbackmonthly = "feedback_monthly_close"
@@ -119,6 +118,7 @@ class FeedbackMonthly(panel.PlainPanel):
         self.response = self.process_response(feedbacktext)
 
     def process_response(self, response):
+        """Search the response for ECF codes to be applied."""
         database = self.get_appsys().get_results_database()
         gepfgc = ecfrecord.get_ecf_player_for_grading_code
         gecfcc = ecfrecord.get_ecf_club_for_club_code
@@ -358,12 +358,15 @@ class FeedbackMonthly(panel.PlainPanel):
         return fb
 
     def insert_text_feedbackctrl(self, text):
+        """Append text at end of "feedbackctrl" Text widget."""
         self.feedbackctrl.insert(tkinter.END, text)
 
     def insert_text_applyctrl(self, text):
+        """Append text at end of "apply" Text widget."""
         self.applyctrl.insert(tkinter.END, text)
 
     def insert_allowapply_header(self):
+        """Add header if there are any ECF codes to apply."""
         if self.allowapplycodes is not None:
             return
         self.allowapplycodes = True

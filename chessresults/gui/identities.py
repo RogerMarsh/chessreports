@@ -36,7 +36,7 @@ class Identities(ExceptionHandler):
     """List local new players and remote known players for identification."""
 
     def __init__(self):
-
+        """Initialise attributes and create tkinter.Tk instance."""
         super(Identities, self).__init__()
 
         self.format_error = None
@@ -56,10 +56,11 @@ class Identities(ExceptionHandler):
         self.root.wm_iconify()
 
     def get_widget(self):
+        """Retuen toplevel widget."""
         return self.root
 
     def break_identity(self):
-
+        """Break identification of selected identified new player."""
         selection = self.lbidentified.curselection()
         if len(selection) == 0:
             tkinter.messagebox.showerror(
@@ -96,10 +97,12 @@ class Identities(ExceptionHandler):
         self._get_new_and_identified_players()
 
     def identify_new_player(self):
+        """Indentify selected new player as selected known player."""
+
         def ambiguous_identification(new, known):
 
-            """if new == known:
-            return False"""
+            # """if new == known:
+            # return False"""
             if (
                 known
                 in importdata.localplayer[importdata.gameplayermerge[new]]
@@ -107,15 +110,15 @@ class Identities(ExceptionHandler):
                 if known in importdata.gameplayer:
                     return False
 
-            """if known in self.importdata.gameplayer:
-                return True
-            
+            # """if known in self.importdata.gameplayer:
+            #    return True
+
             # not convinced this is correct - and it does not work
             # did refer to remoteplayermerge deleted a while ago
-            if not isinstance(self.importdata.remoteplayer[known], set):
-                known = self.importdata.remoteplayer[known]
-            if self.importdata.known_to_new.get(known):
-                return True"""
+            # if not isinstance(self.importdata.remoteplayer[known], set):
+            #     known = self.importdata.remoteplayer[known]
+            # if self.importdata.known_to_new.get(known):
+            #     return True"""
 
             return True
 
@@ -254,7 +257,7 @@ class Identities(ExceptionHandler):
                 self.lbidentified.selection_set(e)
 
     def open_import(self):
-
+        """Open an import report file selected by dialogue."""
         filename = tkinter.filedialog.askopenfilename(
             parent=self.get_widget(),
             title="Import Reports",
@@ -386,7 +389,7 @@ class Identities(ExceptionHandler):
         return bool(filename)
 
     def player_text(self, player):
-
+        """Return concatenation of player elements as str."""
         n, e, sd, ed, s, p = player
         if s is None:
             s = ""
@@ -397,7 +400,7 @@ class Identities(ExceptionHandler):
         return "  ".join((n, e, sd, ed, s, p))
 
     def quit_identify(self):
-
+        """Show dialogue to confirm "quit" action."""
         if tkinter.messagebox.askyesno(
             parent=self.get_widget(),
             title="Identify New Players",
@@ -406,11 +409,11 @@ class Identities(ExceptionHandler):
             self.root.destroy()
 
     def save_report(self):
-
+        """Save the submission report."""
         self._save_report("Save")
 
     def submit_report(self):
-
+        """Show dialogue to confirm submission report is to be saved."""
         if self.lbnew.size():
             tkinter.messagebox.showerror(
                 parent=self.get_widget(),
@@ -430,7 +433,6 @@ class Identities(ExceptionHandler):
 
     def _get_new_and_identified_players(self):
         """Build new and identified player maps at start and after change."""
-
         gameplayermerge = self.importdata.gameplayermerge
         # get new players on exporting database
         new_players = self.importdata.get_new_players()
@@ -542,7 +544,6 @@ class Identities(ExceptionHandler):
 
     def _unmap_known_to_new(self, known, new):
         """Remove new player from known player map."""
-
         del self.importdata.known_to_new[known]
         del self.importdata.new_to_known[new]
         self._get_new_and_identified_players()
@@ -552,7 +553,7 @@ class IdListbox(tkinter.Listbox, ExceptionHandler):
     """Custom listbox for selecting one item from each of several lists."""
 
     def __init__(self, master, lblabel):
-
+        """Customise tkinter.Listbox to display multi-list listbox."""
         self._bindings = Bindings()
         self.frame = f = tkinter.Frame(master=master)
         tkinter.Label(master=f, text=lblabel).pack(
@@ -639,7 +640,7 @@ class MatchListbox(tkinter.Frame, ExceptionHandler):
     """
 
     def __init__(self, master, caption, labels):
-
+        """Customise tkinter.Frame to show several lists scrolled as one."""
         self._bindings = Bindings()
         tkinter.Frame.__init__(self, master)
 
@@ -698,75 +699,75 @@ class MatchListbox(tkinter.Frame, ExceptionHandler):
         self.lists[0]["yscrollcommand"] = sb.set
 
     def _scroll(self, *args):
-
+        # """Scroll all tkinter.Texts to scrolling arguments in args."""
         for l in self.lists:
             l.yview(*args)
         return "break"
 
     def _select_item(self, event):
-
+        # """Set selection at item nearest y coordinate of event."""
         self.selection_clear(0, tkinter.END)
         self.selection_set(event.widget.nearest(event.y))
         return "break"
 
     def _synchronize_listbox_items(self, event):
-
+        # """Synchronize the listbox items at self._set_top_item."""
         self._lbwidget = event.widget
         self.after_idle(self._set_top_item)
 
     def _activate_item_home(self, event):
-
+        # """Set selection at start of text and make visible.."""
         self.selection_clear(0, tkinter.END)
         self.selection_set(0)
         self.see(0)
         return "break"
 
     def _activate_item_end(self, event):
-
+        # """Set selection at end of text and make visible.."""
         self.selection_clear(0, tkinter.END)
         self.selection_set(tkinter.END)
         self.see(tkinter.END)
         return "break"
 
     def _clear_selection(self, event):
-
+        # """Cleasr selection."""
         self.selection_clear(0, tkinter.END)
         return "break"
 
     def _select_active_item(self, event):
-
+        # """Set selection at active index and make it visible."""
         self.selection_clear(0, tkinter.END)
         self.selection_set(event.widget.index(tkinter.ACTIVE))
         self.see(event.widget.index(tkinter.ACTIVE))
         return "break"
 
     def _set_top_item(self):
-
+        # """Scroll widgets to fit scrollbar adjusted to item nearest top."""
         top = self._lbwidget.nearest(0)
         for l in self.lists:
             l.yview(top)
 
     def curselection(self):
-
+        """Return list of items in selections in all tkinter.Texts."""
         result = []
         for l in self.lists:
             result.append(l.curselection())
         return list(zip(*result))
 
     def delete(self, first, last=None):
-
+        """Delete elements from first to last in all tkinter.Texts."""
         for l in self.lists:
             l.delete(first, last)
 
     def get(self, first, last=None):
-
+        """Return list of text between first and last in all tkinter.Texts."""
         result = []
         for l in self.lists:
             result.append(l.get(first, last))
         return result
 
     def insert(self, index, *elements):
-
+        """Insert elements at index in all tkinter.Texts."""
         for e in elements:
             i = 0
             for l in self.lists:
@@ -774,16 +775,16 @@ class MatchListbox(tkinter.Frame, ExceptionHandler):
                 i = i + 1
 
     def see(self, index):
-
+        """Make index visible in all tkinter.Texts."""
         for l in self.lists:
             l.see(index)
 
     def selection_clear(self, first, last=None):
-
+        """Clear selection from first to last index in all tkinter.Texts."""
         for l in self.lists:
             l.selection_clear(first, last)
 
     def selection_set(self, first, last=None):
-
+        """Set selection from first to last index in all tkinter.Texts."""
         for l in self.lists:
             l.selection_set(first, last)

@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Classes to open ECF club files and extract records.
-"""
+"""Classes to open ECF club files and extract records."""
 
 import io
 from os.path import split
@@ -34,11 +33,10 @@ _deleteclub = "D"  # delete a club
 
 
 class ECFclubsDB(dBaseapi):
-
     """Access a club master file published by ECF."""
 
     def __init__(self, DBpath):
-
+        """Define ECF Club File dBaseIII structure."""
         if isinstance(DBpath, io.BytesIO):
             d, f = False, DBpath
         else:
@@ -59,11 +57,10 @@ class ECFclubsDB(dBaseapi):
 
 
 class ECFclubsUpdateDB(dBaseapi):
-
     """Access a club update file published by ECF."""
 
     def __init__(self, DBpath):
-
+        """Define ECF Club File update dBaseIII structure."""
         if isinstance(DBpath, io.BytesIO):
             d, f = False, DBpath
         else:
@@ -85,14 +82,12 @@ class ECFclubsUpdateDB(dBaseapi):
 
 
 class ECFclubsDBkey(KeydBaseIII):
-
     """Club key."""
 
     pass
 
 
 class ECFclubsDBvalue(Value):
-
     """Club data."""
 
     # def load(self, value):
@@ -103,9 +98,8 @@ class ECFclubsDBvalue(Value):
 
 
 class ECFclubsDBrecord(RecorddBaseIII):
-
     """Club record."""
 
     def __init__(self, keyclass=ECFclubsDBkey, valueclass=ECFclubsDBvalue):
-
+        """Customise RecorddBaseIII with ECFclubsDBkey and ECFclubsDBvalue."""
         super(ECFclubsDBrecord, self).__init__(keyclass, valueclass)

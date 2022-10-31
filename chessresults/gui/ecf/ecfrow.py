@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Create widgets that display ECF club and player details.
-"""
+"""Create widgets that display ECF club and player details."""
 
 import tkinter
 
@@ -21,7 +20,6 @@ from ...core.ecf import ecfmaprecord
 
 
 class ECFrefDBrowECFClub(ecfrecord.ECFrefDBrecordECFclub, DataRow):
-
     """Display an ECF Club record.
 
     Note that this is the subset of fields copied from master file.
@@ -78,7 +76,7 @@ class ECFrefDBrowECFClub(ecfrecord.ECFrefDBrecordECFclub, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ECFrefDBrowECFClub,).grid_row(textitems=(...), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ECFrefDBrowECFClub instance.
 
@@ -94,7 +92,6 @@ class ECFrefDBrowECFClub(ecfrecord.ECFrefDBrecordECFclub, DataRow):
 
 
 class ECFrefDBrowECFPlayer(ecfrecord.ECFrefDBrecordECFplayer, DataRow):
-
     """Display an ECF player record.
 
     Note that this is the subset of fields copied from master file.
@@ -167,7 +164,7 @@ class ECFrefDBrowECFPlayer(ecfrecord.ECFrefDBrecordECFplayer, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ECFrefDBrowECFPlayer,).grid_row(textitems=(.), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ECFrefDBrowECFPlayer instance.
 

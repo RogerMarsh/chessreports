@@ -2,8 +2,7 @@
 # Copyright 2013 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Classes to open ECF Online Grading Database files and extract records.
-"""
+"""Classes to open ECF Online Grading Database files and extract records."""
 
 import csv
 import io
@@ -23,11 +22,10 @@ PLAYERS = "ogdplayers"
 
 
 class ECFOGD(Textapi):
-
     """Access an Online Grading Database file published by ECF."""
 
     def __init__(self, DBpath):
-
+        """Define filespec for text in DBpath file, and delegate."""
         if isinstance(DBpath, io.BytesIO):
             d, f = False, DBpath
         else:
@@ -43,12 +41,11 @@ class ECFOGD(Textapi):
         Textapi.__init__(self, dbnames, d)
 
     def make_root(self, filename):
-
+        """Return ECFOGDRoot instance for filename."""
         return ECFOGDRoot(filename)
 
 
 class ECFOGDRoot(TextapiRoot):
-
     """Provide record access to an Online Grading Database file in bsddb style.
 
     The CSV file containing the online grading database is displayed as a text
@@ -59,7 +56,7 @@ class ECFOGDRoot(TextapiRoot):
     """
 
     def open_root(self):
-
+        """Delegate then note CSV file fieldnames and row count."""
         super(ECFOGDRoot, self).open_root()
         self.headerline = self.textlines.pop(0)
         self.record_count = len(self.textlines)
@@ -74,23 +71,20 @@ class ECFOGDRoot(TextapiRoot):
 
 
 class ECFOGDkey(KeyText):
-
     """OGD player key."""
 
     pass
 
 
 class ECFOGDvalue(ValueText):
-
     """OGD player data."""
 
     pass
 
 
 class ECFOGDrecord(RecordText):
-
     """OGD player record."""
 
     def __init__(self, keyclass=ECFOGDkey, valueclass=ECFOGDvalue):
-
+        """Customise RecordText with ECFOGDkey and ECFOGDvalue."""
         super(ECFOGDrecord, self).__init__(keyclass, valueclass)

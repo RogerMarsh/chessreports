@@ -2,8 +2,7 @@
 # Copyright 2017 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Interface to DPT results database for player names known in other editions
-of event.
+"""DPT results database interface for player names in prior editions of event.
 
 The KnownNamesDS class in this module supports the DPT inteface to a database.
 
@@ -18,7 +17,8 @@ from ..basecore.knownnames import KnownNames
 
 
 class KnownNamesDS(DataSourceCursor, KnownNames):
+    """Provide DPT DataSourceCursor for KnownNames.
 
-    """Combine player names known in other editions of event with DPT
-    interface.
+    KnownNames identifies identical player names from prior editions of
+    an event.
     """

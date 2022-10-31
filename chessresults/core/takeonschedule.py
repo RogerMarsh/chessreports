@@ -2,12 +2,10 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Take on events schedule class.
-"""
+"""Take on events schedule class."""
 
 
 class TakeonSchedule(object):
-
     """Schedule extracted from event schedule file.
 
     Team names are derived from match names.  This class supports editing of

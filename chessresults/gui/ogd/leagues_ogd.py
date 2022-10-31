@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database Leagues frame class.
-"""
+"""Results database Leagues frame class."""
 
 import os
 import importlib
@@ -18,7 +17,6 @@ from ... import ECF_OGD_DATA_IMPORT_MODULE
 
 
 class Leagues(leagues_database.Leagues):
-
     """The Results frame for a Results database.
 
     Use as

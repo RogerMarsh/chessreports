@@ -33,7 +33,6 @@ from ..core.ogd import ecfgcodemaprecord
 
 
 class ResultsDBrowAliasLink(resultsrecord.ResultsDBrecordPlayer, DataRow):
-
     """Display an alias record with grading code link."""
 
     header_specification = [
@@ -114,7 +113,7 @@ class ResultsDBrowAliasLink(resultsrecord.ResultsDBrecordPlayer, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ResultsDBrowAliasLink).grid_row(textitems=(.), **kargs).
+        """Return ResultsDBrowAliasLink.grid_row instance.
 
         Create textitems argument for ResultsDBrowAliasLink instance.
 

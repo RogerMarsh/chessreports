@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Create widgets that display various sets of player details.
-"""
+"""Create widgets that display various sets of player details."""
 # class names need to be tidied up
 
 import tkinter
@@ -23,7 +22,6 @@ from ...core.ecf import ecfrecord
 
 
 class ECFmapDBrowNewPlayer(ecfmaprecord.ECFmapDBrecordClub, DataRow):
-
     """Display a Player record without club affiliation."""
 
     header_specification = [
@@ -104,7 +102,7 @@ class ECFmapDBrowNewPlayer(ecfmaprecord.ECFmapDBrecordClub, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ECFmapDBrowNewPlayer,).grid_row(textitems=(.), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ECFmapDBrowNewPlayer instance.
 
@@ -127,7 +125,6 @@ class ECFmapDBrowNewPlayer(ecfmaprecord.ECFmapDBrecordClub, DataRow):
 
 
 class ECFmapDBrowPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
-
     """Display a Player record with club affiliation."""
 
     header_specification = [
@@ -221,7 +218,7 @@ class ECFmapDBrowPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ECFmapDBrowPlayer,).grid_row(textitems=(...), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ECFmapDBrowPlayer instance.
 
@@ -249,7 +246,6 @@ class ECFmapDBrowPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
 
 
 class ECFmapDBrowNewPerson(ecfmaprecord.ECFmapDBrecordPlayer, DataRow):
-
     """Display a Player record without ECF grading code."""
 
     header_specification = [
@@ -317,7 +313,7 @@ class ECFmapDBrowNewPerson(ecfmaprecord.ECFmapDBrecordPlayer, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ECFmapDBrowNewPerson,).grid_row(textitems=(.), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ECFmapDBrowNewPerson instance.
 
@@ -339,7 +335,6 @@ class ECFmapDBrowNewPerson(ecfmaprecord.ECFmapDBrecordPlayer, DataRow):
 
 
 class ECFmapDBrowPerson(resultsrecord.ResultsDBrecordPlayer, DataRow):
-
     """Display a Player record with ECF grading code."""
 
     header_specification = [
@@ -405,7 +400,7 @@ class ECFmapDBrowPerson(resultsrecord.ResultsDBrecordPlayer, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ECFmapDBrowPerson,).grid_row(textitems=(...), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ECFmapDBrowPerson instance.
 

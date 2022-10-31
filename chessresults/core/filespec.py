@@ -124,13 +124,12 @@ OGDPERSONID_FIELD_DEF = "OGDpersonid"
 
 
 class FileSpec(solentware_base.core.filespec.FileSpec):
-
     """Specify the results database."""
 
     def __init__(
         self, use_specification_items=None, dpt_records=None, **kargs
     ):
-
+        """Define results database and delegate."""
         dptfn = FileSpec.dpt_dsn
         fn = FileSpec.field_name
 

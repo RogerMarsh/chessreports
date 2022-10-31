@@ -2,8 +2,7 @@
 # Copyright 2013 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Display game summary for selected events.
-"""
+"""Display game summary for selected events."""
 
 import tkinter
 import os

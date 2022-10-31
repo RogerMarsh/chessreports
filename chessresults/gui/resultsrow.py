@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Create widgets that display details of events and players.
-"""
+"""Create widgets that display details of events and players."""
 
 import tkinter
 
@@ -21,7 +20,6 @@ from ..core import filespec
 
 
 class ResultsDBrowEvent(resultsrecord.ResultsDBrecordEvent, DataRow):
-
     """Display an Event record."""
 
     header_specification = [
@@ -87,7 +85,7 @@ class ResultsDBrowEvent(resultsrecord.ResultsDBrecordEvent, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ResultsDBrowEvent,).grid_row(textitems=(...), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ResultsDBrowEvent instance.
 
@@ -112,7 +110,6 @@ class ResultsDBrowEvent(resultsrecord.ResultsDBrecordEvent, DataRow):
 
 
 class ResultsDBrowIdentity(resultsrecord.ResultsDBrecordPlayer, DataRow):
-
     """Display an identified player record."""
 
     header_specification = [
@@ -165,7 +162,7 @@ class ResultsDBrowIdentity(resultsrecord.ResultsDBrecordPlayer, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ResultsDBrowIdentity,).grid_row(textitems=(.), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ResultsDBrowIdentity instance.
 
@@ -185,7 +182,6 @@ class ResultsDBrowIdentity(resultsrecord.ResultsDBrecordPlayer, DataRow):
 
 
 class ResultsDBrowNewPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
-
     """Display a new player record."""
 
     header_specification = [
@@ -264,7 +260,7 @@ class ResultsDBrowNewPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ResultsDBrowNewPlayer).grid_row(textitems=(.), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ResultsDBrowNewPlayer instance.
 
@@ -292,7 +288,6 @@ class ResultsDBrowNewPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
 
 
 class ResultsDBrowAlias(resultsrecord.ResultsDBrecordPlayer, DataRow):
-
     """Display an alias record."""
 
     header_specification = [
@@ -358,7 +353,7 @@ class ResultsDBrowAlias(resultsrecord.ResultsDBrecordPlayer, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ResultsDBrowAlias).grid_row(textitems=(.), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ResultsDBrowAlias instance.
 
@@ -381,7 +376,6 @@ class ResultsDBrowAlias(resultsrecord.ResultsDBrecordPlayer, DataRow):
 
 
 class ResultsDBrowPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
-
     """Display a player record."""
 
     header_specification = [
@@ -447,7 +441,7 @@ class ResultsDBrowPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ResultsDBrowPlayer,).grid_row(textitems=(...), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ResultsDBrowPlayer instance.
 

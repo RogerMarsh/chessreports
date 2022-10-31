@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database Leagues frame class.
-"""
+"""Results database Leagues frame class."""
 
 import tkinter
 import tkinter.messagebox
@@ -41,7 +40,6 @@ _KnownNamesDS = "KnownNamesDS"
 
 
 class Leagues(leagues_validate.Leagues):
-
     """The Results frame for a Results database."""
 
     _menu_opentakeondata = "leagues_database_menu_opentakeondata"
@@ -341,7 +339,7 @@ class Leagues(leagues_validate.Leagues):
         return switch_table
 
     def _add_ecf_url_item(self, menu):
-        """Subclasses should override this if edit ECF URL defaults needed."""
+        """Override in subclasses if edit ECF URL defaults needed."""
 
     def database_close(self):
         """Close results database."""

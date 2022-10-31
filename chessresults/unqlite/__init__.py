@@ -2,5 +2,4 @@
 # Copyright 2019 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results unqlite interface
-"""
+"""Results unqlite interface."""

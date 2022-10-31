@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Merge player functions.
-"""
+"""Merge player functions."""
 
 from . import resultsrecord
 from . import filespec

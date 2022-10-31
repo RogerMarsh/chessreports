@@ -24,7 +24,6 @@ from ..core import filespec
 
 
 class NewIdentityDSS(DataSourceSet):
-
     """Define an interface between a database and GUI controls.
 
     The database is an instance of a subclass of solentware_base/dptapi.DPTapi.

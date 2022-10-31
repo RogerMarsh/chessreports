@@ -46,6 +46,7 @@ class ConvertResults(object):
     """Class for importing results data."""
 
     def __init__(self, pinprefix):
+        """Initialise data structes for converting data to internal format."""
         super(ConvertResults, self).__init__()
         self.pinprefix = pinprefix
         self.converterror = None
@@ -237,7 +238,7 @@ class ConvertResults(object):
         return True
 
     def change_game_player_identifiers(self, game):
-        """Change player id from <event, player> to <player, event, section>
+        """Change player id from <event, player> to <player, event, section>.
 
         one entry per player per event existed
         but need one entry per player per section per event
@@ -266,7 +267,7 @@ class ConvertResults(object):
             )
 
     def copy_event_and_player_identifiers_to_games(self):
-        """Copy identifiers to games"""
+        """Copy identifiers to games."""
         # copy event and player identifiers to game
         for game in self.game.values():
             match = self.match[game[cc._mcode]]
@@ -296,6 +297,7 @@ class ConvertResults(object):
         return True
 
     def empty_extract(self):
+        """Clear data structures."""
         self.player.clear()
         self.game.clear()
         self.event.clear()
@@ -453,14 +455,14 @@ class ConvertResults(object):
                 del self.player[k]
 
     def rebuild_player_data(self):
-        """Change player identity to <player, event, section>"""
+        """Change player identity to <player, event, section>."""
         # copy event and player identifiers to game
         self.player.clear()
         for game in self.game.values():
             self.change_game_player_identifiers(game)
 
     def report_games(self):
-        """Report all games and games for players with affiliation doubts
+        """Report all games and games for players with affiliation doubts.
 
         All games sorted by event and section.
         Games for players with affiliation doubts sorted by player.
@@ -650,7 +652,7 @@ class ConvertResults(object):
         )
 
     def set_player_detail(self, player, game, gplayer, gpin):
-        """Copy name and pin detail from game to player"""
+        """Copy name and pin detail from game to player."""
         if not player:
             player[cc._player] = game[gplayer]
             player[cc._pin] = game[gpin]
@@ -658,7 +660,7 @@ class ConvertResults(object):
                 player[a] = game[a]
 
     def set_potential_names(self, player, side, eventteams, section):
-        """Add potential team names and affiliations to player[cc._names]"""
+        """Add potential team names and affiliations to player[cc._names]."""
         names = player.setdefault(cc._names, {})
         names[section] = names.setdefault(section, {})
         phrases = dict()
@@ -672,7 +674,7 @@ class ConvertResults(object):
                 counter += 1
 
     def set_team_names_and_affiliations(self):
-        # derive an affiliation from sections (matches) each player played
+        """Derive player's affiliation from sections (matches) played."""
         teams = set()
         for eps, player in self.player.items():
             # pick most common phrase as player affiliation
@@ -779,6 +781,8 @@ class ConvertSubmissionFile(ConvertResults):
     }
 
     def translate_results_format(self):
+        """Translate results to internal format."""
+
         def convert_colour_text(data):
             # try:
             # data[cc._gcolor] = ConvertSubmissionFile.colour[
@@ -1069,6 +1073,7 @@ class ConvertLeagueDump(ConvertResults):
     }
 
     def __init__(self, pinprefix):
+        """Initialise data structures."""
         super(ConvertLeagueDump, self).__init__(pinprefix=pinprefix)
         self.affiliate = dict()
         self.club = dict()
@@ -1076,6 +1081,7 @@ class ConvertLeagueDump(ConvertResults):
         self.team = dict()
 
     def empty_extract(self):
+        """Clear data structures."""
         self.affiliate.clear()
         self.club.clear()
         self.represent.clear()
@@ -1083,6 +1089,7 @@ class ConvertLeagueDump(ConvertResults):
         return super(ConvertLeagueDump, self).empty_extract()
 
     def translate_match_field(self):
+        """Translate matches to internal format."""
         fixturelines = []
         reportlines = []
         matchresults = {}
@@ -1115,6 +1122,8 @@ class ConvertLeagueDump(ConvertResults):
         return (fixturelines, reportlines, matchresults)
 
     def translate_results_format(self):
+        """Translate results to internal format."""
+
         def get_affiliate(data, context):
             self.affiliate[(data[cc._ecode], data[cc._pcode])] = data
             if cc._pname in data:
@@ -1366,6 +1375,7 @@ class PhraseCounts(object):
     """
 
     def __init__(self, phrase):
+        """Initialise counts which contribute to phrase weight."""
         super(PhraseCounts, self).__init__()
         self.phrase = tuple(phrase.split())
         self.chars = phrase
@@ -1373,13 +1383,15 @@ class PhraseCounts(object):
         self.count = 0
 
     def __add__(self, increment):
+        """Add increment to self.count contribution to phrase weight."""
         self.count += increment
 
     def get_weight(self):
+        """Return weight assigned to phrase."""
         return (self.count, len(self.phrase))
 
     def __eq__(self, other):
-        """Return True if defining attributea are equal"""
+        """Return True if defining attributea are equal."""
         if self.count != other.count:
             return False
         elif len(self.phrase) != len(other.phrase):
@@ -1389,7 +1401,7 @@ class PhraseCounts(object):
         return True
 
     def __ne__(self, other):
-        """Return True if any defining attribute is not equal"""
+        """Return True if any defining attribute is not equal."""
         if self.count == other.count:
             return False
         elif len(self.phrase) == len(other.phrase):
@@ -1399,7 +1411,7 @@ class PhraseCounts(object):
         return True
 
     def __ge__(self, other):
-        """Return True if defining attributes in order are greater or equal"""
+        """Return True if defining attributes in order are greater or equal."""
         if self.count < other.count:
             return False
         elif len(self.phrase) < len(other.phrase):
@@ -1409,7 +1421,7 @@ class PhraseCounts(object):
         return True
 
     def __gt__(self, other):
-        """Return True if defining attributes in order are greater"""
+        """Return True if defining attributes in order are greater."""
         if self.count <= other.count:
             return False
         elif len(self.phrase) <= len(other.phrase):
@@ -1419,7 +1431,7 @@ class PhraseCounts(object):
         return True
 
     def __le__(self, other):
-        """Return True if defining attributes in order are smaller or equal"""
+        """Return True if defining attributes in order are smaller or equal."""
         if self.count > other.count:
             return False
         elif len(self.phrase) > len(other.phrase):
@@ -1429,7 +1441,7 @@ class PhraseCounts(object):
         return True
 
     def __lt__(self, other):
-        """Return True if defining attributes in order are smaller or equal"""
+        """Return True if defining attributes in order are smaller or equal."""
         if self.count >= other.count:
             return False
         elif len(self.phrase) >= len(other.phrase):
@@ -1484,6 +1496,7 @@ class TeamNames(list):
     """Default team names for a match."""
 
     def __init__(self, matchname, teams):
+        """Extend and deduce home and away team names."""
         super(TeamNames, self).__init__()
         self.append({cc._hometeam: "", cc._awayteam: ""})
         self.matchname = matchname
@@ -1514,4 +1527,5 @@ class TeamNames(list):
             del self[:-1]
 
     def __call__(self, team):
+        """Return home or away team."""
         return self[-1][team]

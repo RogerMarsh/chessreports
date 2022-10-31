@@ -29,7 +29,6 @@ from . import filespec
 
 
 class CollationDB(object):
-
     """Update results database from games in a Collation instance."""
 
     def __init__(self, games, database):
@@ -158,7 +157,7 @@ class CollationDB(object):
             playersgames[pid] = True
 
         def unset_player(skey):
-            """Decrement affiliation and section counts and create key maps"""
+            """Decrement affiliation and section counts and create key maps."""
             if skey not in playerskey:
                 pr = get_alias(self._database, skey)
                 a = pr.value.affiliation
@@ -546,7 +545,6 @@ class CollationDB(object):
 
 
 class NameManager(object):
-
     """Manage name lookup and reference counts for a collation.
 
     Originally local attributes of update_players but merge_players needs this
@@ -556,7 +554,7 @@ class NameManager(object):
     """
 
     def __init__(self, database):
-        """Setup an empty name lookup."""
+        """Initialise name lookup data structures."""
         super(NameManager, self).__init__()
         self._database = database
         # These were local attributes of CollationDB.update_results originally.

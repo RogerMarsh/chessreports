@@ -15,7 +15,6 @@ from solentware_misc.gui import logpanel
 
 
 class TaskPanel(logpanel.TextAndLogPanel):
-
     """The background task panel for a Results database."""
 
     _btn_closebackgroundtask = "taskpanel_close"

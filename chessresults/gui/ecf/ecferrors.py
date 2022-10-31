@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Class for displaying reports.
-"""
+"""Class for displaying reports."""
 
 import tkinter
 
@@ -11,7 +10,6 @@ from solentware_bind.gui.exceptionhandler import ExceptionHandler
 
 
 class ECFErrorFrame(ExceptionHandler):
-
     """Display error reports."""
 
     def __init__(self, parent, title, header, reports, cnf=dict(), **kargs):
@@ -55,14 +53,13 @@ class ECFErrorFrame(ExceptionHandler):
             rep.frame.grid(row=0, column=n, sticky=tkinter.NSEW)
 
     def on_ok(self, event=None):
-        """Destroy the report"""
+        """Destroy the report."""
         self.document.destroy()
 
 
-# This class may get moved to rmappsys
+# This class may get moved to solentware_misc. (Ancient package name updated.)
 # Renamed as ErrorReport to avoid name clash with Report in core.report module.
 class ErrorReport(ExceptionHandler):
-
     """Create an error report."""
 
     def __init__(self, parent, report, cnf=dict(), **kargs):

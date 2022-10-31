@@ -22,7 +22,6 @@ from . import ecfplayergrids
 
 
 class ECFPlayers(panel.PanedPanelGridSelectorBar):
-
     """The ECFPlayers panel for a Results database."""
 
     _btn_break_affiliation = "ecfplayers_break_affiliation"

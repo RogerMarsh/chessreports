@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database datagrid classes for identifying players.
-"""
+"""Results database datagrid classes for identifying players."""
 
 import tkinter
 
@@ -18,7 +17,6 @@ from ..core import filespec
 
 
 class PlayerGrid(gridbindings.SelectorGridBindings, DataGridReadOnly):
-
     """Base class for grid widgets used on new player and player pages."""
 
     def __init__(self, **kwargs):
@@ -36,11 +34,10 @@ class PlayerGrid(gridbindings.SelectorGridBindings, DataGridReadOnly):
 
 
 class AliasGrid(PlayerGrid):
-
     """Grid for all players."""
 
     def __init__(self, **kwargs):
-        """Custom PlayerGrid for the playeralias index."""
+        """Customise PlayerGrid for the playeralias index."""
         super().__init__(**kwargs)
         dr = self.appsyspanel.get_appsys().get_data_register()
         self.make_header(resultsrow.ResultsDBrowAlias.header_specification)
@@ -55,11 +52,10 @@ class AliasGrid(PlayerGrid):
 
 
 class IdentityGrid(PlayerGrid):
-
     """Grid for identified players."""
 
     def __init__(self, **kwargs):
-        """Custom PlayerGrid for the playeridentity index."""
+        """Customise PlayerGrid for the playeridentity index."""
         super().__init__(**kwargs)
         dr = self.appsyspanel.get_appsys().get_data_register()
         self.make_header(resultsrow.ResultsDBrowIdentity.header_specification)
@@ -74,11 +70,10 @@ class IdentityGrid(PlayerGrid):
 
 
 class NewGrid(PlayerGrid):
-
     """Grid for new players."""
 
     def __init__(self, **kwargs):
-        """Custom PlayerGrid for the playernew index."""
+        """Customise PlayerGrid for the playernew index."""
         super().__init__(**kwargs)
         dr = self.appsyspanel.get_appsys().get_data_register()
         self.make_header(resultsrow.ResultsDBrowNewPlayer.header_specification)

@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Record definition classes for chess results data.
-"""
+"""Record definition classes for chess results data."""
 
 from ast import literal_eval
 
@@ -27,18 +26,16 @@ from .constants import AWIN, DRAW, HWIN
 
 
 class ResultsDBkeyEvent(KeyData):
-
     """Primary key of event."""
 
     pass
 
 
 class ResultsDBvalueEvent(Value):
-
     """Event data."""
 
     def __init__(self):
-
+        """Customize Value for event data."""
         super(ResultsDBvalueEvent, self).__init__()
         self.name = None
         self.startdate = None
@@ -63,13 +60,12 @@ class ResultsDBvalueEvent(Value):
 
 
 class ResultsDBrecordEvent(Record):
-
     """Event record."""
 
     def __init__(
         self, keyclass=ResultsDBkeyEvent, valueclass=ResultsDBvalueEvent
     ):
-
+        """Customise Record with ResultsDBkeyEvent and ResultsDBvalueEvent."""
         super(ResultsDBrecordEvent, self).__init__(keyclass, valueclass)
 
     def get_keys(self, datasource=None, partial=None):
@@ -100,14 +96,12 @@ class ResultsDBrecordEvent(Record):
 
 
 class ResultsDBkeyGame(KeyData):
-
     """Primary key of game."""
 
     pass
 
 
 class ResultsDBvalueGame(ValueList):
-
     """Game data."""
 
     attributes = dict(
@@ -188,13 +182,12 @@ class ResultsDBvalueGame(ValueList):
 
 
 class ResultsDBrecordGame(Record):
-
     """Game record."""
 
     def __init__(
         self, keyclass=ResultsDBkeyGame, valueclass=ResultsDBvalueGame
     ):
-
+        """Customise Record with ResultsDBkeyGame and ResultsDBvalueGame."""
         super(ResultsDBrecordGame, self).__init__(keyclass, valueclass)
 
     def get_keys(self, datasource=None, partial=None):
@@ -232,14 +225,12 @@ class ResultsDBrecordGame(Record):
 
 
 class ResultsDBkeyName(KeyData):
-
     """Primary key of name."""
 
     pass
 
 
 class ResultsDBvalueName(ValueList):
-
     """Name data.
 
     Any value, usually used as a name, can be put on a name record and the
@@ -255,7 +246,7 @@ class ResultsDBvalueName(ValueList):
     _attribute_order = tuple(sorted(attributes.keys()))
 
     def __init__(self):
-
+        """Customize ValueList for name data."""
         super(ResultsDBvalueName, self).__init__()
         self.name = None
         self.reference_count = None
@@ -274,13 +265,12 @@ class ResultsDBvalueName(ValueList):
 
 
 class ResultsDBrecordName(Record):
-
     """Name record. A lookup for text used many times in other records."""
 
     def __init__(
         self, keyclass=ResultsDBkeyName, valueclass=ResultsDBvalueName
     ):
-
+        """Customise Record with ResultsDBkeyName and ResultsDBvalueName."""
         super(ResultsDBrecordName, self).__init__(keyclass, valueclass)
 
     def get_keys(self, datasource=None, partial=None):
@@ -304,14 +294,12 @@ class ResultsDBrecordName(Record):
 
 
 class ResultsDBkeyPlayer(KeyData):
-
     """Primary key of player."""
 
     pass
 
 
 class ResultsDBvaluePlayer(ValueList):
-
     """Player data."""
 
     attributes = dict(
@@ -332,7 +320,7 @@ class ResultsDBvaluePlayer(ValueList):
     _attribute_order = tuple(_attribute_order)
 
     def __init__(self):
-
+        """Customise ValueList for player data."""
         super(ResultsDBvaluePlayer, self).__init__()
         self.name = None
         self.event = None
@@ -429,7 +417,6 @@ class ResultsDBvaluePlayer(ValueList):
 
 
 class ResultsDBrecordPlayer(Record):
-
     """Player record."""
 
     # handle changes to related records when alias and merge modified by
@@ -438,7 +425,7 @@ class ResultsDBrecordPlayer(Record):
     def __init__(
         self, keyclass=ResultsDBkeyPlayer, valueclass=ResultsDBvaluePlayer
     ):
-
+        """Customise Record with ResultsDBkeyPlayer and ResultsDBvaluePlayer."""
         super(ResultsDBrecordPlayer, self).__init__(keyclass, valueclass)
 
     def get_keys(self, datasource=None, partial=None):
@@ -1033,7 +1020,7 @@ def get_unpacked_player_identity(identity):
 
 
 def get_events_matching_event_name(database, eventname, sections):
-    """Return (key,ResultsDBrecordEvent()),[(key,ResultsDBrecordEvent()), ...]
+    """Return (key,ResultsDBrecordEvent()), ...].
 
     the event being processed and a list of earlier events with same name.
 

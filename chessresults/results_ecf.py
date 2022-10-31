@@ -2,7 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Chess results database application with ECF results submission"""
+"""Chess results database application with ECF results submission."""
 
 if __name__ == "__main__":
 

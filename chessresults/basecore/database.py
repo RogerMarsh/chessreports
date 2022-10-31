@@ -2,8 +2,7 @@
 # Copyright 2019 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""ChessResults database methods common to all database engine interfaces.
-"""
+"""ChessResults database methods common to all database engine interfaces."""
 
 import os
 import shutil
@@ -13,8 +12,7 @@ from ..core import constants
 
 
 class Database:
-
-    """ """
+    """Provide methods common to all database engine interfaces."""
 
     def open_database(self, files=None):
         """Return '' to fit behaviour of dpt version of this method."""

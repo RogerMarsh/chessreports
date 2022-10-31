@@ -2,5 +2,4 @@
 # Copyright 2011 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""results bsddb3 interface.
-"""
+"""results bsddb3 interface."""

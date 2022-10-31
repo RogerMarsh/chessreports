@@ -2,9 +2,7 @@
 # Copyright 2009 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Prepare League database dumps for Results input.
-
-"""
+"""Prepare League database dumps for Results input."""
 
 if __name__ == "__main__":
 

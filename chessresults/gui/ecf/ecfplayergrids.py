@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database datagrid classes for assigning ECF grading codes to players.
-"""
+"""Results database datagrid classes for assigning ECF codes to players."""
 
 import tkinter
 
@@ -16,12 +15,10 @@ from ...core import filespec
 
 
 class ECFPlayerGrid(playergrids.PlayerGrid):
-
     """Base class for grid widgets used on ECF grading code page."""
 
 
 class NewPersonGrid(ECFPlayerGrid):
-
     """Grid for players with no ECF grading code recorded."""
 
     def __init__(self, **kwargs):
@@ -54,7 +51,6 @@ class NewPersonGrid(ECFPlayerGrid):
 
 
 class PersonGrid(ECFPlayerGrid):
-
     """Grid for players linked to ECF grading code."""
 
     def __init__(self, **kwargs):
@@ -87,7 +83,6 @@ class PersonGrid(ECFPlayerGrid):
 
 
 class ECFPersonGrid(ECFPlayerGrid):
-
     """Grid for players on master list with ECF grading codes."""
 
     def __init__(self, **kwargs):
@@ -107,7 +102,6 @@ class ECFPersonGrid(ECFPlayerGrid):
 
 
 class NewPlayerClubGrid(ECFPlayerGrid):
-
     """Grid for players with no ECF club affiliation recorded."""
 
     def __init__(self, **kwargs):
@@ -140,7 +134,6 @@ class NewPlayerClubGrid(ECFPlayerGrid):
 
 
 class PlayerECFDetailGrid(ECFPlayerGrid):
-
     """Grid for ECF detail of identified players."""
 
     def __init__(self, **kwargs):
@@ -160,7 +153,6 @@ class PlayerECFDetailGrid(ECFPlayerGrid):
 
 
 class ECFClubCodeGrid(ECFPlayerGrid):
-
     """Grid for ECF clubs available for affiliation."""
 
     def __init__(self, **kwargs):

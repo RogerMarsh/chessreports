@@ -2,8 +2,7 @@
 # Copyright 2013 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results transaction log functions.
-"""
+"""Results transaction log functions."""
 
 import sys
 import os

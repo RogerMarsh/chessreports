@@ -2,8 +2,7 @@
 # Copyright 2013 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database Import Events panel class.
-"""
+"""Results database Import Events panel class."""
 
 import tkinter
 import tkinter.messagebox
@@ -20,7 +19,6 @@ from ..core import importcollation
 
 
 class ImportEvents(logpanel.TextAndLogPanel):
-
     """The panel for importing events from another Results database."""
 
     _btn_closeimport = "importevents_close"
@@ -41,7 +39,6 @@ class ImportEvents(logpanel.TextAndLogPanel):
         **kargs
     ):
         """Extend and define the results database import event tab."""
-
         # See comment in function _do_ecf_reference_data_import of relative
         # module ..core.ecfdataimport for explanation of this change.
         # Binding the instance attribute is not delegated to the superclass,
@@ -487,7 +484,7 @@ class ImportEvents(logpanel.TextAndLogPanel):
         )
 
     def list_events(self, database, tasklog):
-        """The import file is ok.  List the events in the file."""
+        """List the events in the file if the import file is ok."""
         importdata = self._importdata
         tasklog.append_text(
             "Preparing to check the import file against the database."
@@ -531,7 +528,7 @@ class ImportEvents(logpanel.TextAndLogPanel):
             tasklog.append_text_only("")
 
     def do_updates(self, database, tasklog):
-        """The import file is ok.  Do the updates."""
+        """Do the updates if the import file is ok."""
         importdata = self._importdata
         tasklog.append_text(
             "Preparing to check the import file against the database."

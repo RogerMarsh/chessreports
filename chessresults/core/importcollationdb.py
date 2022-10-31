@@ -24,17 +24,17 @@ from .importreports import convert_alias_to_transfer_format
 from .importreports import get_event_from_player
 
 
-class ImportCollationDB(Exception):
+class ImportCollationDBError(Exception):
+    """Exception class for importcollationdb module."""
+
     pass
 
 
 class ImportCollationDB(collationdb.CollationDB):
-
     """Update results database from games in a CollationEvents instance."""
 
     def __init__(self, collation, database):
-        """ """
-
+        """Initialise data structures for merging players."""
         super().__init__(collation.games, database)
 
         self.collation = collation
@@ -43,8 +43,7 @@ class ImportCollationDB(collationdb.CollationDB):
         self.mergeplausible = dict()
 
     def export_players_on_database(self):
-        """ """
-
+        """Return list of players on database."""
         # get all aliases on importing database
         # note identity with embedded keys translated and merge structure
         players = dict()
@@ -179,7 +178,7 @@ class ImportCollationDB(collationdb.CollationDB):
         return checked
 
     def is_database_empty_of_players(self):
-
+        """Return True if there are no records on database."""
         cursor = self._database.database_cursor(
             filespec.PLAYER_FILE_DEF, filespec.PLAYER_FIELD_DEF
         )
@@ -247,9 +246,9 @@ class ImportCollationDB(collationdb.CollationDB):
                     alias = set(dbpc.value.alias)
                 except TypeError:
                     if dbpc.value.alias not in {None, True, False}:
-                        raise ImportCollationDB("Record alias value")
+                        raise ImportCollationDBError("Record alias value")
                     elif dbgpc.value.merge != dbpc.value.alias:
-                        raise ImportCollationDB("Record merge value")
+                        raise ImportCollationDBError("Record merge value")
                     alias = set()
                 alias.add(dbgpc.key.recno)
                 dbpc.value.alias = sorted(alias)

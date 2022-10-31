@@ -2,9 +2,7 @@
 # Copyright 2020 Roger Marsh
 # Licence: See LICENSE.txt (BSD licence)
 
-"""Create empty ChessResults database with chosen database engine and segment
-size.
-"""
+"""Create empty database with chosen database engine and segment size."""
 
 from solentware_base.tools import create_database
 

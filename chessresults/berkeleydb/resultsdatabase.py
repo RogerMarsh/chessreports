@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database using Berkeley DB database via berkeleydb.
-"""
+"""Results database using Berkeley DB database via berkeleydb."""
 
 from berkeleydb.db import (
     DB_BTREE,
@@ -32,7 +31,7 @@ class ResultsDatabase(database.Database, berkeleydb_database.Database):
     _knownnames_modulename = "chessresults.basecore.knownnamesds"
 
     def __init__(self, DBfile, **kargs):
-
+        """Provide FileSpec and database environment flags for database."""
         dbnames = FileSpec(**kargs)
 
         environment = {

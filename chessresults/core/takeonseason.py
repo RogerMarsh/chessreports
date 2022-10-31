@@ -36,11 +36,12 @@ from . import constants
 
 
 class TakeonSeasonError(Exception):
+    """Exception class for takeonseason module."""
+
     pass
 
 
 class TakeonSeason(object):
-
     """Default management of source and derived data files for an event.
 
     Assume that the initial schedule and results files are empty and that
@@ -72,7 +73,7 @@ class TakeonSeason(object):
 
     @property
     def collation(self):
-        """ """
+        """Return the TakeonCollation instance or None."""
         return self._collation
 
     def get_data_file_names(self, config):
@@ -373,7 +374,7 @@ class TakeonSeason(object):
         raise TakeonSeasonError("datafiles_exist not implemented")
 
     def get_collated_games(self):
-        """Return the Collation.games object"""
+        """Return the Collation.games object."""
         return self._collation.games
 
     def get_difference_file(self, lines, diff, orig, parent, dlgcaption):

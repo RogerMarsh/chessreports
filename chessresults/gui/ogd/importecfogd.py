@@ -24,7 +24,6 @@ from ..minorbases.textdatarow import TextDataRow, TextDataHeader
 
 
 class ImportECFOGD(logpanel.WidgetAndLogPanel):
-
     """The panel for importing an ECF Online Grading Database CSV file."""
 
     _btn_closeecfogdimport = "importecfogd_close"
@@ -51,7 +50,6 @@ class ImportECFOGD(logpanel.WidgetAndLogPanel):
             to a WidgetAndLogPanel(...) call.
 
             """
-
             # Added when DataGridBase changed to assume a popup menu is
             # available when right-click done on empty part of data drid frame.
             # The popup is used to show all navigation available from grid: but

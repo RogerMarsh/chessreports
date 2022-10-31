@@ -2,19 +2,16 @@
 # Copyright 2017 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Interface to results database for player names known in other
-editions of event.
-"""
+"""Map new players to known players for event."""
 
 from .playerfind import find_player_names_in_other_editions_of_event
 
 
 class KnownNames:
-
-    """Extend to represent subset of games on file that match a postion."""
+    """Provide map of new players to known players for event."""
 
     def __init__(self, *a, **k):
-        """Extend to provide placeholder for position used to select games."""
+        """Provide map of new players to known players for event."""
         super().__init__()
 
         # Event used to select player names in other editions of event.
@@ -24,9 +21,7 @@ class KnownNames:
         self.map_newplayer_to_knownplayer = {}
 
     def get_known_names(self, event):
-        """Find records with same player name in other editions of event and
-        put them on the recordset for display.
-        """
+        """Find records with same player name in other editions of event."""
         recordset = self.dbhome.recordlist_nil(self.dbset)
         if event:
             map_np_to_kp = find_player_names_in_other_editions_of_event(

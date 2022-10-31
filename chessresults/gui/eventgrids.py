@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database datagrid classes for events.
-"""
+"""Results database datagrid classes for events."""
 
 import tkinter
 
@@ -16,16 +15,15 @@ from ..core import filespec
 
 
 class EventBaseGrid(gridbindings.GridBindings, DataGridReadOnly):
-
     """Base class for grid widgets used on event page."""
 
     def __init__(self, **kwargs):
-        """Extend and bind grid navigation within page commands to events"""
+        """Extend and bind grid navigation within page commands to events."""
         super().__init__(**kwargs)
         self.bindings()
 
     def show_popup_menu_no_row(self, event=None):
-        """Override superclass to do nothing"""
+        """Override superclass to do nothing."""
         # Added when DataGridBase changed to assume a popup menu is available
         # when right-click done on empty part of data drid frame.  The popup is
         # used to show all navigation available from grid: but this is not done
@@ -34,7 +32,6 @@ class EventBaseGrid(gridbindings.GridBindings, DataGridReadOnly):
 
 
 class EventGrid(EventBaseGrid):
-
     """Grid for events recorded."""
 
     def __init__(self, **kwargs):

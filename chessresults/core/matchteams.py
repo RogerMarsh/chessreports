@@ -26,7 +26,13 @@ class MatchTeams(object):
     """
 
     def __init__(self, string="", split=True):
-        """ """
+        """Calculate the possible pairs of teams names from string.
+
+        A weight is assigned to each pair based on number of words in each
+        item: len(item1) * len(item2).  The intent is to favour long names
+        over short names where ambiguity exists.
+
+        """
         super().__init__()
         if not isinstance(string, str):
             if isinstance(string, (list, tuple)):
@@ -67,16 +73,21 @@ class MatchTeams(object):
             self.teamsplits = [(self.string, self.string)]
 
     def __contains__(self, string):
+        """Return True if string is in self.phrases."""
         return string in self.phrases
 
     def count(self, string):
+        """Return occurrence count of string in self.phrases, default 0."""
         return self.phrases.get(string, 0)
 
     def index(self, string):
+        """Return location of first occurrence of string in self.clauses."""
         return self.clauses.index(string)
 
     def find(self, string):
+        """Return location of string in self.position, default -1."""
         return self.position.get(string, -1)
 
     def __iter__(self):
+        """Return iterator over self.clauses."""
         return self.clauses.__iter__()

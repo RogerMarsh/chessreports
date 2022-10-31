@@ -2,8 +2,7 @@
 # Copyright 2022 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database panel for copying event details from one event to another.
-"""
+"""Panel for copying event details from one event to another."""
 
 import tkinter
 import tkinter.messagebox
@@ -14,14 +13,13 @@ from . import ecfeventgrids
 
 
 class ECFEventCopy(panel.PanelGridSelector):
-
     """The Copy Event Detail panel for a Results database."""
 
     _btn_ecfeventcopy = "ecfeventcopy_copy"
     _btn_ecfeventback = "ecfeventcopy_back"
 
     def __init__(self, parent=None, cnf=dict(), **kargs):
-        """Extend and define the results database ECF events panel"""
+        """Extend and define the results database ECF events panel."""
         self.eventgrid = None
         super().__init__(parent=parent, cnf=cnf, **kargs)
         self.show_panel_buttons(

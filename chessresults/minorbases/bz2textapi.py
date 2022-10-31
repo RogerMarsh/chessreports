@@ -2,9 +2,10 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Provide read access to text files compressed by bzip2 using the database
-interface defined in the core.database.Database and core.cursor.Cursor
-classes.
+"""Provide read access to text files compressed by bzip2.
+
+The database interface defined in the core.database.Database and
+core.cursor.Cursor classes is used.
 """
 
 import bz2
@@ -13,7 +14,6 @@ from . import textapi
 
 
 class BZ2Textapi(textapi.Textapi):
-
     """Define a textdb database structure for a bz2 compressed file."""
 
     def make_root(self, filename):
@@ -22,7 +22,6 @@ class BZ2Textapi(textapi.Textapi):
 
 
 class BZ2TextapiRoot(textapi.TextapiRoot):
-
     """Define a bz2 compressed text file.
 
     See superclass for description.

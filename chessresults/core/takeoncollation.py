@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Class to reconcile event schedule (eg. fixture list) with reported results.
-"""
+"""Class to reconcile event schedule (fixture list) with reported results."""
 from chessvalidate.core import gameobjects
 
 from . import importcollation, constants
@@ -11,12 +10,10 @@ from .importresults import get_player_identifier_from_game
 
 
 class TakeonCollation(importcollation.ImportCollation):
-
     """Results extracted from a generic event report."""
 
     def __init__(self, reports, fixtures, importdata):
         """Extend, allow for noting merges."""
-
         self.merges = dict()
         super().__init__(importdata)
 

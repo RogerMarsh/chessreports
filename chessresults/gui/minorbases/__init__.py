@@ -2,8 +2,10 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Provide row definition to various file formats using the database interface
-defined in the core.database.Database and core.cursor.Cursor classes.
+"""Provide row definition to various file formats.
+
+The database interface defined in the core.database.Database and
+core.cursor.Cursor classes is used.
 
 Access is provided for:
 

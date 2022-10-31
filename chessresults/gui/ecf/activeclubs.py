@@ -36,7 +36,6 @@ _REFRESH_FILE_FIELD = {
 
 
 class ActiveClubs(logpanel.WidgetAndLogPanel):
-
     """The 'active_clubs' panel for a Results database."""
 
     _btn_closeactiveclubs = "activeclubs_close"
@@ -52,7 +51,6 @@ class ActiveClubs(logpanel.WidgetAndLogPanel):
         **kargs
     ):
         """Extend and define the 'active_clubs' database update panel."""
-
         self.datafilename, self.downloaddate, self.active_clubs = datafile
 
         super().__init__(

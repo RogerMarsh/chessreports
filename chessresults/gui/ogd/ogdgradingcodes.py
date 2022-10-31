@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database panel for allocating ECF online grading codes to players.
-"""
+"""Panel for allocating ECF online grading codes to players."""
 
 from ast import literal_eval
 import tkinter
@@ -20,7 +19,6 @@ from ...core import filespec
 
 
 class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
-
     """The ECFGradingCodes panel for a Results database."""
 
     _btn_identify = "ecfgradingcodes_identify"
@@ -59,7 +57,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
         )
 
     def close(self):
-        """Close resources prior to destroying this instance
+        """Close resources prior to destroying this instance.
 
         Used, at least, as callback from AppSysFrame container
         """

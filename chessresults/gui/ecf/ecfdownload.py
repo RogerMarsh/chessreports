@@ -2,8 +2,9 @@
 # Copyright 2020 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Dialogues to extract player and club lists from downloads from the ECF
-website, or extract them from previously downloaded files.
+"""Dialogues to extract player and club lists from ECF website downloads.
+
+The extract can be direct or from previously downloaded files.
 
 """
 from solentware_misc.gui.dialogue import ModalDialogueGo
@@ -22,6 +23,7 @@ class ECFDownloadDialogue(ModalDialogueGo):
     """
 
     def __init__(self, parent=None, text="data", scroll=False, **kargs):
+        """Create ECF download dialogue."""
         text = "".join(
             (
                 "Click 'Download' to download the '",
@@ -35,20 +37,27 @@ class ECFDownloadDialogue(ModalDialogueGo):
         super().__init__(*args, text=text, buttons=buttons, **kargs)
 
 
+# Probably best to delete all this, or at least move it to a tests or
+# samples directory.
 if __name__ == "__main__":
 
     import tkinter
 
     class R(tkinter.Tk):
+        """A simple sample."""
+
         def __init__(self):
+            """Initialise test."""
             super().__init__()
             self.b = tkinter.Button(self, text="Do", command=self.do)
             self.b.pack()
 
         def get_widget(self):
+            """Return top level widget."""
             return self
 
         def do(self):
+            """Run the dialogue."""
             d = ECFDownloadDialogue(
                 parent=self,
                 title="Test",
@@ -65,6 +74,8 @@ if __name__ == "__main__":
     # As close as possible to tkinter.simpledialog test but without the three
     # extra dialogues following d.go().
     def test():
+        """Run a test."""
+
         class Q(tkinter.Tk):
             def get_widget(self):
                 return self

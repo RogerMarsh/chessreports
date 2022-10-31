@@ -36,6 +36,7 @@ class PrepareResults(object):
     """Class for importing results data."""
 
     def __init__(self, container):
+        """Initialise data structures for import from files in container."""
         super(PrepareResults, self).__init__()
         self.container = container
         self.pinprefix = os.path.splitext(os.path.basename(container))[0]
@@ -45,6 +46,7 @@ class PrepareResults(object):
         self.error = []
 
     def empty_extract(self):
+        """Return False."""
         return False
 
     def translate_results_format(
@@ -246,6 +248,7 @@ class PrepareResults(object):
         return extract
 
     def get_folder_contents(self, container):
+        """Add file names in directory container to self.list."""
         for f in os.listdir(container):
             fn = os.path.join(container, f)
             if os.path.isfile(fn):
@@ -279,7 +282,7 @@ class PrepareSubmissionFile(PrepareResults):
     """Import data from file formatted as ECF results submission file."""
 
     def translate_results_format(self):
-
+        """Translate results to internal format."""
         # context copied from merges.py and value part of key:value
         # changed as necessary
         context = {
@@ -530,6 +533,7 @@ class PrepareSubmissionFile(PrepareResults):
         )
 
     def write_file(self, inpath, outpath, folder):
+        """Write text derived from inpath file to outpath file in folder."""
         d, f = os.path.split(outpath[0])
         nd = os.path.join(folder, d)
         if not os.path.exists(nd):
@@ -544,6 +548,7 @@ class PrepareSubmissionFile(PrepareResults):
 
     @staticmethod
     def generate_file_name(inpath, infolder, outfolder):
+        """Return file name in outfolder derived from inpath and infolder."""
         m = os.path.split(inpath[len(infolder) + 1 :])
         d = os.path.splitext(m[-1])
         return os.path.join(outfolder, m[0], d[0], m[-1])
@@ -553,12 +558,16 @@ class PrepareLeagueDump(PrepareResults):
     """Import data from dump of League program database."""
 
     def __init__(self, container):
+        """Delegate."""
         super(PrepareLeagueDump, self).__init__(container)
 
     def empty_extract(self):
+        """Delegate to superclass method and return it's response."""
         return super(PrepareLeagueDump, self).empty_extract()
 
     def translate_results_format(self):
+        """Translate results to internal format."""
+
         def copy_player_filter(lines, text, data):
             if cc.PCODE in data:
                 if data[cc.PCODE] in self.keeppinvaluemap:
@@ -737,6 +746,7 @@ class PrepareLeagueDump(PrepareResults):
         )
 
     def write_file(self, inpath, outpath, folder):
+        """Write text derived from inpath file to outpath file in folder."""
         d, f = os.path.split(outpath[0])
         nd = os.path.join(folder, d)
         if not os.path.exists(nd):
@@ -751,6 +761,11 @@ class PrepareLeagueDump(PrepareResults):
 
     @staticmethod
     def generate_file_name(inpath, infolder, outfolder):
+        """Return path name concatenation outfolder and inpath basename.
+
+        infolder is present for compatibility with PrepareSubmissionFile.
+
+        """
         return os.path.join(
             outfolder,
             os.path.splitext(os.path.split(inpath)[-1])[0],
@@ -758,4 +773,5 @@ class PrepareLeagueDump(PrepareResults):
         )
 
     def get_folder_contents(self, container):
+        """Add container to self.files set."""
         self.files.add(container)

@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database Event panel class.
-"""
+"""Results database Event panel class."""
 
 import tkinter
 import tkinter.messagebox
@@ -68,7 +67,6 @@ EVENT_SUMMARY_HEADER = (
 
 
 class Events(panel.PanelGridSelector):
-
     """The Events panel for a Results database."""
 
     _btn_dropevent = "events_drop"

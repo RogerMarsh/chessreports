@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database panel for submitting events to ECF for grading.
-"""
+"""Results database panel for submitting events to ECF for grading."""
 
 import tkinter
 import tkinter.messagebox
@@ -27,7 +26,6 @@ from . import ecferrors
 
 
 class ECFEvents(panel.PanelGridSelector):
-
     """The ECF Events panel for a Results database."""
 
     _btn_ecf_save = "ecfevents_save"
@@ -37,7 +35,7 @@ class ECFEvents(panel.PanelGridSelector):
     _btn_ecf_feedback_monthly = "ecfevents_feedback_monthly"
 
     def __init__(self, parent=None, cnf=dict(), **kargs):
-        """Extend and define the results database ECF events panel"""
+        """Extend and define the results database ECF events panel."""
         self.eventgrid = None
         super(ECFEvents, self).__init__(parent=parent, cnf=cnf, **kargs)
         self.show_panel_buttons(

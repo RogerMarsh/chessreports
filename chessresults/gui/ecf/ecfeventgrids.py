@@ -2,8 +2,7 @@
 # Copyright 2009 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database datagrid classes for event's ECF detail and submission.
-"""
+"""Results database datagrid classes for event's ECF detail and submission."""
 
 import tkinter
 
@@ -15,12 +14,10 @@ from ...core import filespec
 
 
 class ECFEventBaseGrid(eventgrids.EventBaseGrid):
-
     """Base class for grid widgets used on ECF event page."""
 
 
 class ECFEventGrid(ECFEventBaseGrid):
-
     """Grid for events to be submitted to ECF for grading."""
 
     def __init__(self, **kwargs):

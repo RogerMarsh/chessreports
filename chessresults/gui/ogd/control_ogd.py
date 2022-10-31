@@ -26,7 +26,6 @@ from ...core import constants
 
 
 class Control(control_database.Control):
-
     """The Control panel for a Results database."""
 
     _btn_copyecfogdratingfile = "control_ogd_copy_rating"

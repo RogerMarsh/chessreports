@@ -22,44 +22,37 @@ from .. import help_
 
 
 def help_about(master):
-    """Display About document"""
-
+    """Display About document."""
     help_widget(master, help_.ABOUT, help_)
 
 
 def help_file_size(master):
-    """Display File Size document"""
-
+    """Display File Size document."""
     help_widget(master, help_.FILESIZE, help_)
 
 
 def help_guide(master):
-    """Display Guide document"""
-
+    """Display Guide document."""
     help_widget(master, help_.GUIDE, help_)
 
 
 def help_keyboard(master):
-    """Display Keyboard actions document"""
-
+    """Display Keyboard actions document."""
     help_widget(master, help_.ACTIONS, help_)
 
 
 def help_samples(master):
-    """Display Samples document"""
-
+    """Display Samples document."""
     help_widget(master, chessvalidate_help_.SAMPLES, chessvalidate_help_)
 
 
 def help_tablespecs(master):
-    """Display csv file layouts document"""
-
+    """Display csv file layouts document."""
     help_widget(master, chessvalidate_help_.TABLESPECS, chessvalidate_help_)
 
 
 def help_notes(master):
-    """Display Notes document"""
-
+    """Display Notes document."""
     help_widget(master, chessvalidate_help_.NOTES, chessvalidate_help_)
 
 

@@ -2,9 +2,7 @@
 # Copyright 2007 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Define a row from a dBaseIII file.
-
-"""
+"""Define a row from a dBaseIII file."""
 
 import tkinter
 
@@ -22,7 +20,6 @@ from solentware_grid.gui.datarow import (
 
 
 class dBaseDataHeader(DataHeader):
-
     """Provide methods to create a new header and configure its widgets."""
 
     @staticmethod
@@ -40,7 +37,6 @@ class dBaseDataHeader(DataHeader):
 
 
 class dBaseDataRow(RecorddBaseIII, DataRow):
-
     """Provide methods to create, for display, a row from a dBaseIII file."""
 
     # The header is derived from file so define a null header here
@@ -70,7 +66,7 @@ class dBaseDataRow(RecorddBaseIII, DataRow):
         self.row_specification = []
 
     def grid_row(self, **kargs):
-        """Return super(dBaseDataRow, self).grid_row(textitems=(...), **kargs).
+        """Return tuple of instructions to create row.
 
         Create row specification from dBase file fieldnames.
         Create textitems argument for dBaseDataRow instance.

@@ -24,11 +24,10 @@ from ..core import filespec
 
 
 class AliasLinkGrid(playergrids.PlayerGrid):
-
     """Grid for all players with grading code link."""
 
     def __init__(self, **kwargs):
-        """Custom PlayerGrid for the playeralias index."""
+        """Customise PlayerGrid for the playeralias index."""
         super().__init__(**kwargs)
         dr = self.appsyspanel.get_appsys().get_data_register()
         self.make_header(

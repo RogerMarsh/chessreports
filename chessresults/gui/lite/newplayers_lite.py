@@ -18,7 +18,6 @@ from .. import newplayers_database
 
 
 class NewPlayers(newplayers_database.NewPlayers):
-
     """New Players panel for Results database with Online Grading Database.
 
     Customise newplayers_database user interface for use with published

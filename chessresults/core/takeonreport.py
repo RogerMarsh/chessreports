@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Generate a report comparing results with schedule.
-"""
+"""Generate a report comparing results with schedule."""
 
 import collections
 
@@ -12,7 +11,6 @@ from . import convertresults
 
 
 class TakeonReport(convertresults.ConvertResults):
-
     """Game results extracted from data take-on file.
 
     Subclasses will deal with particular input formats.
@@ -20,7 +18,7 @@ class TakeonReport(convertresults.ConvertResults):
     """
 
     def __init__(self, **kargs):
-
+        """Extend to handle match names with default pinprefix of ''."""
         super().__init__(pinprefix="")
         self.textlines = None
         self.error = []
@@ -77,6 +75,7 @@ class TakeonReport(convertresults.ConvertResults):
         return [t.rstrip() for t in self.textlines]
 
     def report_games(self, master=None):
+        """Delegate and return generated report."""
         er, par, pgr, gr = super(TakeonReport, self).report_games()
         return (
             (("Inconsistent Affiliations and Team Names", pgr),),
@@ -89,7 +88,7 @@ class TakeonReport(convertresults.ConvertResults):
 
 
 class TakeonSubmission(convertresults.ConvertSubmissionFile, TakeonReport):
-    """Import data from file formatted as ECF results submission file"""
+    """Import data from file formatted as ECF results submission file."""
 
     def build_results(self, textlines, schedule, pinprefix):
         """Populate the event report from self.textlines."""
@@ -151,6 +150,7 @@ class TakeonLeagueDump(convertresults.ConvertLeagueDump, TakeonReport):
     """Import data from dump of League program database."""
 
     def __init__(self):
+        """Extend with default pinprefix of ''."""
         super(TakeonLeagueDump, self).__init__(pinprefix="")
 
     def build_results(self, textlines, schedule, pinprefix):

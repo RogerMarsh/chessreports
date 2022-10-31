@@ -32,7 +32,6 @@ clubline = ": New Club supplied ("
 
 
 class Feedback(panel.PlainPanel):
-
     """The Feedback panel for a Results database."""
 
     _btn_closefeedback = "feedback_close"

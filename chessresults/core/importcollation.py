@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Collate results imported from another results database.
-"""
+"""Collate results imported from another results database."""
 
 from chessvalidate.core import gameobjects
 
@@ -14,7 +13,6 @@ homeplayercolour = {"yes": True, "no": False}
 
 
 class ImportCollation(gameobjects.GameCollation):
-
     """Results extracted from an export file from a results database."""
 
     def __init__(self, importreport):

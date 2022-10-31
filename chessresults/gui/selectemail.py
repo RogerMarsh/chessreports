@@ -2,9 +2,8 @@
 # Copyright 2022 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Email selection filter User Interface for Results application.
+"""Email selection filter User Interface for Results application."""
 
-"""
 from chessvalidate.gui import selectemail
 
 from ..core import configuration

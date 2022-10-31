@@ -2,8 +2,7 @@
 # Copyright 2011 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Help files for Results.
-"""
+"""Help files for Results."""
 
 import os
 

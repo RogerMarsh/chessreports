@@ -22,7 +22,6 @@ from ..core import filespec
 
 
 class NewIdentityDSS(DataSource):
-
     """Define an interface between a database and user interface.
 
     The database is an instance of a subclass of

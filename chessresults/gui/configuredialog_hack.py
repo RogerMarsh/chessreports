@@ -2,9 +2,7 @@
 # Copyright 2022 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""A workaround for a problem encountered in ConfigureDialog class.
-
-"""
+"""A workaround for a problem encountered in ConfigureDialog class."""
 
 import tkinter
 
@@ -12,7 +10,6 @@ from solentware_misc.gui.configuredialog import ConfigureDialog
 
 
 class ConfigureDialogHack(ConfigureDialog):
-
     """Configuration file text editor in a dialogue.
 
     Update methods are defined but do not change database.  Subclasses must
@@ -31,7 +28,6 @@ class ConfigureDialogHack(ConfigureDialog):
         **kargs
     ):
         """Create a configuration file text editor dialogue."""
-
         # Skip to ConfigureDialog superclass' __init__() method.
         super(ConfigureDialog, self).__init__(**kargs)
 

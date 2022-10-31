@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database Leagues frame class.
-"""
+"""Results database Leagues frame class."""
 
 from .. import leagues_database
 from . import control_lite
@@ -12,7 +11,6 @@ from . import newplayers_lite
 
 
 class Leagues(leagues_database.Leagues):
-
     """The Results frame for a Results database."""
 
     def define_state_switch_table(self):

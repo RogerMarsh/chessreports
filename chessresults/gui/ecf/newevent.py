@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Panel for editing details of an Event for submission to ECF.
-"""
+"""Panel for editing details of an Event for submission to ECF."""
 
 import tkinter
 import tkinter.messagebox
@@ -17,7 +16,6 @@ from .ecfeventcopy import ECFEventCopy
 
 
 class NewEvent(panel.PlainPanel):
-
     """The NewEvent panel for a Results database."""
 
     _btn_ok = "newevent_ok"
@@ -645,7 +643,6 @@ class NewEvent(panel.PlainPanel):
 
     def populate_event_control(self):
         """Populate new event widget with data from record."""
-
         if self.ecfeventrecord:
             v = self.ecfeventrecord.value
             _change_fixed_value(self.eventname, v.eventname)

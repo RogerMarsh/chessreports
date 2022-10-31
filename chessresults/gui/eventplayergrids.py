@@ -2,8 +2,7 @@
 # Copyright 2017 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database datagrid classes for new players in an event.
-"""
+"""Results database datagrid classes for new players in an event."""
 
 import tkinter
 
@@ -16,14 +15,11 @@ from ..core import resultsrecord
 
 
 class EventPlayerBaseGrid(eventgrids.EventBaseGrid):
-
     """Base class for grid widgets used on event page."""
 
 
 class EventPlayerGrid(EventPlayerBaseGrid):
-
-    """Grid for players in an event whose names have been used in other
-    editions of the event.
+    """Grid for player names which have been used in prior editions of event.
 
     These are still new players: they have not been linked to a known player
     nor marked as 'known new players'.  Known players do not appear in this

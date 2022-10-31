@@ -30,7 +30,6 @@ _REFRESH_FILE_FIELD = {
 
 
 class ImportECFData(logpanel.WidgetAndLogPanel):
-
     """The panel for importing an ECF dBaseIII reference file."""
 
     _btn_closeecfimport = "importecfdata_close"

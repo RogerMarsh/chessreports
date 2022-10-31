@@ -2,8 +2,7 @@
 # Copyright 2020 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Classes to extract feedback from website responses for monthly grading.
-"""
+"""Classes to extract feedback from website responses for monthly rating."""
 
 from html.parser import HTMLParser
 import re
@@ -45,10 +44,10 @@ _CLASS_ISSUE = ("class", "issue")
 
 
 class FeedbackHTML(HTMLParser):
-
     """Parse a feedback file."""
 
     def __init__(self, *a, **k):
+        """Delegate then initialise feedback and submission attributes."""
         super().__init__(*a, **k)
         self.feedbackdata = []
         self.feedbackstring = ""
@@ -62,7 +61,7 @@ class FeedbackHTML(HTMLParser):
         self.issues_exist = False
 
     def insert_whitespace_and_redact_dates(self):
-        """Insert " " separator if needed and redact dates in feedbackstring.
+        r"""Insert " " separator if needed and redact dates in feedbackstring.
 
         feedbackdata has the actual response from ECF, but feedbackstring
         must have whitespace between the elements from feedbackdata, and
@@ -93,6 +92,7 @@ class FeedbackHTML(HTMLParser):
         )
 
     def find_player_lists(self):
+        """Create lists of feedback and submission players and references."""
         fbpl = _feedback_player_list_re.search(self.feedbackstring)
         spl = _submission_player_list_re.search(self.feedbackstring)
         if fbpl:
@@ -103,19 +103,23 @@ class FeedbackHTML(HTMLParser):
             self.submissionplayers = _submission_pin_re.split(spl.group(1))
 
     def handle_starttag(self, tag, attrs):
+        """Override HTMLParser method which does nothing."""
         if str(tag) == "tr" and _CLASS_ISSUE in attrs:
             self.issues_exist = True
         if tag.strip() in {"script", "style"}:
             self._ignore_data += 1
 
     def handle_endtag(self, tag):
+        """Override HTMLParser method which does nothing."""
         if tag.strip() in {"script", "style"}:
             self._ignore_data -= 1
 
     def handle_startendtag(self, tag, attrs):
+        """Delegate to HTMLParser method."""
         super().handle_startendtag(tag, attrs)
 
     def handle_data(self, tag):
+        """Override HTMLParser method which does nothing."""
         if self._ignore_data:
             return
         ts = tag.strip()
@@ -124,19 +128,25 @@ class FeedbackHTML(HTMLParser):
         self.feedbackdata.append(ts)
 
     def handle_entityref(self, tag):
+        """Override HTMLParser method which does nothing."""
         pass
 
     def handle_charref(self, tag):
+        """Override HTMLParser method which does nothing."""
         pass
 
     def handle_comment(self, tag):
+        """Override HTMLParser method which does nothing."""
         pass
 
     def handle_decl(self, tag):
+        """Override HTMLParser method which does nothing."""
         pass
 
     def handle_pi(self, tag):
+        """Override HTMLParser method which does nothing."""
         pass
 
     def handle_unknown_decl(self, tag):
+        """Override HTMLParser method which does nothing."""
         pass

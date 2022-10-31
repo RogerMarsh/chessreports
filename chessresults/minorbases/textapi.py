@@ -2,8 +2,10 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Provide read access to text files using the database interface defined in
-the core.database.Database and core.database.Cursor classes.
+"""Provide read access to text files.
+
+The database interface defined in the core.database.Database and
+core.database.Cursor classes is used.
 
 """
 
@@ -22,11 +24,12 @@ from solentware_base.core.constants import FILE, FOLDER, FIELDS
 
 
 class TextapiError(Exception):  # DatabaseError):
+    """Exception class for textapi module."""
+
     pass
 
 
 class Textapi:  # (Database):
-
     """Implement Database API on a text file.
 
     The database is read only.
@@ -211,12 +214,11 @@ class Textapi:  # (Database):
         return srkey
 
     def make_root(self, filename):
-
+        """Return TextapiRoot instance for filename."""
         return TextapiRoot(filename)
 
 
 class TextapiRoot:
-
     """Provide record access to a text file in bsddb style.
 
     The cursor instance returned by Cursor() duplicates many methods in
@@ -227,7 +229,7 @@ class TextapiRoot:
     """
 
     def __init__(self, filename):
-
+        """Initialise for text file "filename" in closed state."""
         self._localdata = threading.local()
         self._lock_text = threading.Lock()
         self._lock_text.acquire()
@@ -239,11 +241,11 @@ class TextapiRoot:
             self._lock_text.release()
 
     def __del__(self):
-
+        """Close text file when instance destroyed."""
         self.close()
 
     def close(self):
-
+        """Close text file."""
         self._lock_text.acquire()
         try:
             try:
@@ -269,7 +271,7 @@ class TextapiRoot:
             self._lock_text.release()
 
     def open_root(self):
-
+        """Open text file and extract lines as records."""
         self._lock_text.acquire()
         try:
             try:
@@ -405,7 +407,6 @@ class TextapiRoot:
 
 
 class Cursor:  # (cursor.Cursor):
-
     """Define cursor implemented using the Berkeley DB cursor methods."""
 
     def __init__(self, dbobject, **kargs):
@@ -464,7 +465,7 @@ class Cursor:  # (cursor.Cursor):
         return self._get_record(self._cursor.set(key))
 
     def count_records(self):
-        """return record count or None if cursor is not usable."""
+        """Return record count or None if cursor is not usable."""
         # if not self.is_cursor_open():
         if self._cursor is None:
             return None
@@ -472,7 +473,7 @@ class Cursor:  # (cursor.Cursor):
         return self._cursor._dbobject.record_count
 
     def get_position_of_record(self, record=None):
-        """return position of record in file or 0 (zero)."""
+        """Return position of record in file or 0 (zero)."""
         if record is None:
             return 0
         start = self.first
@@ -489,7 +490,7 @@ class Cursor:  # (cursor.Cursor):
         return position
 
     def get_record_at_position(self, position=None):
-        """return record for positionth record in file or None."""
+        """Return record for positionth record in file or None."""
         if position is None:
             return None
         if position < 0:
@@ -512,7 +513,6 @@ class Cursor:  # (cursor.Cursor):
 
 
 class _CursorText:
-
     """Define a text file cursor.
 
     Wrap the TextapiRoot methods in corresponding cursor method names.

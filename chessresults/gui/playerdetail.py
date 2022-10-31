@@ -23,7 +23,7 @@ from ..core.ogd import ecfogdrecord
 
 
 def display_player_details(myself, selections, title):
-    """ """
+    """Show dialogue giving details of events player took part in."""
     db = myself.get_appsys().get_results_database()
     entries = dict()
     mainnotfound = dict()

@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database Event panel class.
-"""
+"""Results database Event panel class."""
 import tkinter.messagebox
 
 from ...core.ecf import ecfmaprecord
@@ -14,7 +13,6 @@ from .. import events_database
 
 
 class Events(events_database.Events):
-
     """The Events panel for a Results database."""
 
     _btn_ecfplayers = "events_players"

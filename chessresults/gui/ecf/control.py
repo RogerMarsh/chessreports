@@ -47,7 +47,6 @@ from ...core.ecf import ecfplayerdb
 
 
 class Control(control_database.Control):
-
     """The Control panel for a Results database."""
 
     _btn_ecfresultsfeedback = "control_feedback"
@@ -333,7 +332,7 @@ class Control(control_database.Control):
                 return
 
     def _ecf_players_structure(self, data):
-        """Callback for _ecf_download to validate json data structure."""
+        """Validate json player data structure."""
         if set(data.keys()) == constants.PLAYERS_RATINGS_KEYS:
             if (
                 tuple(data[constants.P_R_COLUMN_NAMES])
@@ -345,7 +344,7 @@ class Control(control_database.Control):
         )
 
     def _ecf_clubs_structure(self, data):
-        """Callback for _ecf_download to validate json data structure."""
+        """Validate json club data structure."""
         if set(data.keys()) == constants.ACTIVE_CLUBS_KEYS:
             return data
         raise RuntimeError(
@@ -426,7 +425,7 @@ class Control(control_database.Control):
         )
 
     def on_ecf_master_file(self, event=None):
-        """Do unzip ECF master file actions"""
+        """Do unzip ECF master file actions."""
         if self.display_ecf_zipped_file_contents():
             self.show_buttons_for_ecf_master_file()
             self.create_buttons()

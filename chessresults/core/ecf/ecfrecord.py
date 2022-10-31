@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Record definition classes for data extracted from ECF master files.
-"""
+"""Record definition classes for data extracted from ECF master files."""
 
 from ast import literal_eval
 
@@ -93,18 +92,16 @@ _Playerdictkeys = tuple(
 
 
 class ECFrefDBkeyECFclub(KeyData):
-
     """Primary key of club from ECF."""
 
     pass
 
 
 class ECFrefDBvalueECFclub(Value):
-
     """Club data from ECF."""
 
     def __init__(self):
-
+        """Extend Value with ECF club data."""
         super(ECFrefDBvalueECFclub, self).__init__()
         self.ECFcode = None
         self.ECFactive = False
@@ -136,29 +133,26 @@ class ECFrefDBvalueECFclub(Value):
 
 
 class ECFrefDBrecordECFclub(Record):
-
     """Club record from ECF."""
 
     def __init__(
         self, keyclass=ECFrefDBkeyECFclub, valueclass=ECFrefDBvalueECFclub
     ):
-
+        """Customise Record with ECFrefDBkeyECFclub, ECFrefDBvalueECFclub."""
         super(ECFrefDBrecordECFclub, self).__init__(keyclass, valueclass)
 
 
 class ECFrefDBkeyECFplayer(KeyData):
-
     """Primary key of player from ECF."""
 
     pass
 
 
 class ECFrefDBvalueECFplayer(Value):
-
     """Player data from ECF."""
 
     def __init__(self):
-
+        """Extend Value with ECF player details."""
         super(ECFrefDBvalueECFplayer, self).__init__()
         self.ECFcode = None
         self.ECFactive = False
@@ -198,29 +192,26 @@ class ECFrefDBvalueECFplayer(Value):
 
 
 class ECFrefDBrecordECFplayer(Record):
-
     """Player record from ECF."""
 
     def __init__(
         self, keyclass=ECFrefDBkeyECFplayer, valueclass=ECFrefDBvalueECFplayer
     ):
-
+        """Customise Record by ECFrefDBkeyECFplayer, ECFrefDBvalueECFplayer."""
         super(ECFrefDBrecordECFplayer, self).__init__(keyclass, valueclass)
 
 
 class ECFrefDBkeyECFdate(KeyData):
-
     """Primary key of ECF date record."""
 
     pass
 
 
 class ECFrefDBvalueECFdate(Value):
-
     """ECF date data."""
 
     def __init__(self):
-
+        """Extend Value with ECF transaction type and date."""
         super(ECFrefDBvalueECFdate, self).__init__()
         self.ECFdate = None
         self.ECFtxntype = None
@@ -236,7 +227,6 @@ class ECFrefDBvalueECFdate(Value):
 
 
 class ECFrefDBrecordECFdate(Record):
-
     """ECF date record."""
 
     most_recent_club_master_file_date = None
@@ -247,7 +237,7 @@ class ECFrefDBrecordECFdate(Record):
     def __init__(
         self, keyclass=ECFrefDBkeyECFdate, valueclass=ECFrefDBvalueECFdate
     ):
-
+        """Customise Record with ECFrefDBkeyECFdate, ECFrefDBvalueECFdate."""
         super(ECFrefDBrecordECFdate, self).__init__(keyclass, valueclass)
 
     @staticmethod
@@ -335,14 +325,12 @@ class ECFrefDBrecordECFdate(Record):
 
 
 class ECFrefDBkeyEvent(KeyData):
-
     """Primary key of event."""
 
     pass
 
 
 class ECFrefDBvalueEvent(ValueList):
-
     """Event data."""
 
     attributes = dict(
@@ -393,13 +381,12 @@ class ECFrefDBvalueEvent(ValueList):
 
 
 class ECFrefDBrecordEvent(Record):
-
     """Event record."""
 
     def __init__(
         self, keyclass=ECFrefDBkeyEvent, valueclass=ECFrefDBvalueEvent
     ):
-
+        """Customise Record with ECFrefDBkeyEvent and ECFrefDBvalueEvent."""
         super(ECFrefDBrecordEvent, self).__init__(keyclass, valueclass)
 
 
@@ -477,7 +464,7 @@ def get_ecf_clubs_for_player(database, codelist):
 
 
 def get_ecf_event(value):
-    """Return ECFrefDBrecordEvent instance for key on index or None"""
+    """Return ECFrefDBrecordEvent instance for key on index or None."""
     if value:
         er = ECFrefDBrecordEvent()
         er.load_record(value)

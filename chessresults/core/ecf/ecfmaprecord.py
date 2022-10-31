@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Record definition classes for linking players to ECF grading and club codes.
-"""
+"""Record classes for linking players to ECF grading and club codes."""
 
 from ast import literal_eval
 
@@ -16,14 +15,12 @@ from ..resultsrecord import get_unpacked_player_identity
 
 
 class ECFmapDBkeyClub(KeyData):
-
     """Primary key of club data for player in event."""
 
     pass
 
 
 class ECFmapDBvalueClub(ValueList):
-
     """ECF club for player in event."""
 
     attributes = dict(
@@ -68,7 +65,6 @@ class ECFmapDBvalueClub(ValueList):
 
 
 class ECFmapDBrecordClub(Record):
-
     """Player in event associated with ECF club.
 
     For each ResultsDBrecordPlayer record there are 0 or 1
@@ -77,19 +73,17 @@ class ECFmapDBrecordClub(Record):
     """
 
     def __init__(self, keyclass=ECFmapDBkeyClub, valueclass=ECFmapDBvalueClub):
-
+        """Customise Record with ECFmapDBkeyClub and ECFmapDBvalueClub."""
         super(ECFmapDBrecordClub, self).__init__(keyclass, valueclass)
 
 
 class ECFmapDBkeyEvent(KeyData):
-
     """Primary key of event."""
 
     pass
 
 
 class ECFmapDBvalueEvent(ValueList):
-
     """Event data."""
 
     attributes = dict(
@@ -104,32 +98,29 @@ class ECFmapDBvalueEvent(ValueList):
     )
 
     def empty(self):
-        """(Re)Initialize value attribute"""
+        """(Re)Initialize value attribute."""
         self.eventkey = ""
         self.eventname = None
         self.eventcode = ""
 
 
 class ECFmapDBrecordEvent(Record):
-
-    """Event record"""
+    """Event record."""
 
     def __init__(
         self, keyclass=ECFmapDBkeyEvent, valueclass=ECFmapDBvalueEvent
     ):
-
+        """Customise Record with ECFmapDBkeyEvent and ECFmapDBvalueEvent."""
         super(ECFmapDBrecordEvent, self).__init__(keyclass, valueclass)
 
 
 class ECFmapDBkeyPlayer(KeyData):
-
     """Primary key of player."""
 
     pass
 
 
 class ECFmapDBvaluePlayer(ValueList):
-
     """ECF name and grading code for player in event."""
 
     attributes = dict(
@@ -191,7 +182,7 @@ class ECFmapDBrecordPlayer(Record):
     def __init__(
         self, keyclass=ECFmapDBkeyPlayer, valueclass=ECFmapDBvaluePlayer
     ):
-
+        """Customise Record with ECFmapDBkeyPlayer and ECFmapDBvaluePlayer."""
         super(ECFmapDBrecordPlayer, self).__init__(keyclass, valueclass)
 
 

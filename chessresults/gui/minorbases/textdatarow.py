@@ -2,9 +2,7 @@
 # Copyright 2007 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Define a row from a text file.
-
-"""
+"""Define a row from a text file."""
 
 import tkinter
 
@@ -22,7 +20,6 @@ from solentware_grid.gui.datarow import (
 
 
 class TextDataHeader(DataHeader):
-
     """Provide methods to create a new header and configure its widgets."""
 
     @staticmethod
@@ -40,7 +37,6 @@ class TextDataHeader(DataHeader):
 
 
 class TextDataRow(RecordText, DataRow):
-
     """Provide methods to create, for display, a row of data from a text file."""
 
     # The header is derived from file so define a null header here
@@ -70,7 +66,7 @@ class TextDataRow(RecordText, DataRow):
         self.row_specification = []
 
     def grid_row(self, **kargs):
-        """Return super(TextDataRow, self).grid_row(textitems=(...), **kargs).
+        """Return tuple of instructions to create row.
 
         Create row specification for text file treating line as one field.
         Create textitems argument for TextDataRow instance.

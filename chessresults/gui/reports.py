@@ -2,8 +2,7 @@
 # Copyright 2022 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Customise solentware_misc.gui.reports AppSysReport class.
-"""
+"""Customise solentware_misc.gui.reports AppSysReport class."""
 
 import tkinter.filedialog
 import os

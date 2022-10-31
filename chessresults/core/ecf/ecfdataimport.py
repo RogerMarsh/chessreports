@@ -25,8 +25,7 @@ def _do_ecf_downloaded_data_import(
     ecfdata=None,
     downloaddate=None,
 ):
-    """ """
-
+    """Run the import_method to do the import of ecfdata."""
     results = widget.get_appsys().get_results_database()
     if not results:
         return False

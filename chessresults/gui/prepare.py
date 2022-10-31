@@ -24,6 +24,7 @@ class Prepare(ExceptionHandler):
     """Convert from League or ECF submission format to Results format."""
 
     def __init__(self, format_class):
+        """Initialise attributes and tkinter.Tk instance to control process."""
         super(Prepare, self).__init__()
         self.format_class = format_class
         self.format_error = None
@@ -34,10 +35,11 @@ class Prepare(ExceptionHandler):
         self.root.wm_iconify()
 
     def get_widget(self):
+        """Return toplevel widget."""
         return self.root
 
     def open_submission(self, folder):
-
+        """Create dialogue to save results from folder in internal format."""
         self.format_error = []
         if folder:
             print(folder)
@@ -171,6 +173,7 @@ class Prepare(ExceptionHandler):
             self.root = None
 
     def quit_submission(self):
+        """Quit application if confirmed in a dialogue."""
         if tkinter.messagebox.askyesno(
             parent=self.get_widget(),
             title="Prepare data for Results database",
@@ -179,6 +182,8 @@ class Prepare(ExceptionHandler):
             self.root.destroy()
 
     def save_submission(self):
+        """Create a dialogue to save the files."""
+
         def save_ok():
             if not os.path.exists(folder):
                 msg = " ".join(
@@ -260,6 +265,7 @@ class PrepareECF(Prepare):
     """Convert from ECF submission format to Results format."""
 
     def open_submission(self):
+        """Get input directory from dialog and delegate."""
         folder = tkinter.filedialog.askdirectory(
             parent=self.root, initialdir="~"
         )
@@ -270,6 +276,7 @@ class PrepareLeague(Prepare):
     """Convert from League format to Results format."""
 
     def open_submission(self):
+        """Get input directory from dialog and delegate."""
         folder = tkinter.filedialog.askopenfilename(
             parent=self.root, initialdir="~"
         )

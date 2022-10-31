@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database Leagues frame class.
-"""
+"""Results database Leagues frame class."""
 
 import os
 import importlib
@@ -34,7 +33,6 @@ from ...core import configuration
 
 
 class Leagues(leagues_database.Leagues):
-
     """The Results frame for a Results database."""
 
     _tab_ecfeventdetail = "leagues_tab_ecfeventdetail"

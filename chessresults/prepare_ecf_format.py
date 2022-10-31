@@ -2,9 +2,7 @@
 # Copyright 2009 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Prepare ECF submission files for Results input.
-
-"""
+"""Prepare ECF submission files for Results input."""
 
 if __name__ == "__main__":
 

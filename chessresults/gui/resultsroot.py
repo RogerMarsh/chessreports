@@ -2,8 +2,7 @@
 # Copyright 2010 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database application.
-"""
+"""Results database application."""
 
 from solentware_bind.gui.exceptionhandler import ExceptionHandler
 
@@ -21,7 +20,6 @@ ExceptionHandler._application_name = APPLICATION_NAME
 
 
 class Results(chessvalidate.gui.resultsroot.Results):
-
     """Results application."""
 
     def make_tools_menu(self, menubar):

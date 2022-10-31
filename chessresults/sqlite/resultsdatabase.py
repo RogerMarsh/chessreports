@@ -2,8 +2,7 @@
 # Copyright 2011 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database using Sqlite3 database via sqlite3.
-"""
+"""Results database using Sqlite3 database via sqlite3."""
 
 from solentware_base import sqlite3_database
 
@@ -18,7 +17,7 @@ class ResultsDatabase(database.Database, sqlite3_database.Database):
     _knownnames_modulename = "chessresults.basecore.knownnamesds"
 
     def __init__(self, sqlite3file, **kargs):
-
+        """Define database specification and environment then delegate."""
         names = FileSpec(**kargs)
 
         super(ResultsDatabase, self).__init__(names, sqlite3file, **kargs)

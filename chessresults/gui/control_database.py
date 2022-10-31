@@ -23,7 +23,6 @@ from ..core import constants
 
 
 class Control(panel.PlainPanel):
-
     """The Control panel for a Results database."""
 
     _btn_opendatabase = "control_lite_open_database"  # menu button only
@@ -130,7 +129,7 @@ class Control(panel.PlainPanel):
         )
 
     def on_close_database(self, event=None):
-        """Do close database actions"""
+        """Do close database actions."""
         if not self.get_appsys().database_close():
             self.inhibit_context_switch(self._btn_closedatabase)
 

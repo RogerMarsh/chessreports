@@ -2,7 +2,7 @@
 # Copyright 2022 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Chess results database application"""
+"""Chess results database application."""
 
 if __name__ == "__main__":
 

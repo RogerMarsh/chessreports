@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Create widgets that display dates of data from ECF.
-"""
+"""Create widgets that display dates of data from ECF."""
 
 import tkinter
 
@@ -20,7 +19,6 @@ from ...core.ecf.ecfrecord import ECFrefDBrecordECFdate
 
 
 class ECFrefDBrowECFdate(ECFrefDBrecordECFdate, DataRow):
-
     """Display an ECF date record."""
 
     header_specification = [
@@ -73,7 +71,7 @@ class ECFrefDBrowECFdate(ECFrefDBrecordECFdate, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ECFrefDBrowECFdate,).grid_row(textitems=(...), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ECFrefDBrowECFdate instance.
 

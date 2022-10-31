@@ -2,8 +2,10 @@
 # Copyright (c) 2007 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Provide read access to dBaseIII files using the database interface defined
-in the core.database.Database and core.cursor.Cursor classes.
+"""Provide read access to dBaseIII files.
+
+The database interface defined in the core.database.Database and
+core.cursor.Cursor classes is used.
 
 <Reference to code copied to be inserted if ever found again>
 
@@ -52,11 +54,12 @@ _PRESENT = {_DELETED: None, _EXISTS: None}
 
 
 class dBaseapiError(Exception):  # DatabaseError):
+    """Exception class for dbaseapi module."""
+
     pass
 
 
 class dBaseapi:  # (Database):
-
     """Define a dBaseIII database structure.
 
     The database is read only.
@@ -237,12 +240,11 @@ class dBaseapi:  # (Database):
         return srkey
 
     def make_root(self, dd, fname, dptdesc, sfi):
-
+        """Return dBaseapiRoot instance."""
         return dBaseapiRoot(dd, fname, dptdesc, sfi)
 
 
 class dBaseIII:
-
     """Emulate Berkeley DB file and record structure for dBase III files.
 
     The first, last, nearest, next, prior, and Set methods return the
@@ -253,7 +255,7 @@ class dBaseIII:
     """
 
     def __init__(self, filename):
-
+        """Initialise dBaseIII file "filename" in closed state."""
         self._localdata = threading.local()
         self._lock_dBaseIII = threading.Lock()
         self._lock_dBaseIII.acquire()
@@ -264,11 +266,11 @@ class dBaseIII:
             self._lock_dBaseIII.release()
 
     def __del__(self):
-
+        """Close dBaseIII file when instance deleted."""
         self.close()
 
     def close(self):
-
+        """Close dBaseIII file."""
         self._lock_dBaseIII.acquire()
         try:
             try:
@@ -350,7 +352,7 @@ class dBaseIII:
             value = self._next_record()
 
     def open_dbf(self):
-
+        """Open dBaseIII file and extract field names."""
         self._lock_dBaseIII.acquire()
         try:
             try:
@@ -552,7 +554,6 @@ class dBaseIII:
 
 
 class CursordBaseIII:
-
     """Define a dBase III file cursor.
 
     Wrap the dBaseIII methods in corresponding cursor method names.
@@ -560,6 +561,7 @@ class CursordBaseIII:
     """
 
     def __init__(self, dbobject):
+        """Initialise cursor on dBaseIII dbobject."""
         # super().__init__(dbobject)
         super().__init__()
         if isinstance(dbobject, dBaseIII):
@@ -570,11 +572,11 @@ class CursordBaseIII:
             self._current = None
 
     def __del__(self):
-
+        """Close cursor when instance deleted."""
         self.close()
 
     def close(self):
-
+        """Close cursor."""
         self._dbobject = None
         self._current = None
 
@@ -624,7 +626,6 @@ class CursordBaseIII:
 
 
 class _dBaseapiRoot:
-
     """Provide file level access to a dBaseIII file.
 
     This class containing methods to open and close dBase files.
@@ -956,7 +957,6 @@ class _dBaseapiRoot:
 
 
 class dBaseapiRoot(_dBaseapiRoot):
-
     """Provide record level access to a dBaseIII file."""
 
     def __init__(self, dd, fname, dptdesc, sfi):
@@ -1038,7 +1038,6 @@ class dBaseapiRoot(_dBaseapiRoot):
 
 
 class Cursor(CursordBaseIII):  # , cursor.Cursor):
-
     """Define a dBaseIII cursor.
 
     Clearly not finished.  So notes left as found.  Changed just enough to
@@ -1067,7 +1066,7 @@ class Cursor(CursordBaseIII):  # , cursor.Cursor):
         super().__init__(dbobject=dbasedb)
 
     def count_records(self):
-        """return record count or None if cursor is not usable."""
+        """Return record count or None if cursor is not usable."""
         if not self.is_cursor_open():
             return None
         return self.cursor_count()
@@ -1089,7 +1088,7 @@ class Cursor(CursordBaseIII):  # , cursor.Cursor):
         pass
 
     def get_position_of_record(self, record=None):
-        """return position of record in file or 0 (zero)."""
+        """Return position of record in file or 0 (zero)."""
         if record is None:
             return 0
         start = self.first
@@ -1106,7 +1105,7 @@ class Cursor(CursordBaseIII):  # , cursor.Cursor):
         return position
 
     def get_record_at_position(self, position=None):
-        """return record for positionth record in file or None."""
+        """Return record for positionth record in file or None."""
         if position is None:
             return None
         if position < 0:

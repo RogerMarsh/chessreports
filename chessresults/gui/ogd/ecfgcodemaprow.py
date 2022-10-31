@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Create widgets that display player details with Online Grading List data.
-"""
+"""Create widgets to display player details with Online Grading List data."""
 # class names need to be tidied up
 
 import tkinter
@@ -23,7 +22,6 @@ from ...core.ogd import ecfgcodemaprecord
 
 
 class ECFmapOGDrowPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
-
     """Display a player record."""
 
     header_specification = [
@@ -102,7 +100,7 @@ class ECFmapOGDrowPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ECFmapOGDrowPlayer,).grid_row(textitems=(..), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ECFmapOGDrowPlayer instance.
 

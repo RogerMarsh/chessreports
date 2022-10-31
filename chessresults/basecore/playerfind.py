@@ -19,8 +19,7 @@ from ..core.ecf import ecfmaprecord, ecfrecord
 
 
 def find_player_names_in_other_editions_of_event(db, event):
-    """Return list of alias and person records whose name is in other editions
-    of event.
+    """Return alias and person records with name in other editions of event.
 
     The list contains (name, alias record number, person record number) tuples,
     where name includes event and section identifiers to pick a bundle of game

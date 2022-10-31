@@ -2,9 +2,10 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Provide read access to text files compressed by zip using the database
-interface defined in the core.database.Database and core.cursor.Cursor
-classes.
+"""Provide read access to text files compressed by zip.
+
+The database interface defined in the core.database.Database and
+core.cursor.Cursor classes is used.
 
 """
 
@@ -14,7 +15,6 @@ from . import textapi
 
 
 class ZipTextapi(textapi.Textapi):
-
     """Define a textdb database structure for a zip compressed file.
 
     See superclass for description.
@@ -27,7 +27,6 @@ class ZipTextapi(textapi.Textapi):
 
 
 class ZipTextapiRoot(textapi.TextapiRoot):
-
     """Define a zip compressed text file.
 
     See superclass for description.

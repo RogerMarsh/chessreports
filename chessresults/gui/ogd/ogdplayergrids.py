@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Datagrid classes for allocating ECF online grading codes to players.
-"""
+"""Datagrid classes for allocating ECF online grading codes to players."""
 
 import tkinter
 
@@ -16,12 +15,10 @@ from ...core import filespec
 
 
 class ECFOGDPlayerGrid(playergrids.PlayerGrid):
-
     """Base class for grid widgets used on ECF grading code page."""
 
 
 class OGDPersonGrid(ECFOGDPlayerGrid):
-
     """Grid for players linked to ECF grading code on Online Grading Database."""
 
     def __init__(self, **kwargs):
@@ -56,7 +53,6 @@ class OGDPersonGrid(ECFOGDPlayerGrid):
 
 
 class ECFOGDPersonGrid(ECFOGDPlayerGrid):
-
     """Grid for players on Online Grading Database with ECF grading codes."""
 
     def __init__(self, **kwargs):

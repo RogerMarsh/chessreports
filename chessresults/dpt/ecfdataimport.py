@@ -39,7 +39,6 @@ def copy_ecf_players_post_2020_rules(
     widget - the manager object for the ecf data import tab
 
     """
-
     # DPT database engine code to ensure ECFPLAYER_FILE_DEF file is large
     # enough for any extra records.
 
@@ -123,12 +122,11 @@ def copy_ecf_clubs_post_2020_rules(
     datecontrol=None,
     **kwargs
 ):
-    """Import a new ECF club file
+    """Import a new ECF club file.
 
     widget - the manager object for the ecf data import tab
 
     """
-
     # DPT datebase engine code to ensure ECFPLAYER_FILE_DEF file is large
     # enough for any extra records.
 
@@ -212,7 +210,6 @@ def copy_ecf_players_post_2011_rules(
     widget - the manager object for the ecf data import tab
 
     """
-
     # DPT database engine code to ensure ECFPLAYER_FILE_DEF file is large
     # enough for any extra records.
 
@@ -296,12 +293,11 @@ def copy_ecf_clubs_post_2011_rules(
     datecontrol=None,
     **kwargs
 ):
-    """Import a new ECF club file
+    """Import a new ECF club file.
 
     widget - the manager object for the ecf data import tab
 
     """
-
     # DPT datebase engine code to ensure ECFPLAYER_FILE_DEF file is large
     # enough for any extra records.
 

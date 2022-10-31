@@ -38,7 +38,6 @@ from ..core import filespec
 
 
 class TakeonEdit(panel.PlainPanel):
-
     """The Edit panel for raw results data.
 
     This class is no longer derived from SourceEditBase, which held elements
@@ -57,7 +56,7 @@ class TakeonEdit(panel.PlainPanel):
     _btn_report = "takeonedit_report"
 
     def __init__(self, parent=None, cnf=dict(), **kargs):
-        """Extend and define results data input panel for a results database"""
+        """Extend and define data input panel for a results database."""
         super().__init__(parent=parent, cnf=cnf, **kargs)
         self.generated_schedule = []
         self.generated_results = []

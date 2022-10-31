@@ -2,8 +2,10 @@
 # Copyright (c) 2007 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Provide read access to csv files using the database interface defined in the
-core.database.Database and core.cursor.Cursor classes.
+"""Provide read access to csv files.
+
+The database interface defined in the core.database.Database and
+core.cursor.Cursor classes is used.
 
 Adapted from dbaseapi.py adding index access.
 
@@ -22,11 +24,12 @@ from ..core.constants import PRIMARY, SECONDARY, FILE, FOLDER, FIELDS
 
 
 class CSVapiError(DatabaseError):
+    """Exception class for csvapi module."""
+
     pass
 
 
 class CSVapi(Database):
-
     """Define a CSV database structure.
 
     The database is read only.
@@ -201,12 +204,11 @@ class CSVapi(Database):
         return srkey
 
     def make_root(self, dd, fname, dptdesc, sfi):
-
+        """Retun CSVapi instance."""
         return CSVapiRoot(dd, fname, dptdesc, sfi)
 
 
 class CSV:
-
     """Emulate Berkeley DB file and record structure for CSV files.
 
     The first, last, nearest, next, prior, and Set methods return the
@@ -217,16 +219,16 @@ class CSV:
     """
 
     def __init__(self, filename):
-
+        """Initilise for CSV file "filename" in closed state."""
         self.filename = filename
         self._set_closed_state()
 
     def __del__(self):
-
+        """Close CSV file when deleting CSV instance."""
         self.close()
 
     def close(self):
-
+        """Close CSV file."""
         try:
             try:
                 self._table_link.close()
@@ -285,7 +287,7 @@ class CSV:
             value = self._next_record()
 
     def open_csv(self):
-
+        """Extract records from CSV file into a list of dicts."""
         try:
             # use open or bz2 open depending on extension
             if os.path.splitext(self.filename)[-1].lower() == ".bz2":
@@ -425,7 +427,6 @@ class CSV:
 
 
 class CursorCSVfile:
-
     """Define a dBase III file cursor.
 
     Wrap the CSV methods in corresponding cursor method names.
@@ -433,7 +434,7 @@ class CursorCSVfile:
     """
 
     def __init__(self, dbobject):
-
+        """Initialise cursor for dbobject."""
         if isinstance(dbobject, CSV):
             self._dbobject = dbobject
             self._current = -1
@@ -442,11 +443,11 @@ class CursorCSVfile:
             self._current = None
 
     def __del__(self):
-
+        """Delete instance."""
         self.close()
 
     def close(self):
-
+        """Close cursor."""
         self._dbobject = None
         self._current = None
 
@@ -488,7 +489,6 @@ class CursorCSVfile:
 
 
 class _CSVapiRoot:
-
     """Provide file level access to a CSV file.
 
     This class containing methods to open and close dBase files.
@@ -698,7 +698,6 @@ class _CSVapiRoot:
 
 
 class CSVapiRoot(_CSVapiRoot):
-
     """Provide record level access to a CSV file."""
 
     def __init__(self, dd, fname, dptdesc, sfi):
@@ -777,7 +776,6 @@ class CSVapiRoot(_CSVapiRoot):
 
 
 class CursorCSV(CursorCSVfile, cursor.Cursor):
-
     """Define a CSV cursor.
 
     Clearly not finished.  So notes left as found.
@@ -795,7 +793,7 @@ class CursorCSV(CursorCSVfile, cursor.Cursor):
     """
 
     def __init__(self, dbasedb, keyrange=None):
-
+        """Delegate ignoring keyrange."""
         super().__init__(dbobject=dbasedb)
 
     def set_partial_key(self, partial):

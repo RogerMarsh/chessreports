@@ -23,7 +23,6 @@ from ..core import resultsrecord, filespec, mergeplayers
 
 
 class JoinEventPlayers(panel.PanedPanelGridSelector):
-
     """The New Players panel for a Results database."""
 
     _btn_join = "joineventplayers_join"
@@ -50,9 +49,7 @@ class JoinEventPlayers(panel.PanedPanelGridSelector):
         # Do nothing. All buttons shown by default.
 
     def describe_buttons(self):
-        """Define all action buttons that may appear on join event's players
-        page.
-        """
+        """Define action buttons available on join event's players page."""
         super().describe_buttons()
         self.define_button(
             self._btn_join,
@@ -78,7 +75,7 @@ class JoinEventPlayers(panel.PanedPanelGridSelector):
         )
 
     def on_join(self, event=None):
-        """ """
+        """Handle event for merge players by name to prior event editions."""
         msgtitle = "Join Event Players"
         psel = self.joineventplayersgrid.selection
         pbkm = self.joineventplayersgrid.bookmarks

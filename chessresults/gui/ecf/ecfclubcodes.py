@@ -22,7 +22,6 @@ from . import ecfplayergrids, ecfdetail
 
 
 class ECFClubCodes(panel.PanedPanelGridSelectorBar):
-
     """The ECFClubCodes panel for a Results database."""
 
     _btn_affiliate = "ecfclubcodes_affiliate"

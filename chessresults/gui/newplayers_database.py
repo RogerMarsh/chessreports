@@ -28,7 +28,6 @@ from ..core import filespec
 
 
 class NewPlayers(panel.PanedPanelGridSelectorBar):
-
     """The New Players panel for a Results database."""
 
     _btn_merge = "newplayers_merge"

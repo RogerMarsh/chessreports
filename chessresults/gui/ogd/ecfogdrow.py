@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Create widgets that display ECF player details from Online Grading List.
-"""
+"""Create widgets that display ECF player details from Online Grading List."""
 
 import tkinter
 
@@ -20,7 +19,6 @@ from ...core.ogd import ecfogdrecord
 
 
 class ECFrefOGDrowPlayer(ecfogdrecord.ECFrefOGDrecordPlayer, DataRow):
-
     """Display an ECF player record.
 
     Note that this is the subset of fields copied from master file.
@@ -77,7 +75,7 @@ class ECFrefOGDrowPlayer(ecfogdrecord.ECFrefOGDrecordPlayer, DataRow):
         ]
 
     def grid_row(self, **kargs):
-        """Return super(ECFrefOGDrowPlayer,).grid_row(textitems=(..), **kargs).
+        """Return tuple of instructions to create row.
 
         Create textitems argument for ECFrefOGDrowPlayer instance.
 

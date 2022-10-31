@@ -24,7 +24,6 @@ from ..core.ogd import ecfgcodemaprecord
 
 
 class Players(panel.PanedPanelGridSelectorBar):
-
     """The Players panel for a Results database."""
 
     _btn_aliases = "players_aliases"

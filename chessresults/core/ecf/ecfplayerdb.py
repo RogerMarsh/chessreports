@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Classes to open ECF player files and extract records.
-"""
+"""Classes to open ECF player files and extract records."""
 
 import io
 from os.path import split
@@ -34,11 +33,10 @@ _deleteplayer = "D"  # delete a player
 
 
 class ECFplayersDB(dBaseapi):
-
     """Access a player master file published by ECF."""
 
     def __init__(self, DBpath):
-
+        """Define ECF Player File dBaseIII structure."""
         if isinstance(DBpath, io.BytesIO):
             d, f = False, DBpath
         else:
@@ -66,11 +64,10 @@ class ECFplayersDB(dBaseapi):
 
 
 class ECFplayersUpdateDB(dBaseapi):
-
     """Access a player update file published by ECF."""
 
     def __init__(self, DBpath):
-
+        """Define ECF Player File update dBaseIII structure."""
         if isinstance(DBpath, io.BytesIO):
             d, f = False, DBpath
         else:
@@ -99,14 +96,12 @@ class ECFplayersUpdateDB(dBaseapi):
 
 
 class ECFplayersDBkey(KeydBaseIII):
-
     """Player key."""
 
     pass
 
 
 class ECFplayersDBvalue(Value):
-
     """Player data."""
 
     # def load(self, value):
@@ -117,9 +112,8 @@ class ECFplayersDBvalue(Value):
 
 
 class ECFplayersDBrecord(RecorddBaseIII):
-
     """Player record."""
 
     def __init__(self, keyclass=ECFplayersDBkey, valueclass=ECFplayersDBvalue):
-
+        """Customise RecorddBaseIII with ECFplayersDBkey, ECFplayersDBvalue."""
         super(ECFplayersDBrecord, self).__init__(keyclass, valueclass)

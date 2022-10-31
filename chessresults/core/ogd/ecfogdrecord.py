@@ -54,7 +54,7 @@ class ECFrefOGDrecordPlayer(Record):
     def __init__(
         self, keyclass=ECFrefOGDkeyPlayer, valueclass=ECFrefOGDvaluePlayer
     ):
-
+        """Customise Record with ECFrefOGDkeyPlayer, ECFrefOGDvaluePlayer."""
         super(ECFrefOGDrecordPlayer, self).__init__(keyclass, valueclass)
 
 

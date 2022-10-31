@@ -109,7 +109,6 @@ def validate_ecf_ogd_players_post_2006_rules(
 
 def copy_ecf_ogd_players_post_2006_rules(results, logwidget, gcodes):
     """Copy update in gcodes to database using record definition results."""
-
     # Load the ECF data.
     if logwidget:
         logwidget.append_text(

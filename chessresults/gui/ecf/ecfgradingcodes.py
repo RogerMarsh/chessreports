@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database panel for allocating ECF grading codes.
-"""
+"""Results database panel for allocating ECF grading codes."""
 
 import tkinter
 import tkinter.messagebox
@@ -19,7 +18,6 @@ from . import ecfdetail
 
 
 class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
-
     """The ECFGradingCodes panel for a Results database."""
 
     _btn_identify = "ecfgradingcodes_identify"

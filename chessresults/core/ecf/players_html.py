@@ -2,8 +2,7 @@
 # Copyright 2022 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Extract ECF code for ECF membership number from list players request.
-"""
+"""Extract ECF code for ECF membership number from list players request."""
 
 from html.parser import HTMLParser
 import re
@@ -14,15 +13,18 @@ _ecf_membership_number_re = re.compile(r"^\d{6}$")
 
 
 class PlayersHTMLfeedMethodNotCalled(Exception):
+    """Exception raised if feed method has not been called when expected."""
+
     pass
 
 
 class PlayersHTMLTooManyECFCodes(Exception):
+    """Exception raised if more than one ECF code found for a player."""
+
     pass
 
 
 class PlayersHTML(HTMLParser):
-
     """Parse a response to a list players request.
 
     Eyeballing the response suggests the relevant sequence of data items
@@ -38,6 +40,7 @@ class PlayersHTML(HTMLParser):
     """
 
     def __init__(self, ecf_membership_number, *a, **k):
+        """Delegate then initialise player details attributes."""
         super().__init__(*a, **k)
         self._ecf_membership_number = ecf_membership_number
         self._ignore_data = 0
@@ -46,21 +49,30 @@ class PlayersHTML(HTMLParser):
         self._feed_method_called = False
 
     def feed(self, data):
+        """Set method called flag then delegate.
+
+        Callers should check the flag before calling the method.
+
+        """
         self._feed_method_called = True
         super().feed(data)
 
     def handle_starttag(self, tag, attrs):
+        """Override HTMLParser method which does nothing."""
         if tag.strip() in {"script", "style"}:
             self._ignore_data += 1
 
     def handle_endtag(self, tag):
+        """Override HTMLParser method which does nothing."""
         if tag.strip() in {"script", "style"}:
             self._ignore_data -= 1
 
     def handle_startendtag(self, tag, attrs):
+        """Delegate to HTMLParser method."""
         super().handle_startendtag(tag, attrs)
 
     def handle_data(self, tag):
+        """Override HTMLParser method which does nothing."""
         if self._ignore_data:
             return
         ts = tag.strip()
@@ -93,21 +105,27 @@ class PlayersHTML(HTMLParser):
         return
 
     def handle_entityref(self, tag):
+        """Override HTMLParser method which does nothing."""
         pass
 
     def handle_charref(self, tag):
+        """Override HTMLParser method which does nothing."""
         pass
 
     def handle_comment(self, tag):
+        """Override HTMLParser method which does nothing."""
         pass
 
     def handle_decl(self, tag):
+        """Override HTMLParser method which does nothing."""
         pass
 
     def handle_pi(self, tag):
+        """Override HTMLParser method which does nothing."""
         pass
 
     def handle_unknown_decl(self, tag):
+        """Override HTMLParser method which does nothing."""
         pass
 
     def get_ecf_code(self):

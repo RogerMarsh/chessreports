@@ -2,7 +2,13 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Record definition classes for linking players to online ECF grading codes.
+"""Record definition classes for linking players to grading list ECF codes.
+
+The grading list was published online at regular intervals prior to 2020
+when replaced by online rating.
+
+The ECF codes remain in use in the rating system, including ECF codes for
+players who have not played for many years.
 """
 
 from solentware_base.core.record import KeyData
@@ -12,14 +18,12 @@ from .. import filespec
 
 
 class ECFmapOGDkeyPlayer(KeyData):
-
     """Primary key of player."""
 
     pass
 
 
 class ECFmapOGDvaluePlayer(ValueList):
-
     """ECF name and grading code for player in event."""
 
     attributes = dict(
@@ -60,7 +64,7 @@ class ECFmapOGDrecordPlayer(Record):
     def __init__(
         self, keyclass=ECFmapOGDkeyPlayer, valueclass=ECFmapOGDvaluePlayer
     ):
-
+        """Customise Record with ECFmapOGDkeyPlayer, ECFmapOGDvaluePlayer."""
         super(ECFmapOGDrecordPlayer, self).__init__(keyclass, valueclass)
 
 
@@ -101,7 +105,7 @@ def get_person(database, key):
 
 
 def get_person_for_grading_code(database, code):
-    """Return ECFmapOGDrecordPlayer() for code or None"""
+    """Return ECFmapOGDrecordPlayer() for code or None."""
     encoded_record_number = database.encode_record_number(code)
     cursor = database.database_cursor(
         filespec.MAPECFOGDPLAYER_FILE_DEF, filespec.OGDPERSONCODE_FIELD_DEF

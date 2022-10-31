@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Dialogue for updating ECF grading code and ECF version of player's name.
-"""
+"""Dialogue for updating ECF grading code and ECF version of player's name."""
 
 import tkinter
 import tkinter.messagebox
@@ -28,7 +27,6 @@ from ...basecore import ecfdataimport
 
 
 class ECFDetailDialog(ExceptionHandler):
-
     """Dialogue to display locally entered ECF details for player.
 
     Update methods are defined but do not change database.  Subclasses must
@@ -40,7 +38,6 @@ class ECFDetailDialog(ExceptionHandler):
         self, parent, title, header, items, edititems, cnf=dict(), **kargs
     ):
         """Create dialogue to display locally entered ECF detail for player."""
-
         super(ECFDetailDialog, self).__init__()
         self.edit_ctrl = []
         self.yes = False
@@ -163,7 +160,6 @@ class ECFDetailDialog(ExceptionHandler):
 
 
 class ECFClubDialog(ECFDetailDialog):
-
     """Dialogue to amend locally entered ECF club details for player.
 
     A club record must exist on the Central Grading Database before the club
@@ -320,7 +316,6 @@ class ECFClubDialog(ECFDetailDialog):
 
 
 class ECFNameDialog(ECFDetailDialog):
-
     """Dialogue to amend locally entered ECF formatted name for player."""
 
     def __init__(self, parent, record, cnf=dict(), **kargs):
@@ -438,7 +433,6 @@ class ECFNameDialog(ECFDetailDialog):
 
 
 class ECFGradingCodeDialog(ECFDetailDialog):
-
     """Dialogue to amend locally entered ECF grading code for player."""
 
     def __init__(self, parent, record, cnf=dict(), **kargs):
@@ -671,7 +665,6 @@ class ECFGradingCodeDialog(ECFDetailDialog):
 
 
 class ECFDownloadGradingCodeDialog(ECFDetailDialog):
-
     """Dialogue to download ECF grading code for player."""
 
     def __init__(self, parent, database, cnf=dict(), **kargs):
@@ -837,7 +830,6 @@ class ECFDownloadGradingCodeDialog(ECFDetailDialog):
 
 
 class ECFDownloadPlayerNameDialog(ECFDetailDialog):
-
     """Dialogue to download ECF name for player."""
 
     def __init__(self, parent, database, cnf=dict(), **kargs):
@@ -1002,7 +994,6 @@ class ECFDownloadPlayerNameDialog(ECFDetailDialog):
 
 
 class ECFDownloadClubCodeDialog(ECFDetailDialog):
-
     """Dialogue to download ECF club code."""
 
     def __init__(self, parent, database, cnf=dict(), **kargs):

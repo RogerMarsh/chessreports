@@ -2,8 +2,7 @@
 # Copyright 2008 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Extract results from a file in this applications export format.
-"""
+"""Extract results from a file in this applications export format."""
 from chessvalidate.core.gameresults import displayresult
 
 from . import constants
@@ -96,11 +95,10 @@ def get_player_identifier(
 
 
 class ImportReports(object):
-
     """Class for importing results data."""
 
     def __init__(self, textlines):
-
+        """Initialise for import report of results in textlines."""
         super(ImportReports, self).__init__()
         self.textlines = textlines
         self.game = dict()
@@ -183,7 +181,7 @@ class ImportReports(object):
             return True
 
         def get_event_identifier():
-            """Return event identifier from data details"""
+            """Return event identifier from data details."""
             return (
                 data[constants._event],
                 data[constants._startdate],
@@ -191,7 +189,7 @@ class ImportReports(object):
             )
 
         def get_player_key(player):
-            """Return player key from data details for import name matching
+            """Return player key from data details for import name matching.
 
             The names placed on the export file for matching names between
             two databases use section and pin for all qualifiers of player
@@ -208,7 +206,7 @@ class ImportReports(object):
             )
 
         def get_section_identifier():
-            """Return event identifier from data details"""
+            """Return event identifier from data details."""
             return (
                 data[constants._event],
                 data[constants._startdate],
@@ -683,8 +681,7 @@ class ImportReports(object):
 
 
 def get_import_event_reports(data):
-    """Convenience function to generate ImportReports instance."""
-
+    """Return an ImportReports instance for data."""
     importdata = ImportReports(data)
     if importdata.translate_results_format():
         return importdata

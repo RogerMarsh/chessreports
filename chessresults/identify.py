@@ -2,9 +2,7 @@
 # Copyright 2009 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Identify players sent to remote database who are reported as new players.
-
-"""
+"""Identify players sent to remote database who are reported as new players."""
 
 if __name__ == "__main__":
 
