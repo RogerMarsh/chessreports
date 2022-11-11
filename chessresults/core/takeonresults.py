@@ -61,7 +61,7 @@ class TakeonResults(object):
                 keymap[key](data, key, value)
 
         if len(data):
-            if isinstance(tidyup, collections.Callable):
+            if isinstance(tidyup, collections.abc.Callable):
                 tidyup(data)
 
         return True

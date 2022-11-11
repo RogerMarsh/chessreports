@@ -328,7 +328,7 @@ class ConvertResults(object):
         if context is None:
             context = dict()
         for c in context:
-            if not isinstance(context[c], collections.Callable):
+            if not isinstance(context[c], collections.abc.Callable):
                 context[c] = null
         if keymap is None:
             keymap = dict()

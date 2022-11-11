@@ -45,7 +45,7 @@ class TakeonReport(convertresults.ConvertResults):
                 keymap[key](data, key, value, schedule.match_names)
 
         if len(data):
-            if isinstance(tidyup, collections.Callable):
+            if isinstance(tidyup, collections.abc.Callable):
                 tidyup(data, schedule.match_names)
 
         for smn in schedule.match_names:

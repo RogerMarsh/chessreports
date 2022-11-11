@@ -86,7 +86,7 @@ class PrepareResults(object):
         if context is None:
             context = dict()
         for c in context:
-            if not isinstance(context[c], collections.Callable):
+            if not isinstance(context[c], collections.abc.Callable):
                 if context[c] is True:
                     context[c] = copy_text_extend
                 else:

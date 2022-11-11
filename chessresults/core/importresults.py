@@ -71,7 +71,7 @@ class ImportResults(object):
         if context is None:
             context = dict()
         for c in context:
-            if not isinstance(context[c], collections.Callable):
+            if not isinstance(context[c], collections.abc.Callable):
                 context[c] = null
         if items is None:
             items = dict()
