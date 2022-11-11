@@ -869,6 +869,11 @@ class Leagues(leagues_validate.Leagues):
         self._database_close()
         self.database = None
 
+    @staticmethod
+    def document_edit(**kargs):
+        """Return sourceedit.SourceEdit class instance."""
+        return sourceedit.SourceEdit(**kargs)
+
     def _takeon_open(self, eventseason, title=" "):
         """Open results data take on source documents."""
         title = "".join(("Open", title, "Documents"))
