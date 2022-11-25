@@ -850,7 +850,6 @@ class Leagues(leagues_validate.Leagues):
         ro = self._takeon_open(TakeonSeason)
         if ro:
             self.set_error_file()
-            self.results_folder_generic = self.results_folder
             self.set_takeon_edit_context()
             return True
 
