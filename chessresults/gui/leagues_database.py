@@ -153,7 +153,7 @@ class Leagues(leagues_validate.Leagues):
             ),
             underline=-1,
             tabclass=lambda **k: takeonedit.TakeonEdit(**k),
-            destroy_actions=(takeonedit.TakeonEdit._btn_closedata,),
+            destroy_actions=(takeonedit.TakeonEdit.btn_closedata,),
         )
         self.define_tab(
             self._tab_newplayers,
@@ -259,15 +259,15 @@ class Leagues(leagues_validate.Leagues):
                 ): [self._state_takeonopen_dbopen, self._tab_takeonedit],
                 (
                     self._state_dataopen_dbopen,
-                    sourceedit.SourceEdit._btn_closedata,
+                    sourceedit.SourceEdit.btn_closedata,
                 ): [self._state_dbopen, self._tab_events],
                 (
                     self._state_takeonopen,
-                    takeonedit.TakeonEdit._btn_closedata,
+                    takeonedit.TakeonEdit.btn_closedata,
                 ): [self._state_dbclosed, None],
                 (
                     self._state_takeonopen_dbopen,
-                    takeonedit.TakeonEdit._btn_closedata,
+                    takeonedit.TakeonEdit.btn_closedata,
                 ): [self._state_dbopen, self._tab_events],
                 (
                     self._state_dbopen,
@@ -812,14 +812,14 @@ class Leagues(leagues_validate.Leagues):
             ),
             title="Close",
         ):
-            self.close_season()
+            self.close_event_edition_results()
             if self.get_state() in (
                 self._state_takeonopen_dbopen,
                 self._state_takeonopen,
             ):
-                self.switch_context(takeonedit.TakeonEdit._btn_closedata)
+                self.switch_context(takeonedit.TakeonEdit.btn_closedata)
             else:
-                self.switch_context(sourceedit.SourceEdit._btn_closedata)
+                self.switch_context(sourceedit.SourceEdit.btn_closedata)
             self.set_error_file_on_close_source()
 
     def set_takeon_edit_context(self):
@@ -841,8 +841,8 @@ class Leagues(leagues_validate.Leagues):
             ),
             title="Close",
         ):
-            self.close_season()
-            self.switch_context(sourceedit.SourceEdit._btn_closedata)
+            self.close_event_edition_results()
+            self.switch_context(sourceedit.SourceEdit.btn_closedata)
             self.set_error_file_on_close_source()
 
     def takeon_open(self):

@@ -48,7 +48,7 @@ class TakeonEdit(panel.PlainPanel):
     """
 
     _btn_generate = "takeonedit_generate"
-    _btn_closedata = "takeonedit_close"
+    btn_closedata = "takeonedit_close"
     _btn_save = "takeonedit_save"
     _btn_toggle_compare = "takeonedit_toggle_compare"
     _btn_toggle_generate = "takeonedit_toggle_generate"
@@ -476,7 +476,7 @@ class TakeonEdit(panel.PlainPanel):
             command=self.on_update,
         )
         self.define_button(
-            self._btn_closedata,
+            self.btn_closedata,
             text="Close",
             tooltip="Close the folder containing data.",
             underline=0,
@@ -487,7 +487,7 @@ class TakeonEdit(panel.PlainPanel):
     def on_close_data(self, event=None):
         """Close source document."""
         self.close_data_folder()
-        self.inhibit_context_switch(self._btn_closedata)
+        self.inhibit_context_switch(self.btn_closedata)
 
     def on_generate(self, event=None):
         """Validate source document."""
@@ -540,7 +540,7 @@ class TakeonEdit(panel.PlainPanel):
         """Show buttons for actions allowed comparing input data versions."""
         self.hide_panel_buttons()
         self.show_panel_buttons(
-            (self._btn_toggle_generate, self._btn_closedata, self._btn_save)
+            (self._btn_toggle_generate, self.btn_closedata, self._btn_save)
         )
 
     def show_buttons_for_generate(self):
@@ -550,7 +550,7 @@ class TakeonEdit(panel.PlainPanel):
             (
                 self._btn_generate,
                 self._btn_toggle_compare,
-                self._btn_closedata,
+                self.btn_closedata,
                 self._btn_save,
             )
         )
@@ -562,7 +562,7 @@ class TakeonEdit(panel.PlainPanel):
             (
                 self._btn_generate,
                 self._btn_toggle_compare,
-                self._btn_closedata,
+                self.btn_closedata,
                 self._btn_save,
                 self._btn_report,
                 self._btn_update,
