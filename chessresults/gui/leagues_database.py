@@ -806,7 +806,7 @@ class Leagues(leagues_validate.Leagues):
             message="".join(
                 (
                     "Close\n",
-                    self.results_folder,
+                    self._results_folder,
                     "\nfolder containing results data",
                 )
             ),
@@ -835,7 +835,7 @@ class Leagues(leagues_validate.Leagues):
             message="".join(
                 (
                     "Close\n",
-                    self.results_folder,
+                    self._results_folder,
                     "\nfolder containing results data",
                 )
             ),
@@ -894,7 +894,7 @@ class Leagues(leagues_validate.Leagues):
                 message="".join(
                     (
                         "Close the source documents in\n",
-                        self.results_folder,
+                        self._results_folder,
                         "\nfirst.",
                     )
                 ),
@@ -902,23 +902,23 @@ class Leagues(leagues_validate.Leagues):
             )
             return
 
-        if self.results_folder is None:
+        if self._results_folder is None:
             initdir = "~"
         else:
-            initdir = self.results_folder
-        results_folder = tkinter.filedialog.askdirectory(
+            initdir = self._results_folder
+        _results_folder = tkinter.filedialog.askdirectory(
             parent=self.get_widget(),
             title=" ".join((title, "folder")),
             initialdir=initdir,
         )
-        if results_folder:
-            results_data = eventseason(results_folder)
-            if not os.path.exists(results_folder):
+        if _results_folder:
+            results_data = eventseason(_results_folder)
+            if not os.path.exists(_results_folder):
                 if not tkinter.messagebox.askyesno(
                     parent=self.get_widget(),
                     message="".join(
                         (
-                            results_folder,
+                            _results_folder,
                             "\ndoes not exist.",
                             "\nConfirm that a folder is to be created ",
                             "containing new empty documents.",
@@ -928,19 +928,19 @@ class Leagues(leagues_validate.Leagues):
                 ):
                     return
                 try:
-                    os.makedirs(results_folder)
+                    os.makedirs(_results_folder)
                 except OSError:
                     dlg = tkinter.messagebox.showinfo(
                         parent=self.get_widget(),
                         message=" ".join(
-                            (results_folder, "\ncould not be created.")
+                            (_results_folder, "\ncould not be created.")
                         ),
                         title=title,
                     )
                     return
             if results_data.open_documents(self.get_widget()):
                 self.results_data = results_data
-                self.results_folder = results_folder
+                self._results_folder = _results_folder
                 return True
 
     def set_error_file(self):
@@ -980,7 +980,7 @@ class Leagues(leagues_validate.Leagues):
             Leagues.set_error_file_name(None)
         else:
             Leagues.set_error_file_name(
-                os.path.join(self.results_folder, ERROR_LOG)
+                os.path.join(self._results_folder, ERROR_LOG)
             )
 
     # It is not clear why both this method, and the direct imports to
