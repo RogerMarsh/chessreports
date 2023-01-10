@@ -67,7 +67,10 @@ class TakeonSeason(object):
         self.fixturesfile = None
         self.results = None
         self.resultsfile = None
-        self._fixtures = None
+        # _fistures attribute renamed fixture_schedule to resolve pylint
+        # protected-access report.  Cannot rename as fixtures because that
+        # is already taken (and used see chessvalidate's season module too)..
+        self.fixture_schedule = None
         self._collation = None
         self.takeonfiles = []
 
@@ -167,7 +170,7 @@ class TakeonSeason(object):
                 results = TakeonSubmission()
             results.build_results(
                 textlines,
-                self._fixtures,
+                self.fixture_schedule,
                 os.path.splitext(os.path.basename(self.folder))[0],
             )
             # The next two lines are a relic of the two steps being done in
@@ -177,7 +180,7 @@ class TakeonSeason(object):
             exportgames = results.export_games(pins=True)
             importdata = get_import_event_results(exportgames, "")
             self._collation = TakeonCollation(
-                results, self._fixtures, importdata
+                results, self.fixture_schedule, importdata
             )
             # Following is a poor comment but it suggests I think PDLCollation
             # has the inferior way of doing this.
@@ -310,7 +313,7 @@ class TakeonSeason(object):
         """Update the Schedule object getfixtures from newfixtures text lines."""
         oldfixtures = list(difflib.restore(self.fixtures, 1))
         self.fixtures = list(difflib.ndiff(oldfixtures, newfixtures))
-        self._fixtures = None
+        self.fixture_schedule = None
         self.get_schedule_from_file(TakeonSchedule)
 
     # Copied methods from here on (rescued from original season.py)
@@ -361,7 +364,7 @@ class TakeonSeason(object):
         self.fixturesfile = None
         self.results = None
         self.resultsfile = None
-        self._fixtures = None
+        self.fixture_schedule = None
         self._collation = None
 
     def datafiles_exist(self):
@@ -486,7 +489,7 @@ class TakeonSeason(object):
         getfixtures - the Schedule class or a subclass
 
         """
-        if self._fixtures == None:
+        if self.fixture_schedule == None:
             f = list(difflib.restore(self.fixtures, 2))
-            self._fixtures = getfixtures()
-            self._fixtures.build_schedule(f)
+            self.fixture_schedule = getfixtures()
+            self.fixture_schedule.build_schedule(f)

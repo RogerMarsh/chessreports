@@ -82,11 +82,11 @@ class TakeonEdit(panel.PlainPanel):
             orient=tkinter.HORIZONTAL,
         )
         self.toppane.pack(side=tkinter.TOP, expand=True, fill=tkinter.BOTH)
-        self.show_edits_and_generated()
+        self._show_edits_and_generated()
         self.editschedctrl.edit_modified(tkinter.FALSE)
         self.editresctrl.edit_modified(tkinter.FALSE)
 
-    def generate_event_report(self):
+    def _generate_event_report(self):
         """Generate report on data input and return True if data is ok.
 
         Data can be ok and still be wrong.  ok means merely that the data
@@ -96,9 +96,11 @@ class TakeonEdit(panel.PlainPanel):
         """
         data = self.get_context().results_data
         self.get_schedule(data)
-        self.report_fixtures(data)
+        self._report_fixtures(data)
         self.get_results(data)
-        if not len(data.collation.error) and not len(data._fixtures.error):
+        if not len(data.collation.error) and not len(
+            data.fixture_schedule.error
+        ):
             report = data.collation.reports.report_games()
             for w, r in zip(
                 (self.generated_schedule, self.generated_results), report
@@ -115,14 +117,14 @@ class TakeonEdit(panel.PlainPanel):
         self.resultsctrl.insert(tkinter.END, "\n".join(self.generated_results))
         return not len(data.collation.error)
 
-    def report_fixtures(self, data):
+    def _report_fixtures(self, data):
         """Append fixtures to event schedule report."""
-        fixdata = data._fixtures
+        fixdata = data.fixture_schedule
         if len(fixdata.error):
             return
         #
         # Fixtures report is part of results report in TakeonEdit class.
-        # Commented code below is minimum that a normal report_fixtures
+        # Commented code below is minimum that a normal _report_fixtures
         # method would do.
         #
         # genfix = self.generated_schedule
@@ -188,7 +190,7 @@ class TakeonEdit(panel.PlainPanel):
 
     # Copied methods from here on
 
-    def show_edits_and_generated(self):
+    def _show_edits_and_generated(self):
         """Display widgets showing current data and generated reports."""
         self._hide_panes()
         if self.editpane is None:
@@ -248,7 +250,7 @@ class TakeonEdit(panel.PlainPanel):
         )
         self.resultsctrl.insert(tkinter.END, "\n".join(self.generated_results))
 
-    def show_originals_and_edits(self):
+    def _show_originals_and_edits(self):
         """Display widgets comparing database and edited versions of data."""
         self._hide_panes()
         if self.editpane is None:
@@ -327,7 +329,7 @@ class TakeonEdit(panel.PlainPanel):
         data.extract_schedule(
             self.editschedctrl.get("1.0", tkinter.END).splitlines()
         )
-        fixdata = data._fixtures
+        fixdata = data.fixture_schedule
         genfix = self.generated_schedule
         del genfix[:]
         if len(fixdata.error):
@@ -491,13 +493,13 @@ class TakeonEdit(panel.PlainPanel):
 
     def on_generate(self, event=None):
         """Validate source document."""
-        if self.generate_event_report():
+        if self._generate_event_report():
             self.show_buttons_for_update()
             self.create_buttons()
 
     def on_report(self, event=None):
         """Save validation report."""
-        self.save_reports()
+        self._save_reports()
 
     def on_save(self, event=None):
         """Save source document."""
@@ -505,15 +507,15 @@ class TakeonEdit(panel.PlainPanel):
 
     def on_toggle_compare(self, event=None):
         """Display original source document alongside edited source document."""
-        self.show_buttons_for_compare()
+        self._show_buttons_for_compare()
         self.create_buttons()
-        self.show_originals_and_edits()
+        self._show_originals_and_edits()
 
     def on_toggle_generate(self, event=None):
         """Display edited source document alongside validation report widgets."""
         self.show_buttons_for_generate()
         self.create_buttons()
-        self.show_edits_and_generated()
+        self._show_edits_and_generated()
 
     def on_update(self, event=None):
         """Update database from validated source document."""
@@ -536,7 +538,7 @@ class TakeonEdit(panel.PlainPanel):
             self.show_buttons_for_generate()
             self.create_buttons()
 
-    def show_buttons_for_compare(self):
+    def _show_buttons_for_compare(self):
         """Show buttons for actions allowed comparing input data versions."""
         self.hide_panel_buttons()
         self.show_panel_buttons(
@@ -569,7 +571,7 @@ class TakeonEdit(panel.PlainPanel):
             )
         )
 
-    def save_reports(self):
+    def _save_reports(self):
         """Show save data report file dialogue and return True if saved."""
         reports = os.path.join(self.get_context().results_folder, "Reports")
         if not tkinter.messagebox.askyesno(

@@ -23,6 +23,7 @@ class Configuration(configuration.Configuration):
         (constants.RECENT_DATABASE, "~"),
         (constants.RECENT_EMAIL_SELECTION, "~"),
         (constants.RECENT_EMAIL_EXTRACTION, "~"),
+        (constants.RECENT_CSV_DOWNLOAD, "~"),
         (constants.RECENT_DOCUMENT, "~"),
         (constants.RECENT_SUBMISSION, "~"),
         (constants.RECENT_SOURCE_SUBMISSION, "~"),
