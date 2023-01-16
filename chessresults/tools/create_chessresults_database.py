@@ -34,6 +34,10 @@ try:
 except ImportError:  # Not ModuleNotFoundError for Pythons earlier than 3.6
     chessberkeleydb = None
 try:
+    from ..db_tkinter import resultsdatabase as chessdbtkinter
+except ImportError:  # Not ModuleNotFoundError for Pythons earlier than 3.6
+    chessdbtkinter = None
+try:
     from ..dpt import resultsdatabase as chessdpt
 except ImportError:  # Not ModuleNotFoundError for Pythons earlier than 3.6
     chessdpt = None
@@ -72,6 +76,10 @@ class CreateChessResultsDatabase(create_database.CreateDatabase):
             engines[
                 chessberkeleydb.berkeleydb_database.berkeleydb
             ] = chessberkeleydb.ResultsDatabase
+        if chessdbtkinter:
+            engines[
+                chessdbtkinter.db_tkinter_database.db_tcl
+            ] = chessdbtkinter.ResultsDatabase
         if chessdpt:
             engines[
                 chessdpt.dpt_database._dpt.dptapi
