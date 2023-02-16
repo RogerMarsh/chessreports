@@ -158,13 +158,21 @@ class RatedPlayers(logpanel.WidgetAndLogPanel):
                 len(self.all_players[constants.P_R_COLUMN_NAMES]) - 1,
             )
         )
+        expected_p_length = set(constants.PLAYERS_RATINGS_COLUMN_COUNTS)
+        for p in self.all_players[constants.P_R_PLAYERS]:
+            if not isinstance(p, list):
+                continue
+            if len(p) not in expected_p_length:
+                expected_p_length.clear()
+            else:
+                expected_p_length.intersection_update({len(p)})
+            break
         errors = 0
-        expected_p_length = len(constants.PLAYERS_RATINGS_COLUMN_NAMES)
         for p in self.all_players[constants.P_R_PLAYERS]:
             if not isinstance(p, list):
                 errors += 1
                 continue
-            if len(p) != expected_p_length:
+            if len(p) not in expected_p_length:
                 errors += 1
                 continue
             row = []

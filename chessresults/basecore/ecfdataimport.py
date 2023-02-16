@@ -820,7 +820,12 @@ def copy_ecf_clubs_post_2011_rules(
 
 
 def copy_single_ecf_club_post_2020_rules(results, ecfdata=None, **kwargs):
-    """Copy downloaded club record in ecfdata to database."""
+    """Copy downloaded club record in ecfdata to database.
+
+    The club is marked active so it will appear on the Player ECF Detail
+    list.
+
+    """
     keybyteify = results._keybyteify
 
     # The _strify method of the Database instance is not needed because the
@@ -848,14 +853,14 @@ def copy_single_ecf_club_post_2020_rules(results, ecfdata=None, **kwargs):
         if record == None:
             ecfrec.key.recno = None
             ecfrec.value.ECFcode = club_code
-            ecfrec.value.ECFactive = False
+            ecfrec.value.ECFactive = True
             ecfrec.value.ECFname = club_name
             ecfrec.value.ECFcountycode = assoc_code
             ecfrec.put_record(results, filespec.ECFCLUB_FILE_DEF)
         elif record[0] != club_code:
             ecfrec.key.recno = None
             ecfrec.value.ECFcode = club_code
-            ecfrec.value.ECFactive = False
+            ecfrec.value.ECFactive = True
             ecfrec.value.ECFname = club_name
             ecfrec.value.ECFcountycode = assoc_code
             ecfrec.put_record(results, filespec.ECFCLUB_FILE_DEF)
@@ -867,7 +872,7 @@ def copy_single_ecf_club_post_2020_rules(results, ecfdata=None, **kwargs):
                 record,
             )
             ecfnew = ecfrec.clone()
-            ecfnew.value.ECFactive = False
+            ecfnew.value.ECFactive = True
             ecfnew.value.ECFname = club_name
             ecfnew.value.ECFcountycode = assoc_code
             ecfrec.edit_record(
@@ -884,7 +889,12 @@ def copy_single_ecf_club_post_2020_rules(results, ecfdata=None, **kwargs):
 
 
 def copy_single_ecf_players_post_2020_rules(results, ecfdata=None, **kwargs):
-    """Copy downloaded player record in ecfdata to database."""
+    """Copy downloaded player record in ecfdata to database.
+
+    The player is marked inactive so the nominal club is not displayed in
+    the list of clubs 'played-for'.
+
+    """
     keybyteify = results._keybyteify
 
     # The _strify method of the Database instance is not needed because the

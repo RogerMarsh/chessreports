@@ -200,9 +200,8 @@ class Control(control_database.Control):
         name_title = name.title()
         title = " ".join(("Get", name_title))
         dlg = ecfdownload.ECFDownloadDialogue(
-            self.appsys,
-            title,
-            text=name,
+            parent=self.appsys,
+            text=title,
             scroll=False,
             height=7,
             width=60,
@@ -332,15 +331,27 @@ class Control(control_database.Control):
                 return
 
     def _ecf_players_structure(self, data):
-        """Validate json player data structure."""
+        """Validate json player data structure.
+
+        The set of column names changed once, I think, when the blitz
+        categories promised were added.
+
+        """
         if set(data.keys()) == constants.PLAYERS_RATINGS_KEYS:
-            if (
-                tuple(data[constants.P_R_COLUMN_NAMES])
-                == constants.PLAYERS_RATINGS_COLUMN_NAMES
+            column_names = tuple(data[constants.P_R_COLUMN_NAMES])
+            for prcn in (
+                constants.PLAYERS_RATINGS_COLUMN_NAMES_2022_10,
+                constants.PLAYERS_RATINGS_COLUMN_NAMES_ORIGINAL,
             ):
-                return data
+                if column_names == prcn:
+                    return data
         raise RuntimeError(
-            "Downloaded data not in expected format for rated players"
+            "".join(
+                (
+                    "Downloaded data not in expected format for rated ",
+                    "players.\n\nHas the format been changed?",
+                )
+            )
         )
 
     def _ecf_clubs_structure(self, data):
@@ -348,7 +359,12 @@ class Control(control_database.Control):
         if set(data.keys()) == constants.ACTIVE_CLUBS_KEYS:
             return data
         raise RuntimeError(
-            "Downloaded data not in expected format for active clubs"
+            "".join(
+                (
+                    "Downloaded data not in expected format for active clubs.",
+                    "\n\nHas the format been changed?",
+                )
+            )
         )
 
     def on_ecf_players_download(self, event=None):

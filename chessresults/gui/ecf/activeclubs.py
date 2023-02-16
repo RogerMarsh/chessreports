@@ -135,7 +135,17 @@ class ActiveClubs(logpanel.WidgetAndLogPanel):
         header.grid(row=0, sticky=tkinter.NSEW)
         fbf.grid(row=1, sticky=tkinter.NSEW)
         errors = 0
-        expected_c_set = set(constants.ACTIVE_CLUBS_ROW_KEY_NAMES)
+        expected_c_set = {
+            frozenset(t) for t in constants.ACTIVE_CLUBS_ROW_KEY_TUPLES
+        }
+        for c in self.active_clubs[constants.A_C_CLUBS]:
+            if not isinstance(c, dict):
+                continue
+            if set(c) not in expected_c_set:
+                expected_c_set.clear()
+            else:
+                expected_c_set = set(c)
+            break
         for c in self.active_clubs[constants.A_C_CLUBS]:
             if not isinstance(c, dict):
                 errors += 1

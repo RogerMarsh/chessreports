@@ -22,7 +22,7 @@ class ECFDownloadDialogue(ModalDialogueGo):
 
     """
 
-    def __init__(self, parent=None, text="data", scroll=False, **kargs):
+    def __init__(self, text="data", scroll=False, **kargs):
         """Create ECF download dialogue."""
         text = "".join(
             (
@@ -34,7 +34,7 @@ class ECFDownloadDialogue(ModalDialogueGo):
             )
         )
         buttons = (DOWNLOAD, EXTRACT, CANCEL)
-        super().__init__(*args, text=text, buttons=buttons, **kargs)
+        super().__init__(text=text, buttons=buttons, **kargs)
 
 
 # Probably best to delete all this, or at least move it to a tests or
