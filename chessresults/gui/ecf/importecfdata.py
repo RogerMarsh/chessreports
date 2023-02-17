@@ -17,8 +17,6 @@ from solentware_grid.core.dataclient import DataSource
 from solentware_misc.core import utilities
 from solentware_misc.gui import logpanel, tasklog
 
-from solentware_bind.gui import exceptionhandler
-
 from ...core import filespec
 from ...minorbases.dbaseapi import dBaseapiError
 from ..minorbases.dbasedatarow import dBaseDataRow, dBaseDataHeader
@@ -67,13 +65,11 @@ class ImportECFData(logpanel.WidgetAndLogPanel):
             # The popup is used to show all navigation available from grid: but
             # this is not done in results, at least yet, so avoid the temporary
             # loss of focus to an empty popup menu.
-            class ECFimportgrid(
-                exceptionhandler.ExceptionHandler, DataGridReadOnly
-            ):
+            class ECFimportgrid(DataGridReadOnly):
                 def show_popup_menu_no_row(self, event=None):
                     pass
 
-            self.datagrid = ECFimportgrid(master)
+            self.datagrid = ECFimportgrid()
             try:
                 self.datagrid.set_data_source(
                     DataSource(newrow=dBaseDataRow, *datafilespec)
