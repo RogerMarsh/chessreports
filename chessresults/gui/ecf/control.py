@@ -406,6 +406,48 @@ class Control(control_database.Control):
         if dbspec is None:
             self.inhibit_context_switch(self._btn_copyecfmasterplayer)
             return
+        # The sequence of button clicks, Administration | ECF Master File |
+        # Show Master File | Cancel Import | Club Codes, in the absence of
+        # the following 'if' block causes a TypeError exception:
+        # 'object.__init__() takes exactly one argument (the instance to
+        # initialize)'.
+        # Adding a 'Close File List' button click before 'Club Codes'
+        # prevented the exception without the 'if' block.
+        # Doing the copy by adding 'Start Import ...' before 'Cancel Import'
+        # makes no difference: it just takes longer to get to the exception
+        # (or not) when comparing cases.
+        # Trace print() statements showed two on_copy_ecf_master_player()
+        # calls when 'Show Master File' was clicked: the first with a
+        # Button event and the second with None as the event.
+        # Replacing 'Show Master File' by 'Show Master Club File' causes
+        # a single on_copy_ecf_master_club() call with a Button event and
+        # no exception, both with and without the 'if' block.
+        # No application code differences between the two cases seemed
+        # suspicious.
+        # Swapping on_copy_ecf_master_player() and on_copy_ecf_master_club()
+        # in the command argument of the relevant define_button() calls, in
+        # this module, moves the exception to the button click path with
+        # the on_copy_ecf_master_player() call.
+        # Swapping the _get_memory_dBaseIII_from_zipfile(...) calls in the
+        # on_copy_ecf_master_player() and on_copy_ecf_master_club() methods
+        # causes an exception at the 'Show Master File' stage.
+        # This is avoided by commenting lines 177 and 178 in module
+        # solentware_misc.gui.logpanel:
+        #        #if callable(maketaskwidget):
+        #        #    paned_w.add(maketaskwidget(paned_w))
+        # after which swapping the _get_memory_dBaseIII_from_zipfile(...)
+        # calls in on_copy_ecf_master_player() and on_copy_ecf_master_club()
+        # does cause the 'TyeError: object__init__() ...' exception to follow
+        # the _get_memory_dBaseIII_from_zipfile(ecfplayerdb.ECFplayersDB)
+        # call.
+        # ecfplayerdb.ECFplayersDB and ecfclubdb.ECFclubsDB, eventually
+        # called to process the files, differ in the values of the arguments
+        # passed to their shared superclass.  The expectation is either both
+        # fail or both work: not one always works and one fails in a limited
+        # circumstance.
+        if event is None:
+            self.inhibit_context_switch(self._btn_copyecfmasterplayer)
+            return
         self.get_appsys().set_kwargs_for_next_tabclass_call(
             dict(
                 datafilespec=(
