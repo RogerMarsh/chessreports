@@ -615,6 +615,7 @@ class ECFEvents(panel.PanelGridSelector):
         # codes are present.
         # club_code is added to the decoration in sorted_submit_players so that
         # duplicate entries can be ignored later.
+        zero_not_0 = constants.ECF_ZERO_NOT_0
         pin_to_ecf_code = dict()
         ecf_code_to_pin = dict()
         for pk, pv in submit_players.items():
@@ -634,7 +635,8 @@ class ECFEvents(panel.PanelGridSelector):
                 club_code = None
             if ssp_code:
                 pin_to_ecf_code[pk] = ecf_code_to_pin.setdefault(
-                    (ssp_code, club_code), str(pk)
+                    (ssp_code, club_code),
+                    str(pk) if pk else zero_not_0,
                 )
             sorted_submit_players.append(
                 (
