@@ -525,8 +525,12 @@ class FeedbackMonthly(panel.PlainPanel):
                 ecfmapcursor.close()
 
         if newecfcodes:
+            zero_not_0 = constants.ECF_ZERO_NOT_0
             for spin, newcode in newecfcodes:
-                person = self._get_ecfmaprecord_for_new_person(database, spin)
+                person = self._get_ecfmaprecord_for_new_person(
+                    database,
+                    int(spin) if spin != zero_not_0 else 0,
+                )
                 if person is None:
                     self.insert_text_applyctrl(
                         "".join(
@@ -563,6 +567,7 @@ class FeedbackMonthly(panel.PlainPanel):
 
         if mergeecfcodes:
             for spin, usedcode, mergecode in mergeecfcodes:
+                del spin
                 ecfplayer = ecfrecord.get_ecf_player_for_grading_code(
                     database, usedcode
                 )
@@ -662,6 +667,14 @@ class FeedbackMonthly(panel.PlainPanel):
 
     def on_apply_feedback(self, event=None):
         """Run apply_new_grading_codes in separate thread."""
+        # Workaround same, or at least apparently similar, problem described
+        # in .control.Control.on_copy_ecf_master_player() method.  Only things
+        # to add here are commenting the 'self.tasklog.run_method(...)' call
+        # does not make the problem go away; and the on_cancel_apply_feedback
+        # method becomes affected if the 'switchpanel=True' argument in it's
+        # 'define_button' statement is commented.
+        if event is None:
+            return
         if not self.allowapplycodes:
             tkinter.messagebox.showinfo(
                 title="Apply Feedback", message="Feedback not applied"

@@ -210,9 +210,13 @@ class Feedback(panel.PlainPanel):
             )
 
         def update_player_club():
-            player = self._get_ecfmaprecord_for_player(
-                database, int(fbplayer[constants.PIN])
-            )
+            try:
+                fbplayerpin = int(fbplayer[constants.PIN])
+            except ValueError as exc:
+                if fbplayer[constants.PIN] != constants.ECF_ZERO_NOT_0:
+                    raise ValueError from exc
+                fbplayerpin = 0
+            player = self._get_ecfmaprecord_for_player(database, fbplayerpin)
             if player:
                 playerclone = player.clone()
                 playerclone.value.clubecfname = None
@@ -241,9 +245,15 @@ class Feedback(panel.PlainPanel):
         database = self.get_appsys().get_results_database()
         database.start_transaction()
         for fbplayer in self.newcodesapply:
+            try:
+                fbplayerpin = int(fbplayer[constants.PIN])
+            except ValueError as exc:
+                if fbplayer[constants.PIN] != constants.ECF_ZERO_NOT_0:
+                    raise ValueError from exc
+                fbplayerpin = 0
             if fbplayer[pinline]:
                 person = self._get_ecfmaprecord_for_new_person(
-                    database, int(fbplayer[constants.PIN])
+                    database, fbplayerpin
                 )
                 if person:
                     ecfgcode = fbplayer[newcodeline]
@@ -272,7 +282,7 @@ class Feedback(panel.PlainPanel):
                 else:
                     callup = update_ecf_player()
                 person = self._get_ecfmaprecord_for_person(
-                    database, int(fbplayer[constants.PIN])
+                    database, fbplayerpin
                 )
                 if person:
                     if callup:
@@ -498,6 +508,13 @@ class Feedback(panel.PlainPanel):
 
     def on_apply_feedback(self, event=None):
         """Run apply_new_grading_codes in separate thread."""
+        # Workaround same, or at least apparently similar, problem described
+        # in .feedback_monthly.FeedbackMonthly.on_apply_feedback() method.
+        # Only thing to add here is the problem was not seen when this was
+        # the only convenient way to apply minor reference data updates
+        # before 2020 when grading was replaced by rating.
+        if event is None:
+            return
         self.tasklog.run_method(method=self.apply_new_grading_codes)
 
     def show_buttons_for_cancel_import(self):

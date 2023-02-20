@@ -7,6 +7,8 @@
 from html.parser import HTMLParser
 import re
 
+from ..constants import ECF_ZERO_NOT_0
+
 _whitespace_at_end_re = re.compile(r".*\s+\Z", flags=re.DOTALL)
 _whitespace_at_start_re = re.compile(r"\A\s+.*", flags=re.DOTALL)
 _feedback_player_list_re = re.compile(
@@ -32,7 +34,9 @@ _submission_player_list_re = re.compile(
     flags=re.DOTALL,
 )
 _feedback_number_re = re.compile(r"\s+\d+\.\s+", flags=re.DOTALL)
-_submission_pin_re = re.compile(r"#PIN=\d+", flags=re.DOTALL)
+_submission_pin_re = re.compile(
+    ECF_ZERO_NOT_0.join((r"#PIN=(?:\d+|", r")")), flags=re.DOTALL
+)
 
 # Defined to redact expected date formats.
 _yyyy_mm_dd_re = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", flags=re.DOTALL)
