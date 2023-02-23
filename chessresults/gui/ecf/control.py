@@ -400,12 +400,6 @@ class Control(control_database.Control):
 
     def on_copy_ecf_master_player(self, event=None):
         """Do copy ECF Master File (players) actions."""
-        dbspec = self._get_memory_dBaseIII_from_zipfile(
-            ecfplayerdb.ECFplayersDB
-        )
-        if dbspec is None:
-            self.inhibit_context_switch(self._btn_copyecfmasterplayer)
-            return
         # The sequence of button clicks, Administration | ECF Master File |
         # Show Master File | Cancel Import | Club Codes, in the absence of
         # the following 'if' block causes a TypeError exception:
@@ -445,7 +439,28 @@ class Control(control_database.Control):
         # passed to their shared superclass.  The expectation is either both
         # fail or both work: not one always works and one fails in a limited
         # circumstance.
+        # The ButtonPress-1 binding set in bind_panel_button() in class
+        # solentware_misc.gui.panel.AppSysPanelButton is the source of one
+        # event, while the binding implied by the command argument to the
+        # associated tkinter.Button() call is the source of the other event.
+        # The ButtonPress-1 binding should not be needed but removing it
+        # breaks a few actions.
+        # Many actions are fired by just the ButtonPress-1 binding when both
+        # are present, but by the binding implied by the command argument
+        # when the ButtonPress-1 binding is absent.  (Determined by a print()
+        # statement at the start of each bound method.)
+        # Best guess why the ButtonPress-1 binding is in AppSysPanelButton
+        # class: the code was originally written to work with wxWidgets,
+        # when it was still called wxWindows, and got missed on conversion
+        # to Tcl/Tk (via tkinter).  It is assumed changes since then allowed
+        # the problem to emerge.
         if event is None:
+            self.inhibit_context_switch(self._btn_copyecfmasterplayer)
+            return
+        dbspec = self._get_memory_dBaseIII_from_zipfile(
+            ecfplayerdb.ECFplayersDB
+        )
+        if dbspec is None:
             self.inhibit_context_switch(self._btn_copyecfmasterplayer)
             return
         self.get_appsys().set_kwargs_for_next_tabclass_call(
