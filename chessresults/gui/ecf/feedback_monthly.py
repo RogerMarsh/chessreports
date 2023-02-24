@@ -667,14 +667,6 @@ class FeedbackMonthly(panel.PlainPanel):
 
     def on_apply_feedback(self, event=None):
         """Run apply_new_grading_codes in separate thread."""
-        # Workaround same, or at least apparently similar, problem described
-        # in .control.Control.on_copy_ecf_master_player() method.  Only things
-        # to add here are commenting the 'self.tasklog.run_method(...)' call
-        # does not make the problem go away; and the on_cancel_apply_feedback
-        # method becomes affected if the 'switchpanel=True' argument in it's
-        # 'define_button' statement is commented.
-        if event is None:
-            return
         if not self.allowapplycodes:
             tkinter.messagebox.showinfo(
                 title="Apply Feedback", message="Feedback not applied"

@@ -134,22 +134,10 @@ class ImportEvents(logpanel.TextAndLogPanel):
 
     def on_start_import_events(self, event=None):
         """Run import_event in separate thread."""
-        # Workaround same, or at least apparently similar, problem described
-        # in .feedback_monthly.FeedbackMonthly.on_apply_feedback() method.
-        # Only thing to add here is the problem was not seen when building
-        # a new database in the past.
-        if event is None:
-            return
         self.tasklog.run_method(method=self.import_events)
 
     def on_preview_import_events(self, event=None):
         """Run list_events_in_import_file in separate thread."""
-        # Workaround same, or at least apparently similar, problem described
-        # in .feedback_monthly.FeedbackMonthly.on_apply_feedback() method.
-        # Only thing to add here is the problem was not seen when building
-        # a new database in the past.
-        if event is None:
-            return
         self.tasklog.run_method(method=self.list_events_in_import_file)
 
     def on_rename_import_event_report(self, event=None):

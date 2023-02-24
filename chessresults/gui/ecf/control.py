@@ -400,63 +400,6 @@ class Control(control_database.Control):
 
     def on_copy_ecf_master_player(self, event=None):
         """Do copy ECF Master File (players) actions."""
-        # The sequence of button clicks, Administration | ECF Master File |
-        # Show Master File | Cancel Import | Club Codes, in the absence of
-        # the following 'if' block causes a TypeError exception:
-        # 'object.__init__() takes exactly one argument (the instance to
-        # initialize)'.
-        # Adding a 'Close File List' button click before 'Club Codes'
-        # prevented the exception without the 'if' block.
-        # Doing the copy by adding 'Start Import ...' before 'Cancel Import'
-        # makes no difference: it just takes longer to get to the exception
-        # (or not) when comparing cases.
-        # Trace print() statements showed two on_copy_ecf_master_player()
-        # calls when 'Show Master File' was clicked: the first with a
-        # Button event and the second with None as the event.
-        # Replacing 'Show Master File' by 'Show Master Club File' causes
-        # a single on_copy_ecf_master_club() call with a Button event and
-        # no exception, both with and without the 'if' block.
-        # No application code differences between the two cases seemed
-        # suspicious.
-        # Swapping on_copy_ecf_master_player() and on_copy_ecf_master_club()
-        # in the command argument of the relevant define_button() calls, in
-        # this module, moves the exception to the button click path with
-        # the on_copy_ecf_master_player() call.
-        # Swapping the _get_memory_dBaseIII_from_zipfile(...) calls in the
-        # on_copy_ecf_master_player() and on_copy_ecf_master_club() methods
-        # causes an exception at the 'Show Master File' stage.
-        # This is avoided by commenting lines 177 and 178 in module
-        # solentware_misc.gui.logpanel:
-        #        #if callable(maketaskwidget):
-        #        #    paned_w.add(maketaskwidget(paned_w))
-        # after which swapping the _get_memory_dBaseIII_from_zipfile(...)
-        # calls in on_copy_ecf_master_player() and on_copy_ecf_master_club()
-        # does cause the 'TyeError: object__init__() ...' exception to follow
-        # the _get_memory_dBaseIII_from_zipfile(ecfplayerdb.ECFplayersDB)
-        # call.
-        # ecfplayerdb.ECFplayersDB and ecfclubdb.ECFclubsDB, eventually
-        # called to process the files, differ in the values of the arguments
-        # passed to their shared superclass.  The expectation is either both
-        # fail or both work: not one always works and one fails in a limited
-        # circumstance.
-        # The ButtonPress-1 binding set in bind_panel_button() in class
-        # solentware_misc.gui.panel.AppSysPanelButton is the source of one
-        # event, while the binding implied by the command argument to the
-        # associated tkinter.Button() call is the source of the other event.
-        # The ButtonPress-1 binding should not be needed but removing it
-        # breaks a few actions.
-        # Many actions are fired by just the ButtonPress-1 binding when both
-        # are present, but by the binding implied by the command argument
-        # when the ButtonPress-1 binding is absent.  (Determined by a print()
-        # statement at the start of each bound method.)
-        # Best guess why the ButtonPress-1 binding is in AppSysPanelButton
-        # class: the code was originally written to work with wxWidgets,
-        # when it was still called wxWindows, and got missed on conversion
-        # to Tcl/Tk (via tkinter).  It is assumed changes since then allowed
-        # the problem to emerge.
-        if event is None:
-            self.inhibit_context_switch(self._btn_copyecfmasterplayer)
-            return
         dbspec = self._get_memory_dBaseIII_from_zipfile(
             ecfplayerdb.ECFplayersDB
         )

@@ -508,13 +508,6 @@ class Feedback(panel.PlainPanel):
 
     def on_apply_feedback(self, event=None):
         """Run apply_new_grading_codes in separate thread."""
-        # Workaround same, or at least apparently similar, problem described
-        # in .feedback_monthly.FeedbackMonthly.on_apply_feedback() method.
-        # Only thing to add here is the problem was not seen when this was
-        # the only convenient way to apply minor reference data updates
-        # before 2020 when grading was replaced by rating.
-        if event is None:
-            return
         self.tasklog.run_method(method=self.apply_new_grading_codes)
 
     def show_buttons_for_cancel_import(self):
