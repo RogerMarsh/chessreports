@@ -54,6 +54,7 @@ class TakeonCollation(importcollation.ImportCollation):
                     enddate=game[constants._enddate],
                     section=game[constants._section],
                     pin=game[pin],
+                    reported_codes=frozenset(),
                 )
                 if constants._board in game:
                     p.affiliation = game[affiliation]

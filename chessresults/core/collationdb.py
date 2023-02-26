@@ -84,7 +84,11 @@ class CollationDB(object):
                         (
                             name,
                             "  ".join((start, end, event)),
-                            section,
+                            get_name_from_record_value(
+                                self._database.get_primary_record(
+                                    filespec.NAME_FILE_DEF, section
+                                )
+                            ).value.name,
                             str(pin),
                             affiliation,
                         )
