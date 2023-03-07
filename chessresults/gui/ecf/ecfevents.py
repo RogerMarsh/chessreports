@@ -192,17 +192,23 @@ class ECFEvents(panel.PanelGridSelector):
         submit_games = dict()
         db = self.get_appsys().get_results_database()
 
-        for e in ebkm:
-            submit_events[e[-1]] = resultsrecord.get_event_from_record_value(
-                db.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
-            )
-        for e in esel:
-            if e not in ebkm:
+        db.start_read_only_transaction()
+        try:
+            for e in ebkm:
                 submit_events[
                     e[-1]
                 ] = resultsrecord.get_event_from_record_value(
                     db.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
                 )
+            for e in esel:
+                if e not in ebkm:
+                    submit_events[
+                        e[-1]
+                    ] = resultsrecord.get_event_from_record_value(
+                        db.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
+                    )
+        finally:
+            db.end_read_only_transaction()
 
         if len(submit_events) == 0:
             dlg = tkinter.messagebox.showinfo(
@@ -219,19 +225,23 @@ class ECFEvents(panel.PanelGridSelector):
             reference_event = submit_events[s]
             break
 
-        ecfeventrecord = ecfrecord.get_ecf_event(
-            db.get_primary_record(
-                filespec.ECFEVENT_FILE_DEF,
-                db.database_cursor(
+        db.start_read_only_transaction()
+        try:
+            ecfeventrecord = ecfrecord.get_ecf_event(
+                db.get_primary_record(
                     filespec.ECFEVENT_FILE_DEF,
-                    filespec.ECFEVENTIDENTITY_FIELD_DEF,
-                ).get_unique_primary_for_index_key(
-                    db.encode_record_number(
-                        reference_event.value.get_event_identity()
-                    )
-                ),
+                    db.database_cursor(
+                        filespec.ECFEVENT_FILE_DEF,
+                        filespec.ECFEVENTIDENTITY_FIELD_DEF,
+                    ).get_unique_primary_for_index_key(
+                        db.encode_record_number(
+                            reference_event.value.get_event_identity()
+                        )
+                    ),
+                )
             )
-        )
+        finally:
+            db.end_read_only_transaction()
 
         if ecfeventrecord is None:
             dlg = tkinter.messagebox.showinfo(
@@ -267,14 +277,20 @@ class ECFEvents(panel.PanelGridSelector):
                 )
                 return
 
-        all_events = resultsrecord.get_events_matching_event_identity(
-            db, reference_event.value.get_event_identity()
-        )
-        msg = []
-        for ae in all_events:
-            if ae not in submit_events:
-                for s in all_events[ae].value.sections:
-                    msg.append(resultsrecord.get_section_details(db, s, False))
+        db.start_read_only_transaction()
+        try:
+            all_events = resultsrecord.get_events_matching_event_identity(
+                db, reference_event.value.get_event_identity()
+            )
+            msg = []
+            for ae in all_events:
+                if ae not in submit_events:
+                    for s in all_events[ae].value.sections:
+                        msg.append(
+                            resultsrecord.get_section_details(db, s, False)
+                        )
+        finally:
+            db.end_read_only_transaction()
         if len(msg):
             resp = tkinter.messagebox.askquestion(
                 parent=self.get_widget(),
@@ -334,82 +350,91 @@ class ECFEvents(panel.PanelGridSelector):
         ):
             return
 
-        games = []
-        for se in submit_events:
-            games.extend(
-                resultsrecord.get_games_for_event(db, submit_events[se])
-            )
-        for g in games:
-            v = g.value
-            if v.hometeam and v.awayteam:
-                ecfsection = (v.hometeam, v.awayteam)
-            elif v.section:
-                ecfsection = v.section
-            else:
-                ecfsection = (v.event,)
-            if ecfsection not in submit_games:
-                submit_games[ecfsection] = [g]
-            else:
-                submit_games[ecfsection].append(g)
-        aliases = resultsrecord.get_persons(
-            db, resultsrecord.get_aliases_for_games(db, games)
-        )
-        submit_players = self._get_ecf_players_for_alias_map(db, aliases)
-        submit_player_clubs = ecfmaprecord.get_player_clubs_for_games(
-            db, games
-        )
-        submit_clubs = self._get_ecf_clubs_for_alias_map(
-            db, submit_player_clubs
-        )
-        submit_counties = dict()
-        for sc in submit_clubs:
-            # this needs pick relevant txn date I think
-            v = submit_clubs[sc].value
-            if v.ECFcode not in submit_counties:
-                submit_counties[v.ECFcode] = v.ECFcountycode
-        submit_names = resultsrecord.get_names_for_games(db, games)
-        del games
-
-        list0 = []
-        for sp, spc in submit_player_clubs.items():
-            if spc.value.clubcode is None and spc.value.clubecfcode is None:
-                list0.append(
-                    resultsrecord.get_player_name_text_tabs(
-                        db, spc.value.get_unpacked_playername()
-                    )
+        db.start_read_only_transaction()
+        try:
+            games = []
+            for se in submit_events:
+                games.extend(
+                    resultsrecord.get_games_for_event(db, submit_events[se])
                 )
-        if len(list0):
-            reports = [("Player has no ECF club code", list0)]
-            errors = ecferrors.ECFErrorFrame(
-                None, "ECF Errors", "Sample club", reports
+            for g in games:
+                v = g.value
+                if v.hometeam and v.awayteam:
+                    ecfsection = (v.hometeam, v.awayteam)
+                elif v.section:
+                    ecfsection = v.section
+                else:
+                    ecfsection = (v.event,)
+                if ecfsection not in submit_games:
+                    submit_games[ecfsection] = [g]
+                else:
+                    submit_games[ecfsection].append(g)
+            aliases = resultsrecord.get_persons(
+                db, resultsrecord.get_aliases_for_games(db, games)
             )
-            return
+            submit_players = self._get_ecf_players_for_alias_map(db, aliases)
+            submit_player_clubs = ecfmaprecord.get_player_clubs_for_games(
+                db, games
+            )
+            submit_clubs = self._get_ecf_clubs_for_alias_map(
+                db, submit_player_clubs
+            )
+            submit_counties = dict()
+            for sc in submit_clubs:
+                # this needs pick relevant txn date I think
+                v = submit_clubs[sc].value
+                if v.ECFcode not in submit_counties:
+                    submit_counties[v.ECFcode] = v.ECFcountycode
+            submit_names = resultsrecord.get_names_for_games(db, games)
+            del games
 
-        list1 = []
-        list2 = []
-        list3 = []
-        for sp in submit_players:
-            if isinstance(
-                submit_players[sp], ecfmaprecord.ECFmapDBvaluePlayer
-            ):
-                if submit_players[sp].playerecfname is None:
-                    list2.append(
+            list0 = []
+            for sp, spc in submit_player_clubs.items():
+                if (
+                    spc.value.clubcode is None
+                    and spc.value.clubecfcode is None
+                ):
+                    list0.append(
                         resultsrecord.get_player_name_text_tabs(
-                            db, submit_players[sp].get_unpacked_playername()
+                            db, spc.value.get_unpacked_playername()
                         )
                     )
-                elif submit_players[sp].playerecfcode is None:
-                    list3.append(
+            if len(list0):
+                reports = [("Player has no ECF club code", list0)]
+                errors = ecferrors.ECFErrorFrame(
+                    None, "ECF Errors", "Sample club", reports
+                )
+                return
+
+            list1 = []
+            list2 = []
+            list3 = []
+            for sp in submit_players:
+                if isinstance(
+                    submit_players[sp], ecfmaprecord.ECFmapDBvaluePlayer
+                ):
+                    if submit_players[sp].playerecfname is None:
+                        list2.append(
+                            resultsrecord.get_player_name_text_tabs(
+                                db,
+                                submit_players[sp].get_unpacked_playername(),
+                            )
+                        )
+                    elif submit_players[sp].playerecfcode is None:
+                        list3.append(
+                            resultsrecord.get_player_name_text_tabs(
+                                db,
+                                submit_players[sp].get_unpacked_playername(),
+                            )
+                        )
+                elif submit_players[sp] is None:
+                    list1.append(
                         resultsrecord.get_player_name_text_tabs(
-                            db, submit_players[sp].get_unpacked_playername()
+                            db, aliases[sp].value.identity()
                         )
                     )
-            elif submit_players[sp] is None:
-                list1.append(
-                    resultsrecord.get_player_name_text_tabs(
-                        db, aliases[sp].value.identity()
-                    )
-                )
+        finally:
+            db.end_read_only_transaction()
         if len(list1) + len(list2) > 0:
             if len(list3) == 0:
                 msg = " ".join(

@@ -20,7 +20,13 @@ class ResultsDatabase(database.Database, dpt_database.Database):
     _datasourceset_modulename = "solentware_grid.dpt.dptdatasourceset"
     _knownnames_modulename = "chessresults.dpt.knownnames"
 
-    def __init__(self, databasefolder, **kargs):
+    def __init__(
+        self,
+        databasefolder,
+        use_specification_items=None,
+        dpt_records=None,
+        **kargs,
+    ):
         """Set sysprint, file specification from kargs, and delegate.
 
         The default for sysprint, if not present in kargs, is "CONSOLE".
@@ -30,10 +36,17 @@ class ResultsDatabase(database.Database, dpt_database.Database):
             sysprint = kargs.pop("sysprint")
         except KeyError:
             sysprint = "CONSOLE"
-        ddnames = FileSpec(**kargs)
+        ddnames = FileSpec(
+            use_specification_items=use_specification_items,
+            dpt_records=dpt_records,
+        )
 
-        super(ResultsDatabase, self).__init__(
-            ddnames, databasefolder, sysprint=sysprint, **kargs
+        super().__init__(
+            ddnames,
+            databasefolder,
+            use_specification_items=use_specification_items,
+            sysprint=sysprint,
+            **kargs,
         )
 
     def delete_database(self):

@@ -104,6 +104,21 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
         if len(npsel):
             if npsel[0] not in npbkm:
                 players.append(npsel[0])
+        db.start_read_only_transaction()
+        try:
+            names = [
+                resultsrecord.get_player_name_text_tabs(
+                    db,
+                    resultsrecord.get_unpacked_player_identity(
+                        ecfmaprecord.get_player(
+                            db, p[-1]
+                        ).value.playername
+                    ),
+                )
+                for p in players
+            ]
+        finally:
+            db.end_read_only_transaction()
         dlg = dialogue.ModalConfirm(
             parent=self,
             title="Affiliate Players to Club",
@@ -117,19 +132,7 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
                             ].value.ECFname,
                         )
                     ),
-                    "\n".join(
-                        [
-                            resultsrecord.get_player_name_text_tabs(
-                                db,
-                                resultsrecord.get_unpacked_player_identity(
-                                    ecfmaprecord.get_player(
-                                        db, p[-1]
-                                    ).value.playername
-                                ),
-                            )
-                            for p in players
-                        ]
-                    ),
+                    "\n".join(names),
                 )
             ),
             action_titles={
@@ -144,31 +147,25 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
         if not dlg.ok_pressed():
             return
 
-        ecfrec = ecfrecord.get_ecf_club(db, ecsel[0][-1])
-
+        deleted_players = []
         db.start_transaction()
+        ecfrec = ecfrecord.get_ecf_club(db, ecsel[0][-1])
         for p in players:
             mr = ecfmaprecord.get_player(db, p[-1])
             if mr is None:
                 pr = ecfmaprecord.ECFmapDBrecordClub()
                 pr.load_record(self.newpersongrid.objects[p])
-                dlg = tkinter.messagebox.showinfo(
-                    parent=self.get_widget(),
-                    message="".join(
-                        (
-                            resultsrecord.get_player_name_text(
-                                db, pr.value.get_unpacked_playername()
-                            ),
-                            "\nrecord has been deleted.\n",
-                            "Cannot proceed with club code allocation ",
-                            "for this player.",
-                        )
-                    ),
-                    title=msgtitle,
+                deleted_players.append(
+                    resultsrecord.get_player_name_text(
+                        db, pr.value.get_unpacked_playername()
+                    )
                 )
                 continue
             newmr = mr.clone()
+            print("ecfrec", ecfrec.key.__dict__, ecfrec.value.__dict__)
+            print("(mr)", newmr.key.__dict__, newmr.value.__dict__)
             newmr.value.clubcode = ecfrec.value.ECFcode
+            print("newmr", newmr.key.__dict__, newmr.value.__dict__)
             mr.edit_record(
                 db,
                 filespec.MAPECFCLUB_FILE_DEF,
@@ -176,6 +173,46 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
                 newmr,
             )
         db.commit()
+
+        if deleted_players:
+            if len(deleted_players) == 1:
+                tkinter.messagebox.showinfo(
+                    parent=self.get_widget(),
+                    message="".join(
+                        (
+                            deleted_players[0],
+                            "\nrecord has been deleted.\n",
+                            "Club code allocation not done",
+                        )
+                    ),
+                    title=msgtitle,
+                )
+            else:
+                tkinter.messagebox.showinfo(
+                    parent=self.get_widget(),
+                    message="".join(
+                        (
+                            str(len(deleted_players)),
+                            " player records have been deleted.\n",
+                            "Club code allocation not done.\n",
+                            "Names shown one at a time in following reports.",
+                        )
+                    ),
+                    title=msgtitle,
+                )
+                for name_text in deleted_players:
+                    tkinter.messagebox.showinfo(
+                        parent=self.get_widget(),
+                        message="".join(
+                            (
+                                name_text,
+                                "\nrecord has been deleted.\n",
+                                "Cannot proceed with club code allocation ",
+                                "for this player.",
+                            )
+                        ),
+                        title=msgtitle,
+                    )
 
         self.newplayerclubgrid.bookmarks[:] = []
         if ecsel[0] in self.ecfclubcodegrid.bookmarks:
@@ -213,6 +250,21 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
         if len(npsel):
             if npsel[0] not in npbkm:
                 players.append(npsel[0])
+        db.start_read_only_transaction()
+        try:
+            names = [
+                resultsrecord.get_player_name_text_tabs(
+                    db,
+                    resultsrecord.get_unpacked_player_identity(
+                        ecfmaprecord.get_player(
+                            db, p[-1]
+                        ).value.playername
+                    ),
+                )
+                for p in players
+            ]
+        finally:
+            db.end_read_only_transaction()
         dlg = dialogue.ModalConfirm(
             parent=self,
             title="Affiliate Players to Club",
@@ -224,19 +276,7 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
                             "no club",
                         )
                     ),
-                    "\n".join(
-                        [
-                            resultsrecord.get_player_name_text_tabs(
-                                db,
-                                resultsrecord.get_unpacked_player_identity(
-                                    ecfmaprecord.get_player(
-                                        db, p[-1]
-                                    ).value.playername
-                                ),
-                            )
-                            for p in players
-                        ]
-                    ),
+                    "\n".join(names),
                 )
             ),
             action_titles={
@@ -351,17 +391,27 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
             return
 
         db = self.get_appsys().get_results_database()
-        mr = ecfmaprecord.get_player(db, npsel[0][-1])
+        db.start_read_only_transaction()
+        try:
+            mr = ecfmaprecord.get_player(db, npsel[0][-1])
+            if mr is None:
+                pr = ecfmaprecord.ECFmapDBrecordClub()
+                pr.load_record(self.newplayerclubgrid.objects[npsel[0]])
+                name_text = resultsrecord.get_player_name_text(
+                    db, pr.value.get_unpacked_playername()
+                )
+            elif mr.value.clubecfcode:
+                name_text = resultsrecord.get_player_name_text(
+                    db, mr.value.get_unpacked_playername()
+                )
+        finally:
+            db.end_read_only_transaction()
         if mr is None:
-            pr = ecfmaprecord.ECFmapDBrecordClub()
-            pr.load_record(self.newplayerclubgrid.objects[npsel[0]])
             dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
-                        resultsrecord.get_player_name_text(
-                            db, pr.value.get_unpacked_playername()
-                        ),
+                        name_text,
                         "\nrecord has been deleted.\nCannot ",
                         "proceed with amendment of ECF version of name.",
                     )
@@ -375,9 +425,7 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
                     parent=self.get_widget(),
                     message="".join(
                         (
-                            resultsrecord.get_player_name_text(
-                                db, mr.value.get_unpacked_playername()
-                            ),
+                            name_text,
                             "\nrecord has ECF Club Code.\nCannot ",
                             "proceed with amendment of ECF club details.",
                         )

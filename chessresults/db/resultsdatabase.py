@@ -30,9 +30,18 @@ class ResultsDatabase(database.Database, bsddb3_database.Database):
     _datasourceset_modulename = "solentware_grid.core.datasourceset"
     _knownnames_modulename = "chessresults.basecore.knownnamesds"
 
-    def __init__(self, DBfile, **kargs):
+    def __init__(
+        self,
+        DBfile,
+        use_specification_items=None,
+        dpt_records=None,
+        **kargs,
+    ):
         """Define database specification and environment then delegate."""
-        dbnames = FileSpec(**kargs)
+        dbnames = FileSpec(
+            use_specification_items=use_specification_items,
+            dpt_records=dpt_records,
+        )
 
         environment = {
             "flags": (
@@ -46,8 +55,12 @@ class ResultsDatabase(database.Database, bsddb3_database.Database):
             ),
         }
 
-        super(ResultsDatabase, self).__init__(
-            dbnames, DBfile, environment, **kargs
+        super().__init__(
+            dbnames,
+            DBfile,
+            environment,
+            use_specification_items=use_specification_items,
+            **kargs,
         )
 
     def delete_database(self):

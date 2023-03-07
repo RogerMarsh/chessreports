@@ -226,108 +226,118 @@ class Events(panel.PanelGridSelector):
             )
             return
 
-        for e in export_events:
-            rv = resultsrecord.get_event_from_record_value(
-                database.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
-            ).value
-            er = [rv.startdate, rv.enddate, rv.name]
-            er.extend(
-                [
-                    resultsrecord.get_name_from_record_value(
-                        database.get_primary_record(filespec.NAME_FILE_DEF, s)
-                    ).value.name
-                    for s in rv.sections
-                ]
-            )
-            if logwidget:
-                logwidget.append_text_only("\t".join(er))
-
-        # get all aliases on exporting database
-        # note identity with embedded keys translated and merge structure
-        if logwidget:
-            logwidget.append_text("Finding all player names on the database.")
-            logwidget.append_text_only("")
-        players = dict()
-        gai = resultsrecord.get_alias_identity
-        pr = resultsrecord.ResultsDBrecordPlayer()
-        pk = pr.key
-        pv = pr.value
-        pr.set_database(database)
-        rset = database.recordlist_ebm(filespec.PLAYER_FILE_DEF)
-        cursor = rset.create_recordset_cursor()
+        database.start_read_only_transaction()
         try:
-            r = cursor.first()
-            while r:
-                pr.load_record(r)
-                players[pk.recno] = (
-                    gai(pr),
-                    pv.merge,
-                    pv.alias,
-                    pv.affiliation,
-                    pv.reported_codes,
+            for e in export_events:
+                rv = resultsrecord.get_event_from_record_value(
+                    database.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
+                ).value
+                er = [rv.startdate, rv.enddate, rv.name]
+                er.extend(
+                    [
+                        resultsrecord.get_name_from_record_value(
+                            database.get_primary_record(filespec.NAME_FILE_DEF, s)
+                        ).value.name
+                        for s in rv.sections
+                    ]
                 )
-                r = cursor.next()
-        finally:
-            cursor.close()
-            rset.close()
+                if logwidget:
+                    logwidget.append_text_only("\t".join(er))
 
-        # get all games for events being exported
-        if logwidget:
-            logwidget.append_text("Finding all games in the events.")
-            logwidget.append_text_only("")
-        games = []
-        for event in export_events:
-            eventgames = resultsrecord.get_games_for_event(
-                database, resultsrecord.get_event(database, event[-1])
-            )
-            games.extend(eventgames)
+            # get all aliases on exporting database
+            # note identity with embedded keys translated and merge structure
+            if logwidget:
+                logwidget.append_text(
+                    "Finding all player names on the database."
+                )
+                logwidget.append_text_only("")
+            players = dict()
+            gai = resultsrecord.get_alias_identity
+            pr = resultsrecord.ResultsDBrecordPlayer()
+            pk = pr.key
+            pv = pr.value
+            pr.set_database(database)
+            rset = database.recordlist_ebm(filespec.PLAYER_FILE_DEF)
+            cursor = rset.create_recordset_cursor()
+            try:
+                r = cursor.first()
+                while r:
+                    pr.load_record(r)
+                    players[pk.recno] = (
+                        gai(pr),
+                        pv.merge,
+                        pv.alias,
+                        pv.affiliation,
+                        pv.reported_codes,
+                    )
+                    r = cursor.next()
+            finally:
+                cursor.close()
+                rset.close()
 
-        # get all alias keys for games being exported and map coded to decoded
-        if logwidget:
-            logwidget.append_text_only("")
-            logwidget.append_text("Finding all player names in the events.")
-        eventplayers = set()
-        gameplayers = dict()
-        for g in games:
-            for ak in (g.value.homeplayer, g.value.awayplayer):
-                k = ak  # Legacy of {coded:decoded} mapping.
-                eventplayers.add(k)
-                gameplayers[ak] = k
-        if logwidget:
-            logwidget.append_text("Preparing data for export.")
-            logwidget.append_text_only("")
+            # get all games for events being exported
+            if logwidget:
+                logwidget.append_text("Finding all games in the events.")
+                logwidget.append_text_only("")
+            games = []
+            for event in export_events:
+                eventgames = resultsrecord.get_games_for_event(
+                    database, resultsrecord.get_event(database, event[-1])
+                )
+                games.extend(eventgames)
 
-        # add all aliases to export data with identity last
-        main_alias_values = {type(True), type(False), type(None)}
-        exportdata = []
-        for k, v in players.items():
-            pi, pm, pa, paff, prc = v
-            if type(pm) in main_alias_values:
-                for a in pa:
-                    if a != k:
-                        exportdata.extend(
-                            convert_alias_to_transfer_format(
-                                players[a][0], constants._name
+            # get alias keys for games being exported and map coded to decoded.
+            if logwidget:
+                logwidget.append_text_only("")
+                logwidget.append_text(
+                    "Finding all player names in the events."
+                )
+            eventplayers = set()
+            gameplayers = dict()
+            for g in games:
+                for ak in (g.value.homeplayer, g.value.awayplayer):
+                    k = ak  # Legacy of {coded:decoded} mapping.
+                    eventplayers.add(k)
+                    gameplayers[ak] = k
+            if logwidget:
+                logwidget.append_text("Preparing data for export.")
+                logwidget.append_text_only("")
+
+            # add all aliases to export data with identity last
+            main_alias_values = {type(True), type(False), type(None)}
+            exportdata = []
+            for k, v in players.items():
+                pi, pm, pa, paff, prc = v
+                if type(pm) in main_alias_values:
+                    for a in pa:
+                        if a != k:
+                            exportdata.extend(
+                                convert_alias_to_transfer_format(
+                                    players[a][0], constants._name
+                                )
                             )
-                        )
-                exportdata.extend(
-                    convert_alias_to_transfer_format(pi, constants._name)
-                )
-                exportdata.append(
-                    "=".join((constants._exportedeventplayer, "true"))
-                )
+                    exportdata.extend(
+                        convert_alias_to_transfer_format(pi, constants._name)
+                    )
+                    exportdata.append(
+                        "=".join((constants._exportedeventplayer, "true"))
+                    )
 
-        # add all games being exported to export data
-        allmerged = True
-        for g in games:
-            allmerged = allmerged and add_game_to_export(g)
+            # add all games being exported to export data
+            allmerged = True
+            for g in games:
+                allmerged = allmerged and add_game_to_export(g)
+        finally:
+            database.end_read_only_transaction()
+
         if not allmerged:
             tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (
-                        "Cannot generate an export file when some players in the",
-                        "events being exported have not been merged or joined.",
+                        "Cannot generate an export file when some players in",
+                        "the events being exported have not been merged or",
+                        "joined.",
                     )
                 ),
                 title="Events",
@@ -606,32 +616,43 @@ class Events(panel.PanelGridSelector):
         db = self.get_appsys().get_results_database()
         event_report = []
         identity_report = []
-        for e in delete_events:
-            rec = resultsrecord.get_event_from_record_value(
-                db.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
-            )
-            identity_report.extend(
-                self.player_identification_dependant_on_event(db, rec)
-            )
-            rv = rec.value
-            er = [rv.startdate, rv.enddate, rv.name]
-            er.extend(
-                [
-                    resultsrecord.get_name_from_record_value(
-                        db.get_primary_record(filespec.NAME_FILE_DEF, s)
-                    ).value.name
-                    for s in rv.sections
+        db.start_read_only_transaction()
+        try:
+            for e in delete_events:
+                rec = resultsrecord.get_event_from_record_value(
+                    db.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
+                )
+                identity_report.extend(
+                    self.player_identification_dependant_on_event(db, rec)
+                )
+                rv = rec.value
+                er = [rv.startdate, rv.enddate, rv.name]
+                er.extend(
+                    [
+                        resultsrecord.get_name_from_record_value(
+                            db.get_primary_record(filespec.NAME_FILE_DEF, s)
+                        ).value.name
+                        for s in rv.sections
+                    ]
+                )
+                event_report.append("\t".join(er))
+            if identity_report:
+                names = [
+                    resultsrecord.get_player_name_text_tabs(
+                        db, i.value.identity()
+                    )
+                    for i in identity_report
                 ]
-            )
-            event_report.append("\t".join(er))
+        finally:
+            db.end_read_only_transaction()
         if identity_report:
             head = "".join(
                 (
                     " ".join(
                         (
-                            "The following events cannot be deleted because the",
-                            "players listed below use one, or more, of them as",
-                            "part of their main identification:",
+                            "The following events cannot be deleted because",
+                            "the players listed below use one, or more, of",
+                            "them as part of their main identification:",
                         )
                     ),
                     "\n\n",
@@ -639,8 +660,8 @@ class Events(panel.PanelGridSelector):
                     "\n\n",
                     " ".join(
                         (
-                            "Any events not mentioned in the list of players can",
-                            "be deleted by adjusting the event selection.",
+                            "Any events not mentioned in the list of players",
+                            "can be deleted by adjusting the event selection.",
                         )
                     ),
                 )
@@ -655,14 +676,7 @@ class Events(panel.PanelGridSelector):
                 "\n\n".join(
                     (
                         head,
-                        "\n".join(
-                            [
-                                resultsrecord.get_player_name_text_tabs(
-                                    db, i.value.identity()
-                                )
-                                for i in identity_report
-                            ]
-                        ),
+                        "\n".join(names),
                     )
                 )
             )
@@ -813,7 +827,7 @@ class Events(panel.PanelGridSelector):
         )
 
     def player_identification_dependant_on_event(self, database, event):
-        """Return list of players in event used as main identifier of person."""
+        """Return list of players in event used as main person identifier."""
         players = set()
         identifiers = []
         for g in resultsrecord.get_games_for_event(database, event):
@@ -877,13 +891,17 @@ class Events(panel.PanelGridSelector):
         if logwidget:
             logwidget.append_text("Extracting game summaries for each event.")
             logwidget.append_text_only("")
-        for e in summary_events:
-            gamesummary.GameSummary(self, database, e)
+        database.start_read_only_transaction()
+        try:
+            for e in summary_events:
+                gamesummary.GameSummary(self, database, e)
+        finally:
+            database.end_read_only_transaction()
         if logwidget:
             logwidget.append_text("Extract completed.")
             logwidget.append_text_only("")
 
-    def get_gradingcodes(self, database):
+    def get_gradingcodes(self, database, players):
         """Return dict of ECF codes for players, default empty dict."""
         return {}
 
@@ -928,6 +946,15 @@ class Events(panel.PanelGridSelector):
             )
             return
 
+        database.start_read_only_transaction()
+        try:
+            self._populate_event_summary(database, logwidget, summary_events)
+        finally:
+            database.end_read_only_transaction()
+
+
+    def _populate_event_summary(self, database, logwidget, summary_events):
+        """Write events selected for summary to serial file."""
         for e in summary_events:
             rv = resultsrecord.get_event_from_record_value(
                 database.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])

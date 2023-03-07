@@ -448,46 +448,50 @@ class Feedback(panel.PlainPanel):
                             )
                         )
 
-        for eb in lines:
-            e = eb.decode()
-            if not e:
-                continue
-            if e.startswith(subline):
+        database.start_read_only_transaction()
+        try:
+            for eb in lines:
+                e = eb.decode()
+                if not e:
+                    continue
+                if e.startswith(subline):
+                    report_player(playerfields)
+                    if e.find(pinstart) == -1:
+                        ok = False
+                        break
+                    playerfields = {
+                        pinline: False,
+                        newcodeline: False,
+                        usecodeline: False,
+                        mergecodeline: False,
+                        clubline: False,
+                    }
+                    playerfields[subline] = True
+                    for fv in e.split(fieldstart, 1)[-1].strip().split("#"):
+                        f, v = fv.split("=", 1)
+                        playerfields[f] = v
+                    self.newcodesapply.append(playerfields)
+                elif e.startswith(pinline):
+                    if e.find(":") == -1:
+                        ok = False
+                        break
+                    start, end = e.split(":", 1)
+                    if not start.endswith(playerfields[constants.PIN]):
+                        ok = False
+                        break
+                    playerfields[pinline] = True
+                elif e.startswith(newcodeline):
+                    playerfields[newcodeline] = e.split()[-1]
+                elif e.startswith(usecodeline):
+                    playerfields[usecodeline] = e.split()[-1]
+                elif e.find(mergecodeline) > 1:
+                    playerfields[mergecodeline] = e.split()[-1][:-1]
+                elif e.find(clubline) > 1:
+                    playerfields[clubline] = True
+            else:
                 report_player(playerfields)
-                if e.find(pinstart) == -1:
-                    ok = False
-                    break
-                playerfields = {
-                    pinline: False,
-                    newcodeline: False,
-                    usecodeline: False,
-                    mergecodeline: False,
-                    clubline: False,
-                }
-                playerfields[subline] = True
-                for fv in e.split(fieldstart, 1)[-1].strip().split("#"):
-                    f, v = fv.split("=", 1)
-                    playerfields[f] = v
-                self.newcodesapply.append(playerfields)
-            elif e.startswith(pinline):
-                if e.find(":") == -1:
-                    ok = False
-                    break
-                start, end = e.split(":", 1)
-                if not start.endswith(playerfields[constants.PIN]):
-                    ok = False
-                    break
-                playerfields[pinline] = True
-            elif e.startswith(newcodeline):
-                playerfields[newcodeline] = e.split()[-1]
-            elif e.startswith(usecodeline):
-                playerfields[usecodeline] = e.split()[-1]
-            elif e.find(mergecodeline) > 1:
-                playerfields[mergecodeline] = e.split()[-1][:-1]
-            elif e.find(clubline) > 1:
-                playerfields[clubline] = True
-        else:
-            report_player(playerfields)
+        finally:
+            database.end_read_only_transaction()
         if not newcodesreport:
             return "File has no new player grading codes"
         elif ok:

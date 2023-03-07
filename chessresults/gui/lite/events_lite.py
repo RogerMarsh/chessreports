@@ -190,53 +190,52 @@ class Events(events_database.Events):
             return
 
         ro = []
-        for e in calculate_events:
-            rv = resultsrecord.get_event_from_record_value(
-                database.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
-            ).value
-            er = [rv.name, rv.startdate, rv.enddate, rv.name]
-            er.extend(
-                [
-                    resultsrecord.get_name_from_record_value(
-                        database.get_primary_record(filespec.NAME_FILE_DEF, s)
-                    ).value.name
-                    for s in rv.sections
-                ]
-            )
-            ro.append(er)
-        event_report = []
-        for er in sorted(ro):
-            event_report.append("\t".join(er[1:]))
-        if logwidget:
-            logwidget.append_text(
-                "Finding players and game results for selected events"
-            )
-            logwidget.append_text_only("")
-        gefpc = resultsrecord.get_events_for_performance_prediction(
-            database, calculate_events
-        )
-        if gefpc is None:
+        database.start_read_only_transaction()
+        try:
+            for e in calculate_events:
+                rv = resultsrecord.get_event_from_record_value(
+                    database.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
+                ).value
+                er = [rv.name, rv.startdate, rv.enddate, rv.name]
+                er.extend(
+                    [
+                        resultsrecord.get_name_from_record_value(
+                            database.get_primary_record(
+                                filespec.NAME_FILE_DEF, s
+                            )
+                        ).value.name
+                        for s in rv.sections
+                    ]
+                )
+                ro.append(er)
+            event_report = []
+            for er in sorted(ro):
+                event_report.append("\t".join(er[1:]))
             if logwidget:
                 logwidget.append_text(
-                    " ".join(
-                        (
-                            "Cannot resolve all player identities.  This may be ",
-                            "because one or more players in the selected events have ",
-                            "not been merged on the New Players tab.",
-                        )
-                    )
+                    "Finding players and game results for selected events"
                 )
+                logwidget.append_text_only("")
+            gefpc = resultsrecord.get_events_for_performance_prediction(
+                database, calculate_events
+            )
+        finally:
+            database.end_read_only_transaction()
+        if gefpc is None:
+            message = " ".join(
+                (
+                    "Cannot resolve all player identities.  This may be",
+                    "because one or more players in the selected events",
+                    "have not been merged on the New Players tab.",
+                )
+            )
+            if logwidget:
+                logwidget.append_text(message)
                 logwidget.append_text_only("")
                 return
             tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
-                message=" ".join(
-                    (
-                        "Cannot resolve all player identities.  This may be ",
-                        "because one or more players in the selected events have ",
-                        "not been merged on the New Players tab.",
-                    )
-                ),
+                message=message,
                 title="Events",
             )
             return
@@ -297,51 +296,50 @@ class Events(events_database.Events):
             return
 
         event_report = []
-        for e in calculate_events:
-            rv = resultsrecord.get_event_from_record_value(
-                database.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
-            ).value
-            er = [rv.startdate, rv.enddate, rv.name]
-            er.extend(
-                [
-                    resultsrecord.get_name_from_record_value(
-                        database.get_primary_record(filespec.NAME_FILE_DEF, s)
-                    ).value.name
-                    for s in rv.sections
-                ]
+        database.start_read_only_transaction()
+        try:
+            for e in calculate_events:
+                rv = resultsrecord.get_event_from_record_value(
+                    database.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
+                ).value
+                er = [rv.startdate, rv.enddate, rv.name]
+                er.extend(
+                    [
+                        resultsrecord.get_name_from_record_value(
+                            database.get_primary_record(
+                                filespec.NAME_FILE_DEF, s
+                            )
+                        ).value.name
+                        for s in rv.sections
+                    ]
+                )
+                event_report.append("\t".join(er))
+            if logwidget:
+                logwidget.append_text(
+                    "Finding players and game results for selected events"
+                )
+                logwidget.append_text_only("")
+            gefpc = resultsrecord.get_events_for_performance_calculation(
+                database, calculate_events
             )
-            event_report.append("\t".join(er))
-        if logwidget:
-            logwidget.append_text(
-                "Finding players and game results for selected events"
-            )
-            logwidget.append_text_only("")
-        gefpc = resultsrecord.get_events_for_performance_calculation(
-            database, calculate_events
-        )
+        finally:
+            database.end_read_only_transaction()
         if gefpc is None:
+            message = " ".join(
+                (
+                    "Cannot resolve all player identities.  This may be",
+                    "because one or more players in the selected events",
+                    "have not been merged on the New Players tab.",
+                )
+            )
             if logwidget:
                 logwidget.append_text_only("")
-                logwidget.append_text(
-                    " ".join(
-                        (
-                            "Cannot resolve all player identities.  This may be ",
-                            "because one or more players in the selected events have ",
-                            "not been merged on the New Players tab.",
-                        )
-                    )
-                )
+                logwidget.append_text(message)
                 logwidget.append_text_only("")
                 return
             tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
-                message=" ".join(
-                    (
-                        "Cannot resolve all player identities.  This may be ",
-                        "because one or more players in the selected events have ",
-                        "not been merged on the New Players tab.",
-                    )
-                ),
+                message=message,
                 title="Events",
             )
             return
@@ -400,53 +398,53 @@ class Events(events_database.Events):
             return
 
         ro = []
-        for e in calculate_events:
-            rv = resultsrecord.get_event_from_record_value(
-                database.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
-            ).value
-            er = [rv.name, rv.startdate, rv.enddate, rv.name]
-            er.extend(
-                [
-                    resultsrecord.get_name_from_record_value(
-                        database.get_primary_record(filespec.NAME_FILE_DEF, s)
-                    ).value.name
-                    for s in rv.sections
-                ]
-            )
-            ro.append(er)
-        event_report = []
-        for er in sorted(ro):
-            event_report.append("\t".join(er[1:]))
-        if logwidget:
-            logwidget.append_text(
-                "Finding players and game results for selected events"
-            )
-            logwidget.append_text_only("")
-        gefpc = resultsrecord.get_events_for_performance_calculation(
-            database, calculate_events
-        )
-        if gefpc is None:
+        database.start_read_only_transaction()
+        try:
+            for e in calculate_events:
+                rv = resultsrecord.get_event_from_record_value(
+                    database.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
+                ).value
+                er = [rv.name, rv.startdate, rv.enddate, rv.name]
+                er.extend(
+                    [
+                        resultsrecord.get_name_from_record_value(
+                            database.get_primary_record(
+                                filespec.NAME_FILE_DEF, s
+                            )
+                        ).value.name
+                        for s in rv.sections
+                    ]
+                )
+                ro.append(er)
+            event_report = []
+            for er in sorted(ro):
+                event_report.append("\t".join(er[1:]))
             if logwidget:
                 logwidget.append_text(
-                    " ".join(
-                        (
-                            "Cannot resolve all player identities.  This may be ",
-                            "because one or more players in the selected events have ",
-                            "not been merged on the New Players tab.",
-                        )
+                    "Finding players and game results for selected events"
+                )
+                logwidget.append_text_only("")
+            gefpc = resultsrecord.get_events_for_performance_calculation(
+                database, calculate_events
+            )
+        finally:
+            database.end_read_only_transaction()
+        if gefpc is None:
+            message = " ".join(
+                (
+                    "Cannot resolve all player identities.  This may",
+                    "be because one or more players in the selected",
+                    "events have not been merged on the New Players",
+                    "tab.",
                     )
                 )
+            if logwidget:
+                logwidget.append_text(message)
                 logwidget.append_text_only("")
                 return
             tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
-                message=" ".join(
-                    (
-                        "Cannot resolve all player identities.  This may be ",
-                        "because one or more players in the selected events have ",
-                        "not been merged on the New Players tab.",
-                    )
-                ),
+                message=message,
                 title="Events",
             )
             return

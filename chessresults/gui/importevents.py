@@ -492,7 +492,12 @@ class ImportEvents(logpanel.TextAndLogPanel):
         tasklog.append_text_only("")
         collation = importcollation.ImportCollation(importdata)
         collatedb = importcollationdb.ImportCollationDB(collation, database)
-        if not collatedb.is_database_empty_of_players():
+        database.start_read_only_transaction()
+        try:
+            empty = collatedb.is_database_empty_of_players()
+        finally:
+            database.end_read_only_transaction()
+        if not empty:
             tasklog.append_text(
                 "".join(
                     (
@@ -536,7 +541,12 @@ class ImportEvents(logpanel.TextAndLogPanel):
         tasklog.append_text_only("")
         collation = importcollation.ImportCollation(importdata)
         collatedb = importcollationdb.ImportCollationDB(collation, database)
-        if not collatedb.is_database_empty_of_players():
+        database.start_read_only_transaction()
+        try:
+            empty = collatedb.is_database_empty_of_players()
+        finally:
+            database.end_read_only_transaction()
+        if not empty:
             tasklog.append_text(
                 "".join(
                     (
@@ -545,7 +555,11 @@ class ImportEvents(logpanel.TextAndLogPanel):
                     )
                 )
             )
-            inconsistent = collatedb.is_player_identification_inconsistent()
+            database.start_read_only_transaction()
+            try:
+                inconsistent = collatedb.is_player_identification_inconsistent()
+            finally:
+                database.end_read_only_transaction()
             if len(inconsistent):
                 tasklog.append_text(
                     "".join(
@@ -584,7 +598,11 @@ class ImportEvents(logpanel.TextAndLogPanel):
         # reportdata = self.datawidget.get(
         #    '1.0', tkinter.END).rstrip().split('\n')
         reportdata = self.importtext.decode().rstrip().split("\n")
-        reportdata.extend(collatedb.export_players_on_database())
+        database.start_read_only_transaction()
+        try:
+            reportdata.extend(collatedb.export_players_on_database())
+        finally:
+            database.end_read_only_transaction()
 
         importevent_report = self._importevent_report
         if not importevent_report:
@@ -623,7 +641,12 @@ class ImportEvents(logpanel.TextAndLogPanel):
         """Validate merge import against original import."""
         collreq = importcollation.ImportCollation(importdata)
         collreqdb = importcollationdb.ImportCollationDB(collreq, database)
-        if not collreqdb.is_database_empty_of_players():
+        database.start_read_only_transaction()
+        try:
+            empty = collreqdb.is_database_empty_of_players()
+        finally:
+            database.end_read_only_transaction()
+        if not empty:
             if collreqdb.is_new_player_inconsistent():
                 tasklog.append_text(
                     "".join(

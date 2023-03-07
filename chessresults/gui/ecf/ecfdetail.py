@@ -184,16 +184,20 @@ class ECFClubDialog(ECFDetailDialog):
             ecfcode = ""
         else:
             ecfcode = record.value.clubecfcode
-        items = (
-            (
-                "Name:",
-                resultsrecord.get_player_name_text(
-                    record.database, record.value.get_unpacked_playername()
+        record.database.start_read_only_transaction()
+        try:
+            items = (
+                (
+                    "Name:",
+                    resultsrecord.get_player_name_text(
+                        record.database, record.value.get_unpacked_playername()
+                    ),
                 ),
-            ),
-            ("ECF Club Name:", ecfname),
-            ("Club Code:", ecfcode),
-        )
+                ("ECF Club Name:", ecfname),
+                ("Club Code:", ecfcode),
+            )
+        finally:
+            record.database.end_read_only_transaction()
         edititems = (
             ("Edit ECF Club Name", ecfname),
             ("Edit ECF Club Code", ecfcode),
@@ -268,9 +272,13 @@ class ECFClubDialog(ECFDetailDialog):
                 title="ECF club detail Edit",
             )
             return
-        ecfclub = ecfrecord.get_ecf_club_for_club_code(
-            self.record.database, clubcode
-        )
+        self.record.database.start_read_only_transaction()
+        try:
+            ecfclub = ecfrecord.get_ecf_club_for_club_code(
+                self.record.database, clubcode
+            )
+        finally:
+            self.record.database.end_read_only_transaction()
         if ecfclub:
             tkinter.messagebox.showinfo(
                 parent=self.dialog,
@@ -329,16 +337,20 @@ class ECFNameDialog(ECFDetailDialog):
             ecfcode = ""
         else:
             ecfcode = record.value.playerecfcode
-        items = (
-            (
-                "Name:",
-                resultsrecord.get_player_name_text(
-                    record.database, record.value.get_unpacked_playername()
+        record.database.start_read_only_transaction()
+        try:
+            items = (
+                (
+                    "Name:",
+                    resultsrecord.get_player_name_text(
+                        record.database, record.value.get_unpacked_playername()
+                    ),
                 ),
-            ),
-            ("ECF Name:", ecfname),
-            ("Grading Code:", ecfcode),
-        )
+                ("ECF Name:", ecfname),
+                ("Grading Code:", ecfcode),
+            )
+        finally:
+            record.database.end_read_only_transaction()
         edititems = (("Edit ECF Name", ecfname),)
 
         super(ECFNameDialog, self).__init__(
@@ -446,16 +458,20 @@ class ECFGradingCodeDialog(ECFDetailDialog):
             ecfcode = ""
         else:
             ecfcode = record.value.playerecfcode
-        items = (
-            (
-                "Name:",
-                resultsrecord.get_player_name_text(
-                    record.database, record.value.get_unpacked_playername()
+        record.database.start_read_only_transaction()
+        try:
+            items = (
+                (
+                    "Name:",
+                    resultsrecord.get_player_name_text(
+                        record.database, record.value.get_unpacked_playername()
+                    ),
                 ),
-            ),
-            ("ECF Name:", ecfname),
-            ("Grading Code:", ecfcode),
-        )
+                ("ECF Name:", ecfname),
+                ("Grading Code:", ecfcode),
+            )
+        finally:
+            record.database.end_read_only_transaction()
         edititems = (("Edit Grading Code", ecfcode),)
 
         super(ECFGradingCodeDialog, self).__init__(
@@ -535,14 +551,27 @@ class ECFGradingCodeDialog(ECFDetailDialog):
                 title="ECF detail Edit",
             )
             return
-        ecfplayer = ecfrecord.get_ecf_player_for_grading_code(
-            self.record.database, ecfcode
-        )
-        if ecfplayer is not None:
-            if not ecfplayer.value.ECFactive:
-                mapperson = ecfmaprecord.get_person_for_grading_code(
+        self.record.database.start_read_only_transaction()
+        try:
+            ecfplayer = ecfrecord.get_ecf_player_for_grading_code(
+                self.record.database, ecfcode
+            )
+            if ecfplayer is not None:
+                if not ecfplayer.value.ECFactive:
+                    mapperson = ecfmaprecord.get_person_for_grading_code(
+                        self.record.database, ecfcode
+                    )
+            else:
+                mapperson = ecfmaprecord.get_new_person_for_grading_code(
                     self.record.database, ecfcode
                 )
+        finally:
+            self.record.database.end_read_only_transaction()
+        if ecfplayer is not None:
+            if not ecfplayer.value.ECFactive:
+                #mapperson = ecfmaprecord.get_person_for_grading_code(
+                #    self.record.database, ecfcode
+                #)
                 if mapperson is not None:
                     dlg = tkinter.messagebox.showinfo(
                         parent=self.dialog,
@@ -612,11 +641,11 @@ class ECFGradingCodeDialog(ECFDetailDialog):
             )
             return
 
-        mapplayer = ecfmaprecord.get_new_person_for_grading_code(
-            self.record.database, ecfcode
-        )
-        if mapplayer is not None:
-            if self.record.value.playername != mapplayer.value.playername:
+        #mapplayer = ecfmaprecord.get_new_person_for_grading_code(
+        #    self.record.database, ecfcode
+        #)
+        if mapperson is not None:
+            if self.record.value.playername != mapperson.value.playername:
                 dlg = tkinter.messagebox.showinfo(
                     parent=self.dialog,
                     message=" ".join(
@@ -626,7 +655,7 @@ class ECFGradingCodeDialog(ECFDetailDialog):
                             "Code for",
                             "".join(
                                 (
-                                    mapplayer.value.playerecfname,
+                                    mapperson.value.playerecfname,
                                     " (another new player).",
                                 )
                             ),
@@ -743,9 +772,17 @@ class ECFDownloadGradingCodeDialog(ECFDetailDialog):
                 title="ECF Grading Code Download",
             )
             return
-        ecfplayer = ecfrecord.get_ecf_player_for_grading_code(
-            self.database, ecfcode
-        )
+        self.database.start_read_only_transaction()
+        try:
+            ecfplayer = ecfrecord.get_ecf_player_for_grading_code(
+                self.database, ecfcode
+            )
+            if ecfplayer is None:
+                mapplayer = ecfmaprecord.get_new_person_for_grading_code(
+                    self.database, ecfcode
+                )
+        finally:
+            self.database.end_read_only_transaction()
         if ecfplayer is not None:
             dlg = tkinter.messagebox.showinfo(
                 parent=self.dialog,
@@ -760,10 +797,6 @@ class ECFDownloadGradingCodeDialog(ECFDetailDialog):
                 title="ECF Grading Code Download",
             )
             return
-
-        mapplayer = ecfmaprecord.get_new_person_for_grading_code(
-            self.database, ecfcode
-        )
         if mapplayer is not None:
             dlg = tkinter.messagebox.showinfo(
                 parent=self.dialog,
@@ -908,9 +941,17 @@ class ECFDownloadPlayerNameDialog(ECFDetailDialog):
                 title="ECF Player Name Download",
             )
             return
-        ecfplayer = ecfrecord.get_ecf_player_for_grading_code(
-            self.database, ecfcode
-        )
+        self.database.start_read_only_transaction()
+        try:
+            ecfplayer = ecfrecord.get_ecf_player_for_grading_code(
+                self.database, ecfcode
+            )
+            if ecfplayer is not None:
+                mapplayer = ecfmaprecord.get_new_person_for_grading_code(
+                    self.database, ecfcode
+                )
+        finally:
+            self.database.end_read_only_transaction()
         if ecfplayer is None:
             dlg = tkinter.messagebox.showinfo(
                 parent=self.dialog,
@@ -924,10 +965,6 @@ class ECFDownloadPlayerNameDialog(ECFDetailDialog):
                 title="ECF Player Name Download",
             )
             return
-
-        mapplayer = ecfmaprecord.get_new_person_for_grading_code(
-            self.database, ecfcode
-        )
         if mapplayer is not None:
             dlg = tkinter.messagebox.showinfo(
                 parent=self.dialog,
@@ -1035,7 +1072,13 @@ class ECFDownloadClubCodeDialog(ECFDetailDialog):
                 title="ECF Club Code Download",
             )
             return
-        ecfclub = ecfrecord.get_ecf_club_for_club_code(self.database, clubcode)
+        self.database.start_read_only_transaction()
+        try:
+            ecfclub = ecfrecord.get_ecf_club_for_club_code(
+                self.database, clubcode
+            )
+        finally:
+            self.database.end_read_only_transaction()
         if ecfclub:
             tkinter.messagebox.showinfo(
                 parent=self.dialog,

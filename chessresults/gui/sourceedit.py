@@ -146,9 +146,16 @@ class SourceEdit(sourceedit.SourceEdit):
         for cp in clubs.values():
             for pn in cp:
                 eventname.add(pn[1:-1])
-        event, events = get_events_matching_event_name(
-            db, eventname, data.collation.matches
-        )
+        if db is not None:
+            db.start_read_only_transaction()
+            try:
+                event, events = get_events_matching_event_name(
+                    db, eventname, data.collation.matches
+                )
+            finally:
+                db.end_read_only_transaction()
+        else:
+            event = False
         genres = self.generated_results
 
         # No database open or not using ecf module.

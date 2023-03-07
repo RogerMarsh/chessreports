@@ -243,6 +243,12 @@ class dBaseapi:  # (Database):
         """Return dBaseapiRoot instance."""
         return dBaseapiRoot(dd, fname, dptdesc, sfi)
 
+    def start_read_only_transaction(self):
+        """Do nothing, present for compatibility with Symas LMMD."""
+
+    def end_read_only_transaction(self):
+        """Do nothing, present for compatibility with Symas LMMD."""
+
 
 class dBaseIII:
     """Emulate Berkeley DB file and record structure for dBase III files.

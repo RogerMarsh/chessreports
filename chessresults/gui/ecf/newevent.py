@@ -749,25 +749,29 @@ class NewEvent(panel.PlainPanel):
 
     def _get_event_and_ecf_event_records(self, selection):
         db = self.get_appsys().get_results_database()
-        eventrecord = resultsrecord.get_event_from_record_value(
-            db.get_primary_record(
-                filespec.EVENT_FILE_DEF,
-                selection[0][-1],
+        db.start_read_only_transaction()
+        try:
+            eventrecord = resultsrecord.get_event_from_record_value(
+                db.get_primary_record(
+                    filespec.EVENT_FILE_DEF,
+                    selection[0][-1],
+                )
             )
-        )
-        ecfeventrecord = ecfrecord.get_ecf_event(
-            db.get_primary_record(
-                filespec.ECFEVENT_FILE_DEF,
-                db.database_cursor(
+            ecfeventrecord = ecfrecord.get_ecf_event(
+                db.get_primary_record(
                     filespec.ECFEVENT_FILE_DEF,
-                    filespec.ECFEVENTIDENTITY_FIELD_DEF,
-                ).get_unique_primary_for_index_key(
-                    db.encode_record_number(
-                        eventrecord.value.get_event_identity()
-                    )
-                ),
+                    db.database_cursor(
+                        filespec.ECFEVENT_FILE_DEF,
+                        filespec.ECFEVENTIDENTITY_FIELD_DEF,
+                    ).get_unique_primary_for_index_key(
+                        db.encode_record_number(
+                            eventrecord.value.get_event_identity()
+                        )
+                    ),
+                )
             )
-        )
+        finally:
+            db.end_read_only_transaction()
         return (eventrecord, ecfeventrecord)
 
 

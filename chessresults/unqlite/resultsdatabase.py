@@ -16,11 +16,25 @@ class ResultsDatabase(database.Database, unqlite_database.Database):
     _datasourceset_modulename = "solentware_grid.core.datasourceset"
     _knownnames_modulename = "chessresults.basecore.knownnamesds"
 
-    def __init__(self, nosqlfile, **kargs):
-        """Define database specification and environment then delegate."""
-        names = FileSpec(**kargs)
+    def __init__(
+        self,
+        nosqlfile,
+        use_specification_items=None,
+        dpt_records=None,
+        **kargs,
+    ):
+        """Define database specification then delegate."""
+        names = FileSpec(
+            use_specification_items=use_specification_items,
+            dpt_records=dpt_records,
+        )
 
-        super(ResultsDatabase, self).__init__(names, nosqlfile, **kargs)
+        super().__init__(
+            names,
+            nosqlfile,
+            use_specification_items=use_specification_items,
+            **kargs,
+        )
 
     def delete_database(self):
         """Close and delete the open chess results database."""

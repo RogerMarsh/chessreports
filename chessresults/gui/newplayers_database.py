@@ -139,7 +139,11 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
             return
 
         db = self.get_appsys().get_results_database()
-        mainentry = mergeplayers.get_person_for_alias_key(db, psel[0])
+        db.start_read_only_transaction()
+        try:
+            mainentry = mergeplayers.get_person_for_alias_key(db, psel[0])
+        finally:
+            db.end_read_only_transaction()
         if mainentry is None:
             dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
@@ -147,7 +151,11 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                 title=msgtitle,
             )
             return
-        gpfak = mergeplayers.get_persons_for_alias_keys(db, pbkm)
+        db.start_read_only_transaction()
+        try:
+            gpfak = mergeplayers.get_persons_for_alias_keys(db, pbkm)
+        finally:
+            db.end_read_only_transaction()
         if None in gpfak:
             msg = []
             for k in gpfak[None]:
@@ -172,39 +180,6 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                 title=msgtitle,
             )
             return
-        h = []
-        r = []
-        h.append(
-            "\n".join(
-                (
-                    "".join(
-                        (
-                            resultsrecord.get_player_name_text_tabs(
-                                db, mainentry.value.identity()
-                            ),
-                        )
-                    ),
-                    " ".join(
-                        (
-                            "\nwill become the main entry on the existing player list",
-                            "for the following aliases. These aliases will be",
-                            "removed from the list if main entries only are listed",
-                            "and will lose any main entry highlighting otherwise.\n",
-                        )
-                    ),
-                )
-            )
-        )
-        for e in entries:
-            h.append(
-                "".join(
-                    (
-                        resultsrecord.get_player_name_text_tabs(
-                            db, e.value.identity()
-                        ),
-                    )
-                )
-            )
 
         def generate_report(mainrecord):
             ra = []
@@ -236,28 +211,11 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                 )
             return ra
 
-        ra = generate_report(mainentry)
-        if ra is None:
-            return
-        if ra:
-            r.append(
-                "\n".join(
-                    (
-                        " ".join(("The current aliases of\n",)),
-                        "".join(
-                            (
-                                resultsrecord.get_player_name_text_tabs(
-                                    db, mainentry.value.identity()
-                                ),
-                            )
-                        ),
-                        " ".join(("\nwill be kept. These are\n",)),
-                    )
-                )
-            )
-            r.extend(ra)
-        else:
-            r.append(
+        h = []
+        r = []
+        db.start_read_only_transaction()
+        try:
+            h.append(
                 "\n".join(
                     (
                         "".join(
@@ -267,35 +225,44 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                                 ),
                             )
                         ),
-                        " ".join(("\nhas no aliases.",)),
+                        " ".join(
+                            (
+                                "\nwill become the main entry on the existing",
+                                "player list for the following aliases. These",
+                                "aliases will be removed from the list if",
+                                "main entries only are listed and will lose",
+                                "any main entry highlighting otherwise.\n",
+                            )
+                        ),
                     )
                 )
             )
-        for e in entries:
-            ra = generate_report(e)
+            for e in entries:
+                h.append(
+                    "".join(
+                        (
+                            resultsrecord.get_player_name_text_tabs(
+                                db, e.value.identity()
+                            ),
+                        )
+                    )
+                )
+            ra = generate_report(mainentry)
             if ra is None:
                 return
             if ra:
                 r.append(
                     "\n".join(
                         (
-                            " ".join(
-                                ("\nThe entry on the existing player list\n",)
-                            ),
+                            " ".join(("The current aliases of\n",)),
                             "".join(
                                 (
                                     resultsrecord.get_player_name_text_tabs(
-                                        db, e.value.identity()
+                                        db, mainentry.value.identity()
                                     ),
                                 )
                             ),
-                            " ".join(
-                                (
-                                    "\nand it's aliases",
-                                    "will become aliases of the new main entry.",
-                                    "The aliases are\n",
-                                )
-                            ),
+                            " ".join(("\nwill be kept. These are\n",)),
                         )
                     )
                 )
@@ -304,25 +271,67 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                 r.append(
                     "\n".join(
                         (
-                            " ".join(
-                                ("\nThe entry on the existing player list\n",)
-                            ),
                             "".join(
                                 (
                                     resultsrecord.get_player_name_text_tabs(
-                                        db, e.value.identity()
+                                        db, mainentry.value.identity()
                                     ),
                                 )
                             ),
-                            " ".join(
-                                (
-                                    "\nhas no aliases and will become an alias of the",
-                                    "new main entry.",
-                                )
-                            ),
+                            " ".join(("\nhas no aliases.",)),
                         )
                     )
                 )
+            for e in entries:
+                ra = generate_report(e)
+                if ra is None:
+                    return
+                if ra:
+                    r.append(
+                        "\n".join(
+                            (
+                                "\nThe entry on the existing player list\n",
+                                "".join(
+                                    (
+                                        resultsrecord.get_player_name_text_tabs(
+                                            db, e.value.identity()
+                                        ),
+                                    )
+                                ),
+                                " ".join(
+                                    (
+                                        "\nand it's aliases",
+                                        "will become aliases of the new main",
+                                        "entry. The aliases are\n",
+                                    )
+                                ),
+                            )
+                        )
+                    )
+                    r.extend(ra)
+                else:
+                    r.append(
+                        "\n".join(
+                            (
+                                "\nThe entry on the existing player list\n",
+                                "".join(
+                                    (
+                                        resultsrecord.get_player_name_text_tabs(
+                                            db, e.value.identity()
+                                        ),
+                                    )
+                                ),
+                                " ".join(
+                                    (
+                                        "\nhas no aliases and will become an",
+                                        "alias of the new main entry.",
+                                    )
+                                ),
+                            )
+                        )
+                    )
+        finally:
+            db.end_read_only_transaction()
 
         cdlg = dialogue.ModalConfirm(
             parent=self,
@@ -392,11 +401,21 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
             return
 
         db = self.get_appsys().get_results_database()
-        gnpfak = mergeplayers.get_new_players_for_alias_keys(db, nbkm)
+        db.start_read_only_transaction()
+        try:
+            gnpfak = mergeplayers.get_new_players_for_alias_keys(db, nbkm)
+        finally:
+            db.end_read_only_transaction()
         if None in gnpfak:
             msg = []
-            for k in gnpfak[None]:
-                msg.append(resultsrecord.get_player_name_text_tabs(db, k[0]))
+            db.start_read_only_transaction()
+            try:
+                for k in gnpfak[None]:
+                    msg.append(
+                        resultsrecord.get_player_name_text_tabs(db, k[0])
+                    )
+            finally:
+                db.end_read_only_transaction()
             dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
@@ -414,9 +433,13 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                 playerkey = nsel[0]
             else:
                 playerkey = nbkm[0]
-            mainentry = mergeplayers.get_new_player_for_alias_key(
-                db, playerkey
-            )
+            db.start_read_only_transaction()
+            try:
+                mainentry = mergeplayers.get_new_player_for_alias_key(
+                    db, playerkey
+                )
+            finally:
+                db.end_read_only_transaction()
             if mainentry is None:
                 dlg = tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
@@ -433,7 +456,11 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                 playerkey = psel[0]
             else:
                 playerkey = pbkm[0]
-            mainentry = mergeplayers.get_person_for_alias_key(db, playerkey)
+            db.start_read_only_transaction()
+            try:
+                mainentry = mergeplayers.get_person_for_alias_key(db, playerkey)
+            finally:
+                db.end_read_only_transaction()
             if mainentry is None:
                 dlg = tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
@@ -442,7 +469,11 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                 )
                 return
             if len(nsel):
-                r = mergeplayers.get_new_player_for_alias_key(db, nsel[0])
+                db.start_read_only_transaction()
+                try:
+                    r = mergeplayers.get_new_player_for_alias_key(db, nsel[0])
+                finally:
+                    db.end_read_only_transaction()
                 if r is None:
                     dlg = tkinter.messagebox.showinfo(
                         parent=self.get_widget(),
@@ -468,39 +499,43 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
             return
 
         entries = [v for k, v in gnpfak.items()]
-        h = "\n".join(
-            (
-                " ".join(
-                    (
-                        "The new player entries listed below will be added",
-                        "as aliases of\n",
-                    )
-                ),
-                "".join(
-                    (
-                        resultsrecord.get_player_name_text_tabs(
-                            db, mainentry.value.identity()
-                        ),
-                    )
-                ),  # should the next bit be here rather than in caption
-                " ".join(
-                    (
-                        "\nAll the entries listed below",
-                        "will be removed from the new player list.",
-                    )
-                ),
-            )
-        )
-        a = [
-            "".join(
+        db.start_read_only_transaction()
+        try:
+            h = "\n".join(
                 (
-                    resultsrecord.get_player_name_text_tabs(
-                        db, e.value.identity()
+                    " ".join(
+                        (
+                            "The new player entries listed below will be",
+                            "added as aliases of\n",
+                        )
+                    ),
+                    "".join(
+                        (
+                            resultsrecord.get_player_name_text_tabs(
+                                db, mainentry.value.identity()
+                            ),
+                        )
+                    ),  # should the next bit be here rather than in caption
+                    " ".join(
+                        (
+                            "\nAll the entries listed below",
+                            "will be removed from the new player list.",
+                        )
                     ),
                 )
             )
-            for e in entries
-        ]
+            a = [
+                "".join(
+                    (
+                        resultsrecord.get_player_name_text_tabs(
+                            db, e.value.identity()
+                        ),
+                    )
+                )
+                for e in entries
+            ]
+        finally:
+            db.end_read_only_transaction()
         if len(a):
             a.insert(
                 0,

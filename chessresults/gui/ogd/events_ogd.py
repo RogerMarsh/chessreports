@@ -17,7 +17,7 @@ class Events(events_lite.Events):
         """Extend and define the results database events panel."""
         super(Events, self).__init__(parent=parent, cnf=cnf, **kargs)
 
-    def get_gradingcodes(self, database):
+    def get_gradingcodes(self, database, players):
         """Return dict of ECF codes for players, default empty dict."""
         return {
             p: ecfgcodemaprecord.get_grading_code_for_person(database, person)

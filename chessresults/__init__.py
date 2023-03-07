@@ -12,6 +12,7 @@ from solentware_base.core.constants import (
     UNQLITE_MODULE,
     VEDIS_MODULE,
     DB_TCL_MODULE,
+    LMDB_MODULE,
 )
 
 # berkeleydb interface module name
@@ -38,6 +39,9 @@ _VEDISRESULTS = __name__ + ".vedis.resultsdatabase"
 # tkinter Tcl API interface module name
 _DB_TCLRESULTS = __name__ + ".db_tkinter.resultsdatabase"
 
+# lmdb interface module name
+_LMDBRESULTS = __name__ + ".lmdb.resultsdatabase"
+
 # Map database module names to application module
 APPLICATION_DATABASE_MODULE = {
     BERKELEYDB_MODULE: _BERKELEYDBRESULTS,
@@ -48,6 +52,7 @@ APPLICATION_DATABASE_MODULE = {
     UNQLITE_MODULE: _UNQLITERESULTS,
     VEDIS_MODULE: _VEDISRESULTS,
     DB_TCL_MODULE: _DB_TCLRESULTS,
+    LMDB_MODULE: _LMDBRESULTS,
 }
 
 # Default ECF reference data import module name
@@ -72,6 +77,7 @@ ECF_DATA_IMPORT_MODULE = {
     UNQLITE_MODULE: _BASECORE_ECF_DATA_IMPORT,
     VEDIS_MODULE: _BASECORE_ECF_DATA_IMPORT,
     DB_TCL_MODULE: _BASECORE_ECF_DATA_IMPORT,
+    LMDB_MODULE: _BASECORE_ECF_DATA_IMPORT,
 }
 
 # Map database module names to ECF Online Grading Database data import module
@@ -84,6 +90,7 @@ ECF_OGD_DATA_IMPORT_MODULE = {
     UNQLITE_MODULE: _BASECORE_ECF_OGD_DATA_IMPORT,
     VEDIS_MODULE: _BASECORE_ECF_OGD_DATA_IMPORT,
     DB_TCL_MODULE: _BASECORE_ECF_OGD_DATA_IMPORT,
+    LMDB_MODULE: _BASECORE_ECF_OGD_DATA_IMPORT,
 }
 
 # Default known name datasource module name
@@ -102,6 +109,7 @@ KNOWN_NAME_DATASOURCE_MODULE = {
     UNQLITE_MODULE: _BASECORE_KNOWN_NAME,
     VEDIS_MODULE: _BASECORE_KNOWN_NAME,
     DB_TCL_MODULE: _BASECORE_KNOWN_NAME,
+    LMDB_MODULE: _BASECORE_KNOWN_NAME,
 }
 
 APPLICATION_NAME = "Results"

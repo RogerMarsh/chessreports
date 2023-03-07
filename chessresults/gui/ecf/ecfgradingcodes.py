@@ -142,17 +142,31 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             return
 
         db = self.get_appsys().get_results_database()
-        mr = ecfmaprecord.get_person(db, npsel[0][-1])
+        db.start_read_only_transaction()
+        try:
+            mr = ecfmaprecord.get_person(db, npsel[0][-1])
+            if mr is None:
+                pr = ecfmaprecord.ECFmapDBrecordPlayer()
+                pr.load_record(self.newpersongrid.objects[npsel[0]])
+                name_text = resultsrecord.get_player_name_text(
+                    db, pr.value.get_unpacked_playername()
+                )
+            elif mr.value.playercode is None:
+                name_text = resultsrecord.get_player_name_text(
+                    db, mr.value.get_unpacked_playername()
+                )
+            else:
+                name_text = resultsrecord.get_player_name_text(
+                    db, mr.value.get_unpacked_playername()
+                )
+        finally:
+            db.end_read_only_transaction()
         if mr is None:
-            pr = ecfmaprecord.ECFmapDBrecordPlayer()
-            pr.load_record(self.newpersongrid.objects[npsel[0]])
             dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
-                        resultsrecord.get_player_name_text(
-                            db, pr.value.get_unpacked_playername()
-                        ),
+                        name_text,
                         "\nrecord has been deleted.\nCannot ",
                         "proceed with amendment of ECF version of name.",
                     )
@@ -165,9 +179,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                 parent=self.get_widget(),
                 message="".join(
                     (
-                        resultsrecord.get_player_name_text(
-                            db, mr.value.get_unpacked_playername()
-                        ),
+                        name_text,
                         "\nrecord is not linked to an ECF grading code record ",
                         "so Cancel Edit is not allowed.\n",
                         "Use Identify to link the player to an ECF grading code ",
@@ -184,9 +196,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             message="".join(
                 (
                     "Confirm edit of ECF version of name of\n",
-                    resultsrecord.get_player_name_text(
-                        db, mr.value.get_unpacked_playername()
-                    ),
+                    name_text,
                     "\nto be cancelled.",
                 )
             ),
@@ -229,17 +239,27 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             return
 
         db = self.get_appsys().get_results_database()
-        mr = ecfmaprecord.get_person(db, npsel[0][-1])
+        db.start_read_only_transaction()
+        try:
+            mr = ecfmaprecord.get_person(db, npsel[0][-1])
+            if mr is None:
+                pr = ecfmaprecord.ECFmapDBrecordPlayer()
+                pr.load_record(self.newpersongrid.objects[npsel[0]])
+                name_text = resultsrecord.get_player_name_text(
+                    db, pr.value.get_unpacked_playername()
+                )
+            else:
+                name_text = resultsrecord.get_player_name_text(
+                    db, mr.value.get_unpacked_playername()
+                )
+        finally:
+            db.end_read_only_transaction()
         if mr is None:
-            pr = ecfmaprecord.ECFmapDBrecordPlayer()
-            pr.load_record(self.newpersongrid.objects[npsel[0]])
             dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
-                        resultsrecord.get_player_name_text(
-                            db, pr.value.get_unpacked_playername()
-                        ),
+                        name_text,
                         "\nrecord has been deleted.\nCannot ",
                         "proceed with amendment of ECF version of name.",
                     )
@@ -253,9 +273,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                     parent=self.get_widget(),
                     message="".join(
                         (
-                            resultsrecord.get_player_name_text(
-                                db, mr.value.get_unpacked_playername()
-                            ),
+                            name_text,
                             "\nrecord has ECF Grading Code.\nCannot ",
                             "proceed with amendment of ECF version of name.",
                         )
@@ -302,7 +320,21 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             return
 
         db = self.get_appsys().get_results_database()
-        mr = ecfmaprecord.get_person(db, npsel[0][-1])
+        db.start_read_only_transaction()
+        try:
+            mr = ecfmaprecord.get_person(db, npsel[0][-1])
+            if mr is None:
+                pr = ecfmaprecord.ECFmapDBrecordPlayer()
+                pr.load_record(self.newpersongrid.objects[npsel[0]])
+                name_text = resultsrecord.get_player_name_text(
+                    db, pr.value.get_unpacked_playername()
+                )
+            else:
+                name_text = resultsrecord.get_player_name_text(
+                    db, mr.value.get_unpacked_playername()
+                )
+        finally:
+            db.end_read_only_transaction()
         if mr is None:
             pr = ecfmaprecord.ECFmapDBrecordPlayer()
             pr.load_record(self.newpersongrid.objects[npsel[0]])
@@ -310,9 +342,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                 parent=self.get_widget(),
                 message="".join(
                     (
-                        resultsrecord.get_player_name_text(
-                            db, pr.value.get_unpacked_playername()
-                        ),
+                        name_text,
                         "\nrecord has been deleted.\nCannot ",
                         "proceed with amendment of grading code.",
                     )
@@ -325,9 +355,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                 parent=self.get_widget(),
                 message="".join(
                     (
-                        resultsrecord.get_player_name_text(
-                            db, mr.value.get_unpacked_playername()
-                        ),
+                        name_text,
                         "\nrecord has no ECF version of name.\nCannot ",
                         "proceed with amendment of grading code.",
                     )
@@ -340,9 +368,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                 parent=self.get_widget(),
                 message="".join(
                     (
-                        resultsrecord.get_player_name_text(
-                            db, mr.value.get_unpacked_playername()
-                        ),
+                        name_text,
                         "\nrecord is linked to an ECF grading code record ",
                         mr.value.playercode,
                         " so editing the grading code is not allowed.\n",
@@ -439,17 +465,27 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             return
 
         db = self.get_appsys().get_results_database()
-        mr = ecfmaprecord.get_person(db, npsel[0][-1])
+        db.start_read_only_transaction()
+        try:
+            mr = ecfmaprecord.get_person(db, npsel[0][-1])
+            if mr is None:
+                pr = ecfmaprecord.ECFmapDBrecordPlayer()
+                pr.load_record(self.newpersongrid.objects[npsel[0]])
+                name_text = resultsrecord.get_player_name_text(
+                    db, pr.value.get_unpacked_playername()
+                )
+            else:
+                name_text = resultsrecord.get_player_name_text(
+                    db, mr.value.get_unpacked_playername()
+                )
+        finally:
+            db.end_read_only_transaction()
         if mr is None:
-            pr = ecfmaprecord.ECFmapDBrecordPlayer()
-            pr.load_record(self.newpersongrid.objects[npsel[0]])
             dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
-                        resultsrecord.get_player_name_text(
-                            db, pr.value.get_unpacked_playername()
-                        ),
+                        name_text,
                         "\nrecord has been deleted.\nCannot ",
                         "proceed with adjustment of identification.",
                     )
@@ -462,9 +498,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                 parent=self.get_widget(),
                 message="".join(
                     (
-                        resultsrecord.get_player_name_text(
-                            db, mr.value.get_unpacked_playername()
-                        ),
+                        name_text,
                         "\nrecord is linked to an ECF grading code record ",
                         mr.value.playercode,
                         " so releasing player for adjustment on Player tabs is ",
@@ -476,15 +510,12 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                 title=msgtitle,
             )
             return
-
         if not tkinter.messagebox.askyesno(
             parent=self.get_widget(),
             message="".join(
                 (
                     "Confirm\n",
-                    resultsrecord.get_player_name_text(
-                        db, mr.value.get_unpacked_playername()
-                    ),
+                    name_text,
                     "\nto be removed from this tab ",
                     "for adjustment of identification.",
                 )
@@ -531,10 +562,39 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             return
 
         db = self.get_appsys().get_results_database()
-        ecfrec = ecfrecord.get_ecf_player(db, epsel[0][-1])
-        cpc = ecfmaprecord.get_person_for_grading_code(
-            db, ecfrec.value.ECFcode
-        )
+        db.start_read_only_transaction()
+        try:
+            ecfrec = ecfrecord.get_ecf_player(db, epsel[0][-1])
+            cpc = ecfmaprecord.get_person_for_grading_code(
+                db, ecfrec.value.ECFcode
+            )
+            if cpc is None:
+                mr = ecfmaprecord.get_person(db, npsel[0][-1])
+                if mr is None:
+                    pr = ecfmaprecord.ECFmapDBrecordPlayer()
+                    pr.load_record(self.newpersongrid.objects[npsel[0]])
+                    name_text = resultsrecord.get_player_name_text(
+                        db, pr.value.get_unpacked_playername()
+                    )
+                elif mr.value.playercode:
+                    name_text = resultsrecord.get_player_name_text(
+                        db, mr.value.get_unpacked_playername()
+                    )
+                else:
+                    name_text = resultsrecord.get_player_name_text(
+                        db,
+                        resultsrecord.get_unpacked_player_identity(
+                            self.newpersongrid.objects[
+                                npsel[0]
+                            ].value.playername
+                        ),
+                    )
+            else:
+                name_text = resultsrecord.get_player_name_text(
+                    db, cpc.value.get_unpacked_playername()
+                )
+        finally:
+            db.end_read_only_transaction()
         if cpc is not None:
             dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
@@ -543,9 +603,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                         "Grading Code ",
                         ecfrec.value.ECFcode,
                         " is already linked to\n",
-                        resultsrecord.get_player_name_text(
-                            db, cpc.value.get_unpacked_playername()
-                        ),
+                        name_text,
                         ".\nIf the new link is correct you will need either to ",
                         "return the new player to the New Player tab and ",
                         "merge with the player who has the grading code ",
@@ -556,18 +614,12 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                 title=msgtitle,
             )
             return
-
-        mr = ecfmaprecord.get_person(db, npsel[0][-1])
         if mr is None:
-            pr = ecfmaprecord.ECFmapDBrecordPlayer()
-            pr.load_record(self.newpersongrid.objects[npsel[0]])
             dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
-                        resultsrecord.get_player_name_text(
-                            db, pr.value.get_unpacked_playername()
-                        ),
+                        name_text,
                         "\nrecord has been deleted.\n",
                         "Cannot proceed with grading code allocation.",
                     )
@@ -580,9 +632,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                 parent=self.get_widget(),
                 message="".join(
                     (
-                        resultsrecord.get_player_name_text(
-                            db, mr.value.get_unpacked_playername()
-                        ),
+                        name_text,
                         "\nrecord is linked to an ECF grading code record ",
                         mr.value.playercode,
                         " so linking player to another grading code is ",
@@ -605,14 +655,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                         (" (", ")")
                     ),
                     "\nto be linked to\n",
-                    resultsrecord.get_player_name_text(
-                        db,
-                        resultsrecord.get_unpacked_player_identity(
-                            self.newpersongrid.objects[
-                                npsel[0]
-                            ].value.playername
-                        ),
-                    ),
+                    name_text,
                     ".",
                 )
             ),

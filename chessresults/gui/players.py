@@ -119,7 +119,11 @@ class Players(panel.PanedPanelGridSelectorBar):
             )
             return
 
-        mainentry = mergeplayers.get_person_for_alias_key(db, psel[0])
+        db.start_read_only_transaction()
+        try:
+            mainentry = mergeplayers.get_person_for_alias_key(db, psel[0])
+        finally:
+            db.end_read_only_transaction()
         if mainentry is None:
             dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
@@ -132,7 +136,11 @@ class Players(panel.PanedPanelGridSelectorBar):
                 title=title,
             )
             return
-        demergeentry = resultsrecord.get_alias(db, asel[0][-1])
+        db.start_read_only_transaction()
+        try:
+            demergeentry = resultsrecord.get_alias(db, asel[0][-1])
+        finally:
+            db.end_read_only_transaction()
         if demergeentry is None:
             dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
@@ -150,58 +158,73 @@ class Players(panel.PanedPanelGridSelectorBar):
         if len(mainentry.value.get_alias_list()):
             if demergekey == mainentry.key.recno:  # use report when ready
                 pvi = mainentry.value.identity()
-                playermap = ecfmaprecord.get_person_for_player(
-                    db, mainentry.key.recno
-                )
-                playergcode = ecfgcodemaprecord.get_grading_code_for_person(
-                    db, mainentry
-                )
-                rep = []
-                head = [
-                    "\n\n".join(
-                        (
-                            "Cannot break merge for",
-                            resultsrecord.get_player_name_text_tabs(db, pvi),
-                            "because other aliases exist. These are listed below.",
+                db.start_read_only_transaction()
+                try:
+                    playermap = ecfmaprecord.get_person_for_player(
+                        db, mainentry.key.recno
+                    )
+                    playergcode = (
+                        ecfgcodemaprecord.get_grading_code_for_person(
+                            db, mainentry
                         )
                     )
-                ]
-                if playermap:
-                    head.append(
-                        " ".join(
+                    rep = []
+                    head = [
+                        "\n\n".join(
                             (
-                                "\n\nThis alias is linked to an ECF Grading Code",
-                                "from the ECF master list",
-                                "which also prevents breaking single merge.",
-                            )
-                        )
-                    )
-                if playergcode:
-                    head.append(
-                        " ".join(
-                            (
-                                "\n\nThis alias is linked to a ECF Grading Code",
-                                "from the online grading database",
-                                "which also prevents breaking single merge.",
-                            )
-                        )
-                    )
-                for sk in mainentry.value.alias:
-                    r = resultsrecord.get_alias(db, sk)
-                    if r is not None:
-                        rvi = r.value.identity()
-                        if playermap is None:
-                            rep.append(
+                                "Cannot break merge for",
                                 resultsrecord.get_player_name_text_tabs(
-                                    db, rvi
+                                    db, pvi
+                                ),
+                                " ".join(
+                                    (
+                                        "because other aliases exist.",
+                                        "These are listed below.",
+                                    )
+                                ),
+                            )
+                        )
+                    ]
+                    if playermap:
+                        head.append(
+                            " ".join(
+                                (
+                                    "\n\nThis alias is linked to an ECF",
+                                    "Grading Code from the ECF master list",
+                                    "which also prevents breaking",
+                                    "single merge.",
                                 )
                             )
-                        elif pvi != rvi:
-                            rep.append(
-                                resultsrecord.get_player_name_text_tabs(
-                                    db, rvi
+                        )
+                    if playergcode:
+                        head.append(
+                            " ".join(
+                                (
+                                    "\n\nThis alias is linked to a ECF",
+                                    "Grading Code from the online grading",
+                                    "database which also prevents breaking",
+                                    "single merge.",
                                 )
                             )
+                        )
+                    for sk in mainentry.value.alias:
+                        r = resultsrecord.get_alias(db, sk)
+                        if r is not None:
+                            rvi = r.value.identity()
+                            if playermap is None:
+                                rep.append(
+                                    resultsrecord.get_player_name_text_tabs(
+                                        db, rvi
+                                    )
+                                )
+                            elif pvi != rvi:
+                                rep.append(
+                                    resultsrecord.get_player_name_text_tabs(
+                                        db, rvi
+                                    )
+                                )
+                finally:
+                    db.end_read_only_transaction()
                 if len(rep):
                     rep.insert(
                         0, "The following aliases can be demerged singly:\n"
@@ -217,74 +240,77 @@ class Players(panel.PanedPanelGridSelectorBar):
                     tabstyle="tabular",
                 )
                 return
-            elif demergekey not in mainentry.value.alias:
+            db.start_read_only_transaction()
+            try:
+                dmergename = resultsrecord.get_player_name_text(
+                    db, demergeentry.value.identity()
+                )
+                mainname = resultsrecord.get_player_name_text(
+                    db, mainentry.value.identity()
+                )
+            finally:
+                db.end_read_only_transaction()
+            if demergekey not in mainentry.value.alias:
                 dlg = tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message="".join(
                         (
                             "Cannot break merge because\n\n",
-                            resultsrecord.get_player_name_text(
-                                db, demergeentry.value.identity()
-                            ),
+                            dmergename,
                             "\n\nis not an alias of\n\n",
-                            resultsrecord.get_player_name_text(
-                                db, mainentry.value.identity()
-                            ),
+                            mainname,
                             ".",
                         )
                     ),
                     title=title,
                 )
                 return
-            else:
-                if not tkinter.messagebox.askyesno(
+            if not tkinter.messagebox.askyesno(
+                parent=self.get_widget(),
+                message="".join(
+                    (
+                        "Confirm break merge of\n\n",
+                        dmergename,
+                        "\n\ninto\n\n",
+                        mainname,
+                        ".",
+                    )
+                ),
+                title=title,
+            ):
+                return
+
+            aliasrecord = resultsrecord.ResultsDBrecordPlayer()
+            db.start_read_only_transaction()
+            try:
+                r = db.get_primary_record(filespec.PLAYER_FILE_DEF, demergekey)
+            finally:
+                db.end_read_only_transaction()
+            if r is None:
+                dlg = tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message="".join(
                         (
-                            "Confirm break merge of\n\n",
-                            resultsrecord.get_player_name_text(
-                                db, demergeentry.value.identity()
-                            ),
-                            "\n\ninto\n\n",
-                            resultsrecord.get_player_name_text(
-                                db, mainentry.value.identity()
-                            ),
-                            ".",
+                            "Record for player\n\n",
+                            dmergename,
+                            "\n\ndoes not exist.",
                         )
                     ),
                     title=title,
-                ):
-                    return
-
-                aliasrecord = resultsrecord.ResultsDBrecordPlayer()
-                r = db.get_primary_record(filespec.PLAYER_FILE_DEF, demergekey)
-                if r is None:
-                    dlg = tkinter.messagebox.showinfo(
-                        parent=self.get_widget(),
-                        message="".join(
-                            (
-                                "Record for player\n\n",
-                                resultsrecord.get_player_name_text(
-                                    db, demergeentry.value.identity()
-                                ),
-                                "\n\ndoes not exist.",
-                            )
-                        ),
-                        title=title,
-                    )
-                    return
-
-                db.start_transaction()
-                aliasrecord.load_record(r)
-                newaliasrecord = aliasrecord.clone()
-                newaliasrecord.value.merge = None
-                newaliasrecord.value.alias = []
-                aliasrecord.edit_record(
-                    db,
-                    filespec.PLAYER_FILE_DEF,
-                    filespec.PLAYER_FIELD_DEF,
-                    newaliasrecord,
                 )
+                return
+
+            db.start_transaction()
+            aliasrecord.load_record(r)
+            newaliasrecord = aliasrecord.clone()
+            newaliasrecord.value.merge = None
+            newaliasrecord.value.alias = []
+            aliasrecord.edit_record(
+                db,
+                filespec.PLAYER_FILE_DEF,
+                filespec.PLAYER_FIELD_DEF,
+                newaliasrecord,
+            )
         elif demergekey != mainentry.key.recno:
             dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
@@ -416,7 +442,11 @@ class Players(panel.PanedPanelGridSelectorBar):
             return
 
         db = self.get_appsys().get_results_database()
-        mainentry = mergeplayers.get_person_for_alias_key(db, psel[0])
+        db.start_read_only_transaction()
+        try:
+            mainentry = mergeplayers.get_person_for_alias_key(db, psel[0])
+        finally:
+            db.end_read_only_transaction()
         if mainentry is None:
             dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
@@ -426,27 +456,38 @@ class Players(panel.PanedPanelGridSelectorBar):
             return
 
         pvi = mainentry.value.identity()
-        playermap = ecfmaprecord.get_person_for_player(db, mainentry.key.recno)
         if len(mainentry.value.get_alias_list()):
-            if playermap is None:
-                rep = [resultsrecord.get_player_name_text_tabs(db, pvi)]
-            else:
-                rep = []
-            for sk in mainentry.value.alias:
-                r = resultsrecord.get_alias(db, sk)
-                if r is not None:
-                    rvi = r.value.identity()
-                    if playermap is None:
-                        rep.append(
-                            resultsrecord.get_player_name_text_tabs(db, rvi)
-                        )
-                    elif pvi != rvi:
-                        rep.append(
-                            resultsrecord.get_player_name_text_tabs(db, rvi)
-                        )
-            if len(rep):
-                rep.insert(0, "The following aliases will be demerged:\n")
-            inf = "\n".join(rep)
+            db.start_read_only_transaction()
+            try:
+                playermap = ecfmaprecord.get_person_for_player(
+                    db, mainentry.key.recno
+                )
+                if playermap is None:
+                    rep = [resultsrecord.get_player_name_text_tabs(db, pvi)]
+                else:
+                    rep = []
+                for sk in mainentry.value.alias:
+                    r = resultsrecord.get_alias(db, sk)
+                    if r is not None:
+                        rvi = r.value.identity()
+                        if playermap is None:
+                            rep.append(
+                                resultsrecord.get_player_name_text_tabs(
+                                    db, rvi
+                                )
+                            )
+                        elif pvi != rvi:
+                            rep.append(
+                                resultsrecord.get_player_name_text_tabs(
+                                    db, rvi
+                                )
+                            )
+                if len(rep):
+                    rep.insert(0, "The following aliases will be demerged:\n")
+                inf = "\n".join(rep)
+                rrgpn = resultsrecord.get_player_name_text_tabs(db, pvi)
+            finally:
+                db.end_read_only_transaction()
             if playermap is None:
                 cdlg = dialogue.ModalConfirm(
                     parent=self,
@@ -461,12 +502,10 @@ class Players(panel.PanedPanelGridSelectorBar):
                             ),
                             "".join(
                                 (
-                                    resultsrecord.get_player_name_text_tabs(
-                                        db, pvi
-                                    ),
+                                    rrgpn,
                                     "\n\n",
-                                    "is not linked to an ECF Grading Code so all",
-                                    " aliases will be demerged",
+                                    "is not linked to an ECF Grading Code ",
+                                    "so all aliases will be demerged",
                                 )
                             ),
                         )
@@ -488,15 +527,14 @@ class Players(panel.PanedPanelGridSelectorBar):
                         (
                             "".join(
                                 (
-                                    resultsrecord.get_player_name_text_tabs(
-                                        db, pvi
-                                    ),
+                                    rrgpn,
                                     "\n\n",
                                     "is linked to an ECF Grading Code so all",
-                                    " aliases except this one will be demerged.",
-                                    "\n\n",
-                                    "You will have to break the link to the grading ",
-                                    "code if this must be broken as well",
+                                    " aliases except this one will be ",
+                                    "demerged.\n\n",
+                                    "You will have to break the link to the ",
+                                    "grading code if this must be broken as ",
+                                    "well",
                                 )
                             ),
                         )
@@ -513,6 +551,13 @@ class Players(panel.PanedPanelGridSelectorBar):
             if not cdlg.ok_pressed():
                 return
         else:
+            db.start_read_only_transaction()
+            try:
+                playermap = ecfmaprecord.get_person_for_player(
+                    db, mainentry.key.recno
+                )
+            finally:
+                db.end_read_only_transaction()
             if playermap is None:
                 if not tkinter.messagebox.askyesno(
                     parent=self.get_widget(),
@@ -520,8 +565,8 @@ class Players(panel.PanedPanelGridSelectorBar):
                         (
                             "Confirm Demerge for\n\n",
                             mainentry.value.name,
-                            "\n\nThere are no aliases.",
-                            "\nThe player is not linked to an ECF Grading Code.",
+                            "\n\nThere are no aliases.\nThe player ",
+                            "is not linked to an ECF Grading Code.",
                         )
                     ),
                     title=msgtitle,
@@ -544,32 +589,34 @@ class Players(panel.PanedPanelGridSelectorBar):
                 return
 
         db.start_transaction()
-        aliasrecord = resultsrecord.ResultsDBrecordPlayer()
-        for sk in mainentry.value.alias:
-            r = db.get_primary_record(filespec.PLAYER_FILE_DEF, sk)
-            if r is not None:
-                aliasrecord.load_record(r)
-                newaliasrecord = aliasrecord.clone()
+        try:
+            aliasrecord = resultsrecord.ResultsDBrecordPlayer()
+            for sk in mainentry.value.alias:
+                r = db.get_primary_record(filespec.PLAYER_FILE_DEF, sk)
+                if r is not None:
+                    aliasrecord.load_record(r)
+                    newaliasrecord = aliasrecord.clone()
+                    newaliasrecord.value.merge = None
+                    newaliasrecord.value.alias = []
+                    aliasrecord.edit_record(
+                        db,
+                        filespec.PLAYER_FILE_DEF,
+                        filespec.PLAYER_FIELD_DEF,
+                        newaliasrecord,
+                    )
+
+            newaliasrecord = mainentry.clone()
+            if playermap is None:
                 newaliasrecord.value.merge = None
                 newaliasrecord.value.alias = []
-                aliasrecord.edit_record(
-                    db,
-                    filespec.PLAYER_FILE_DEF,
-                    filespec.PLAYER_FIELD_DEF,
-                    newaliasrecord,
-                )
-
-        newaliasrecord = mainentry.clone()
-        if playermap is None:
-            newaliasrecord.value.merge = None
-            newaliasrecord.value.alias = []
-        mainentry.edit_record(
-            db,
-            filespec.PLAYER_FILE_DEF,
-            filespec.PLAYER_FIELD_DEF,
-            newaliasrecord,
-        )
-        db.commit()
+            mainentry.edit_record(
+                db,
+                filespec.PLAYER_FILE_DEF,
+                filespec.PLAYER_FIELD_DEF,
+                newaliasrecord,
+            )
+        finally:
+            db.commit()
 
         self.aliasgrid.bookmarks[:] = []
         self.aliasgrid.selection[:] = []

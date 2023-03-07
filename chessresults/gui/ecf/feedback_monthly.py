@@ -156,26 +156,30 @@ class FeedbackMonthly(panel.PlainPanel):
         mergeecfcodes = []
         playerset = set()
         clubset = set()
-        for sp in fb.submissionplayers[1:]:
-            elements = [e.strip() for e in sp.split("\t")]
-            ed = dict()
-            for e in elements:
-                f = e.split("=")
-                if len(f) != 2:
-                    continue
-                k = f[0].strip("#")
-                if k in knames:
-                    ed[k] = f[1].strip()
-            if len(pknames.intersection(ed)) == 2:
-                if ed["ECFCode"] not in playerset:
-                    if gepfgc(database, ed["ECFCode"]) is None:
-                        updateplayers.append(ed)
-                        playerset.add(ed["ECFCode"])
-            if len(cknames.intersection(ed)) == 2:
-                if ed["ClubCode"] not in clubset:
-                    if gecfcc(database, ed["ClubCode"]) is None:
-                        updateclubs.append(ed)
-                        clubset.add(ed["ClubCode"])
+        database.start_read_only_transaction()
+        try:
+            for sp in fb.submissionplayers[1:]:
+                elements = [e.strip() for e in sp.split("\t")]
+                ed = dict()
+                for e in elements:
+                    f = e.split("=")
+                    if len(f) != 2:
+                        continue
+                    k = f[0].strip("#")
+                    if k in knames:
+                        ed[k] = f[1].strip()
+                if len(pknames.intersection(ed)) == 2:
+                    if ed["ECFCode"] not in playerset:
+                        if gepfgc(database, ed["ECFCode"]) is None:
+                            updateplayers.append(ed)
+                            playerset.add(ed["ECFCode"])
+                if len(cknames.intersection(ed)) == 2:
+                    if ed["ClubCode"] not in clubset:
+                        if gecfcc(database, ed["ClubCode"]) is None:
+                            updateclubs.append(ed)
+                            clubset.add(ed["ClubCode"])
+        finally:
+            database.end_read_only_transaction()
 
         # Commented code displays the two blocks from which PINs and grading
         # codes are fitted together.

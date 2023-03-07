@@ -2,17 +2,15 @@
 # Copyright 2023 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Results database using Berkeley DB database via tkinter Tcl API."""
+"""Results database using Symas LMMD database via lmdb."""
 
-import os
-
-from solentware_base import db_tkinter_database
+from solentware_base import lmdb_database
 
 from ..core.filespec import FileSpec
 from ..basecore import database
 
 
-class ResultsDatabase(database.Database, db_tkinter_database.Database):
+class ResultsDatabase(database.Database, lmdb_database.Database):
     """Methods and data structures to create, open, and close database."""
 
     _datasourceset_modulename = "solentware_grid.core.datasourceset"
@@ -25,35 +23,22 @@ class ResultsDatabase(database.Database, db_tkinter_database.Database):
         dpt_records=None,
         **kargs,
     ):
-        """Define database specification and environment then delegate."""
+        """Define database specification then delegate."""
         dbnames = FileSpec(
             use_specification_items=use_specification_items,
             dpt_records=dpt_records,
         )
 
-        environment = {
-            "flags": (
-                "-create",
-                "-recover",
-                "-txn",
-                "-private",
-                "-system_mem",
-            ),
-        }
-
         super().__init__(
             dbnames,
-            folder=DBfile,
-            environment=environment,
+            DBfile,
             use_specification_items=use_specification_items,
             **kargs,
-        )
+            )
 
     def delete_database(self):
         """Close and delete the open chess results database."""
-        return super().delete_database(
-            (self.database_file, self._get_log_dir_name())
-        )
+        return super().delete_database((self.database_file,))
 
     # Not clear why _keyify is necessary or just returns value for Berkeley DB.
     def _keyify(self, value):

@@ -27,13 +27,17 @@ def display_player_details(myself, selections, title):
     db = myself.get_appsys().get_results_database()
     entries = dict()
     mainnotfound = dict()
-    for s in selections:
-        for k, v in s:
-            e = mergeplayers.get_person_for_alias_key(db, (k, v))
-            if e is None:
-                mainnotfound[v] = resultsrecord.get_alias(db, v)
-            elif e.key.recno not in entries:
-                entries[e.key.recno] = (e, (k, v))
+    db.start_read_only_transaction()
+    try:
+        for s in selections:
+            for k, v in s:
+                e = mergeplayers.get_person_for_alias_key(db, (k, v))
+                if e is None:
+                    mainnotfound[v] = resultsrecord.get_alias(db, v)
+                elif e.key.recno not in entries:
+                    entries[e.key.recno] = (e, (k, v))
+    finally:
+        db.end_read_only_transaction()
     if len(entries) == 0:
         dlg = tkinter.messagebox.showinfo(
             parent=myself.get_widget(),
@@ -119,20 +123,24 @@ def display_player_details(myself, selections, title):
                 continue
             identity, ecf, ogd, caption, aliases = detail
             if ecf or ogd:
-                header = "".join(
-                    (
-                        "Full details for\n",
-                        resultsrecord.get_player_name_text_tabs(
-                            db, selected.value.identity()
-                        ),
-                        "\n",
-                        "via the identity",
-                        "\n",
-                        identity,
-                        "\n",
-                        "are below, including ECF information.",
+                db.start_read_only_transaction()
+                try:
+                    header = "".join(
+                        (
+                            "Full details for\n",
+                            resultsrecord.get_player_name_text_tabs(
+                                db, selected.value.identity()
+                            ),
+                            "\n",
+                            "via the identity",
+                            "\n",
+                            identity,
+                            "\n",
+                            "are below, including ECF information.",
+                        )
                     )
-                )
+                finally:
+                    db.end_read_only_transaction()
             else:
                 header = "".join(
                     (
@@ -166,7 +174,11 @@ def display_player_details(myself, selections, title):
 def _alias_details(myself, selection, title):
     """Return (<identity name>, <ecf detail>, [<alias name>, ...])."""
     db = myself.get_appsys().get_results_database()
-    mainentry = mergeplayers.get_person_for_alias_key(db, selection)
+    db.start_read_only_transaction()
+    try:
+        mainentry = mergeplayers.get_person_for_alias_key(db, selection)
+    finally:
+        db.end_read_only_transaction()
     if mainentry is None:
         dlg = tkinter.messagebox.showinfo(
             parent=myself.get_widget(),
@@ -178,147 +190,160 @@ def _alias_details(myself, selection, title):
     ecfline = ""
     caption = ""
     ogdline = ""
-    if myself.get_appsys().show_master_list_grading_codes:
-        playermap = ecfmaprecord.get_person_for_player(db, mainentry.key.recno)
-        if playermap is None:
-            ecfline = "Player is not linked to an ECF master list code."
-        elif playermap.value.playercode:
-            playerecf = ecfrecord.get_ecf_player_for_grading_code(
-                db, playermap.value.playercode
+    db.start_read_only_transaction()
+    try:
+        if myself.get_appsys().show_master_list_grading_codes:
+            playermap = ecfmaprecord.get_person_for_player(
+                db, mainentry.key.recno
             )
-            if playerecf.value.ECFmerge:
-                mergecode = "".join(
-                    (
-                        "\n\nThe most recently applied ECF feedback notes ",
-                        "a merge into ",
-                        playerecf.value.ECFmerge,
-                    )
+            if playermap is None:
+                ecfline = "Player is not linked to an ECF master list code."
+            elif playermap.value.playercode:
+                playerecf = ecfrecord.get_ecf_player_for_grading_code(
+                    db, playermap.value.playercode
                 )
-                caption = "".join(
-                    (
-                        "Results submissions for this player will use the ",
-                        playermap.value.playercode,
-                        " grading code.\nThis is certain to be our player ",
-                        "and the ECF will redirect the results.\nIf the ECF ",
-                        "removes a merge we are not informed directly ever.",
+                if playerecf.value.ECFmerge:
+                    mergecode = "".join(
+                        (
+                            "\n\nThe most recently applied ECF feedback ",
+                            "notes a merge into ",
+                            playerecf.value.ECFmerge,
+                        )
                     )
-                )
-            else:
-                mergecode = ""
-            if playerecf.value.ECFactive:
+                    caption = "".join(
+                        (
+                            "Results submissions for this player will use ",
+                            "the ",
+                            playermap.value.playercode,
+                            " grading code.\nThis is certain to be our ",
+                            "player and the ECF will redirect the results.",
+                            "\nIf the ECF removes a merge we are not ",
+                            "informed directly ever.",
+                        )
+                    )
+                else:
+                    mergecode = ""
+                if playerecf.value.ECFactive:
+                    ecfline = "".join(
+                        (
+                            "The information from the ECF Master List is:\n\n",
+                            playerecf.value.ECFcode,
+                            "   ",
+                            playerecf.value.ECFname,
+                            "\n\n",
+                            mergecode,
+                        )
+                    )
+                else:
+                    ecfline = "".join(
+                        (
+                            "No Master List data recorded. ECF grading code ",
+                            "recorded is ",
+                            playerecf.value.ECFcode,
+                            mergecode,
+                        )
+                    )
+            elif playermap.value.playerecfcode:
                 ecfline = "".join(
                     (
-                        "The information from the ECF Master List is:\n\n",
-                        playerecf.value.ECFcode,
+                        "An ECF grading code and name have been entered. ",
+                        "These are:\n\n",
+                        playermap.value.playerecfcode,
                         "   ",
-                        playerecf.value.ECFname,
+                        playermap.value.playerecfname,
                         "\n\n",
-                        mergecode,
+                        "Be sure that the ECF grading code is correct before ",
+                        "including it on a results submission file.",
+                    )
+                )
+            elif playermap.value.playerecfname:
+                ecfline = "".join(
+                    (
+                        "No information from ECF for this player is ",
+                        "available on this database.\n",
+                        "An ECF format name, but no grading code, has been ",
+                        "entered. Name is:\n\n",
+                        playermap.value.playerecfname,
+                        "\n\n",
+                        "This player will be treated as a new player if ",
+                        "included on a results submission file.",
                     )
                 )
             else:
                 ecfline = "".join(
                     (
-                        "No Master List data recorded. ECF grading code ",
-                        "recorded is ",
-                        playerecf.value.ECFcode,
-                        mergecode,
+                        "No information from ECF for this player is ",
+                        "available on this database.\n",
+                        "Neither an ECF format name nor grading code has ",
+                        "been entered.\n",
+                        "At least a name will have to be entered before this ",
+                        "player can be included on a results submission file.",
                     )
                 )
-        elif playermap.value.playerecfcode:
-            ecfline = "".join(
-                (
-                    "An ECF grading code and name have been entered. ",
-                    "These are:\n\n",
-                    playermap.value.playerecfcode,
-                    "   ",
-                    playermap.value.playerecfname,
-                    "\n\n",
-                    "Be sure that the ECF grading code is correct before ",
-                    "including it on a results submission file.",
+        if myself.get_appsys().show_grading_list_grading_codes:
+            playermap = ecfgcodemaprecord.get_person_for_player(
+                db, mainentry.key.recno
+            )
+            if playermap:
+                playerecf = ecfogdrecord.get_ecf_ogd_player_for_grading_code(
+                    db, playermap.value.playercode
                 )
-            )
-        elif playermap.value.playerecfname:
-            ecfline = "".join(
-                (
-                    "No information from ECF for this player is available ",
-                    "on this database.\n",
-                    "An ECF format name, but no grading code, has been ",
-                    "entered. Name is:\n\n",
-                    playermap.value.playerecfname,
-                    "\n\n",
-                    "This player will be treated as a new player if ",
-                    "included on a results submission file.",
-                )
-            )
-        else:
-            ecfline = "".join(
-                (
-                    "No information from ECF for this player is available ",
-                    "on this database.\n",
-                    "Neither an ECF format name nor grading code has been ",
-                    "entered.\n",
-                    "At least a name will have to be entered before this ",
-                    "player can be included on a results submission file.",
-                )
-            )
-    if myself.get_appsys().show_grading_list_grading_codes:
-        playermap = ecfgcodemaprecord.get_person_for_player(
-            db, mainentry.key.recno
-        )
-        if playermap:
-            playerecf = ecfogdrecord.get_ecf_ogd_player_for_grading_code(
-                db, playermap.value.playercode
-            )
-            if playerecf:
-                ogdline = "".join(
-                    (
-                        "The information from the available ECF Grading List ",
-                        "is:\n\n",
-                        playerecf.value.ECFOGDcode,
-                        "   ",
-                        playerecf.value.ECFOGDname,
+                if playerecf:
+                    ogdline = "".join(
+                        (
+                            "The information from the available ECF Grading ",
+                            "List is:\n\n",
+                            playerecf.value.ECFOGDcode,
+                            "   ",
+                            playerecf.value.ECFOGDname,
+                        )
                     )
-                )
+                else:
+                    ogdline = "".join(
+                        (
+                            "No ECF grading list available to provide ",
+                            "detail for this player.  Code is ",
+                            playermap.value.playercode,
+                            ",",
+                        )
+                    )
             else:
-                ogdline = "".join(
-                    (
-                        "No ECF grading list available to provide detail for ",
-                        "this player.  Code is ",
-                        playermap.value.playercode,
-                        ",",
-                    )
+                ogdline = "Player is not linked to an ECF grading list code."
+        asel = []
+        pr = resultsrecord.ResultsDBrecordPlayer()
+        for a in mainentry.value.get_alias_list():
+            r = db.get_primary_record(filespec.PLAYER_FILE_DEF, a)
+            if r is None:
+                break
+            pr.load_record(r)
+            asel.append(
+                resultsrecord.get_player_name_text_tabs(
+                    db, pr.value.identity()
                 )
-        else:
-            ogdline = "Player is not linked to an ECF grading list code."
-    asel = []
-    pr = resultsrecord.ResultsDBrecordPlayer()
-    for a in mainentry.value.get_alias_list():
-        r = db.get_primary_record(filespec.PLAYER_FILE_DEF, a)
-        if r is None:
-            dlg = tkinter.messagebox.showinfo(
-                parent=myself.get_widget(),
-                message="".join(
-                    (
-                        "Alias for player\n",
-                        resultsrecord.get_player_name_text(db, ""),
-                        "\ndoes not exist in alias list.",
-                    )
-                ),
-                title=title,
             )
-            return
-        pr.load_record(r)
-        asel.append(
-            resultsrecord.get_player_name_text_tabs(db, pr.value.identity())
-        )
 
-    return (
-        resultsrecord.get_player_name_text_tabs(
-            db, mainentry.value.identity()
+        else:
+            return (
+                resultsrecord.get_player_name_text_tabs(
+                    db, mainentry.value.identity()
+                ),
+                ecfline,
+                ogdline,
+                caption,
+                asel,
+            )
+        name = resultsrecord.get_player_name_text(db, "")
+    finally:
+        db.end_read_only_transaction()
+    tkinter.messagebox.showinfo(
+        parent=myself.get_widget(),
+        message="".join(
+            (
+                "Alias for player\n",
+                name,
+                "\ndoes not exist in alias list.",
+            )
         ),
-        ecfline,
-        ogdline,
-        caption,
-        asel,
+        title=title,
     )
+    return None
