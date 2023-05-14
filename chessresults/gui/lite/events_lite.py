@@ -436,8 +436,8 @@ class Events(events_database.Events):
                     "be because one or more players in the selected",
                     "events have not been merged on the New Players",
                     "tab.",
-                    )
                 )
+            )
             if logwidget:
                 logwidget.append_text(message)
                 logwidget.append_text_only("")

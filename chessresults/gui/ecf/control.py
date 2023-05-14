@@ -201,8 +201,8 @@ class Control(control_database.Control):
         title = " ".join(("Get", name_title))
         dlg = ecfdownload.ECFDownloadDialogue(
             parent=self.appsys,
-            #title,
-            text=title,#name,
+            # title,
+            text=title,  # name,
             scroll=False,
             height=7,
             width=60,

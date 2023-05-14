@@ -557,7 +557,9 @@ class ImportEvents(logpanel.TextAndLogPanel):
             )
             database.start_read_only_transaction()
             try:
-                inconsistent = collatedb.is_player_identification_inconsistent()
+                inconsistent = (
+                    collatedb.is_player_identification_inconsistent()
+                )
             finally:
                 database.end_read_only_transaction()
             if len(inconsistent):

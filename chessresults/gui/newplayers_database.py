@@ -458,7 +458,9 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                 playerkey = pbkm[0]
             db.start_read_only_transaction()
             try:
-                mainentry = mergeplayers.get_person_for_alias_key(db, playerkey)
+                mainentry = mergeplayers.get_person_for_alias_key(
+                    db, playerkey
+                )
             finally:
                 db.end_read_only_transaction()
             if mainentry is None:

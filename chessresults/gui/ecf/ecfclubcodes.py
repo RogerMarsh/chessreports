@@ -110,9 +110,7 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
                 resultsrecord.get_player_name_text_tabs(
                     db,
                     resultsrecord.get_unpacked_player_identity(
-                        ecfmaprecord.get_player(
-                            db, p[-1]
-                        ).value.playername
+                        ecfmaprecord.get_player(db, p[-1]).value.playername
                     ),
                 )
                 for p in players
@@ -256,9 +254,7 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
                 resultsrecord.get_player_name_text_tabs(
                     db,
                     resultsrecord.get_unpacked_player_identity(
-                        ecfmaprecord.get_player(
-                            db, p[-1]
-                        ).value.playername
+                        ecfmaprecord.get_player(db, p[-1]).value.playername
                     ),
                 )
                 for p in players

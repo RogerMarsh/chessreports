@@ -236,7 +236,9 @@ class Events(panel.PanelGridSelector):
                 er.extend(
                     [
                         resultsrecord.get_name_from_record_value(
-                            database.get_primary_record(filespec.NAME_FILE_DEF, s)
+                            database.get_primary_record(
+                                filespec.NAME_FILE_DEF, s
+                            )
                         ).value.name
                         for s in rv.sections
                     ]
@@ -951,7 +953,6 @@ class Events(panel.PanelGridSelector):
             self._populate_event_summary(database, logwidget, summary_events)
         finally:
             database.end_read_only_transaction()
-
 
     def _populate_event_summary(self, database, logwidget, summary_events):
         """Write events selected for summary to serial file."""

@@ -569,9 +569,9 @@ class ECFGradingCodeDialog(ECFDetailDialog):
             self.record.database.end_read_only_transaction()
         if ecfplayer is not None:
             if not ecfplayer.value.ECFactive:
-                #mapperson = ecfmaprecord.get_person_for_grading_code(
+                # mapperson = ecfmaprecord.get_person_for_grading_code(
                 #    self.record.database, ecfcode
-                #)
+                # )
                 if mapperson is not None:
                     dlg = tkinter.messagebox.showinfo(
                         parent=self.dialog,
@@ -641,9 +641,9 @@ class ECFGradingCodeDialog(ECFDetailDialog):
             )
             return
 
-        #mapplayer = ecfmaprecord.get_new_person_for_grading_code(
+        # mapplayer = ecfmaprecord.get_new_person_for_grading_code(
         #    self.record.database, ecfcode
-        #)
+        # )
         if mapperson is not None:
             if self.record.value.playername != mapperson.value.playername:
                 dlg = tkinter.messagebox.showinfo(

@@ -34,7 +34,7 @@ class ResultsDatabase(database.Database, lmdb_database.Database):
             DBfile,
             use_specification_items=use_specification_items,
             **kargs,
-            )
+        )
 
     def delete_database(self):
         """Close and delete the open chess results database."""
