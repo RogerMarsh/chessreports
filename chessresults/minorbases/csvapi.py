@@ -135,10 +135,11 @@ class CSVapi(Database):
         """
         return dbname in self.CSVfiles
 
-    def database_cursor(self, dbname, indexname, keyrange=None):
+    def database_cursor(self, dbname, indexname, keyrange=None, recordset=None):
         """Create a cursor on indexname in dbname.
 
         keyrange is an addition for DPT. It may yet be removed.
+        recordset is ignored.  It is present for compatibility with others.
 
         """
         return self.CSVfiles[dbname].make_cursor(indexname, keyrange)

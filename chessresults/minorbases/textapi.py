@@ -143,11 +143,12 @@ class Textapi:  # (Database):
         """
         return dbname in self.main
 
-    def database_cursor(self, dbname, dummy, keyrange=None):
+    def database_cursor(self, dbname, dummy, keyrange=None, recordset=None):
         """Create a cursor on dbname.
 
         keyrange is an addition for DPT. It may yet be removed.
-        dummy is ignored.  It is present for compatibility with bsddb.
+        dummy is ignored.  It is present for compatibility with others.
+        recordset is ignored.  It is present for compatibility with others.
 
         """
         if self.main[dbname]._table_link != None:
