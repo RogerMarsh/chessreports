@@ -135,7 +135,9 @@ class CSVapi(Database):
         """
         return dbname in self.CSVfiles
 
-    def database_cursor(self, dbname, indexname, keyrange=None, recordset=None):
+    def database_cursor(
+        self, dbname, indexname, keyrange=None, recordset=None
+    ):
         """Create a cursor on indexname in dbname.
 
         keyrange is an addition for DPT. It may yet be removed.
@@ -324,7 +326,6 @@ class CSV:
                 return (self.record_select, dumps(value))
 
     def _set_closed_state(self):
-
         self._table_link = None
         self.version = None
         self.record_count = None

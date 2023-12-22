@@ -5,7 +5,6 @@
 """Chess results database application with ECF results submission."""
 
 if __name__ == "__main__":
-
     from . import APPLICATION_NAME
 
     # Keep the 'Grading' name because a 'Rating' version may be built using

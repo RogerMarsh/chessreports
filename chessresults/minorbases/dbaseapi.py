@@ -171,7 +171,9 @@ class dBaseapi:  # (Database):
         """
         return dbname in self.dBasefiles
 
-    def database_cursor(self, dbname, indexname, keyrange=None, recordset=None):
+    def database_cursor(
+        self, dbname, indexname, keyrange=None, recordset=None
+    ):
         """Create a cursor on indexname in dbname.
 
         keyrange is an addition for DPT. It may yet be removed.
@@ -436,7 +438,6 @@ class dBaseIII:
                 return (self._localdata.record_select, repr(value))
 
     def _set_closed_state(self):
-
         self._table_link = None
         self.version = None
         self.record_count = None

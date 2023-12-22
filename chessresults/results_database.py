@@ -5,7 +5,6 @@
 """Chess results database application."""
 
 if __name__ == "__main__":
-
     from . import APPLICATION_NAME
 
     # '', not 'Lite', because the 'ECF' and 'OGD' versions add some functions

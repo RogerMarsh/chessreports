@@ -50,6 +50,7 @@ class ImportECFOGD(logpanel.WidgetAndLogPanel):
             to a WidgetAndLogPanel(...) call.
 
             """
+
             # Added when DataGridBase changed to assume a popup menu is
             # available when right-click done on empty part of data drid frame.
             # The popup is used to show all navigation available from grid: but

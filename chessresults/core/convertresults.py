@@ -836,7 +836,6 @@ class ConvertSubmissionFile(ConvertResults):
                 convert_colour_text(data)
 
         def get_match(data, context):
-
             k = str(len(self.match) + 1)
             self.match[k] = data
             data[cc._mcode] = k

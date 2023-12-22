@@ -100,7 +100,6 @@ class Identities(ExceptionHandler):
         """Indentify selected new player as selected known player."""
 
         def ambiguous_identification(new, known):
-
             # """if new == known:
             # return False"""
             if (
@@ -123,7 +122,6 @@ class Identities(ExceptionHandler):
             return True
 
         def is_ambiguous_identification(new, known):
-
             if (
                 known
                 in importdata.localplayer[importdata.gameplayermerge[new]]
@@ -133,7 +131,6 @@ class Identities(ExceptionHandler):
                     return True
 
         def is_new_player(new, known):
-
             if (
                 known
                 in importdata.localplayer[importdata.gameplayermerge[new]]
@@ -476,7 +473,6 @@ class Identities(ExceptionHandler):
             )
 
     def _save_report(self, caption):
-
         importdata = self.importdata
         if importdata is None:
             tkinter.messagebox.showinfo(
@@ -487,7 +483,6 @@ class Identities(ExceptionHandler):
             return
 
         def append_player(es):
-
             n, e, sd, ed, s, p = player
             identified.append("=".join((constants._event, e)))
             identified.append("=".join((constants._startdate, sd)))
@@ -592,14 +587,12 @@ class IdListbox(tkinter.Listbox, ExceptionHandler):
             self._selection = self.curselection()
 
     def _remove_select_color(self, event):
-
         if not self._selection:
             return
         self._set_select_background_color(self._selection, color=self._bgcolor)
         self._selection = ()
 
     def _set_select_background_color(self, selection, color=None):
-
         try:
             for i in selection:
                 self.itemconfigure(i, background=color)
@@ -619,14 +612,12 @@ class IdListbox(tkinter.Listbox, ExceptionHandler):
             self._selection = ()
 
     def _set_select_color(self, event):
-
         self._selection = (
             self.index("@" + str(event.x) + "," + str(event.y)),
         )
         self._set_select_background_color(self._selection, color="yellow")
 
     def _clear_selection(self, event):
-
         if self._selection:
             self._remove_select_color(event)
         self.selection_clear(0, tkinter.END)

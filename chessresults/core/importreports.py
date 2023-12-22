@@ -141,7 +141,6 @@ class ImportReports(object):
                         data[k] = v
             for v in datalistitems.values():
                 if v in data:
-
                     # data[v] can be None for reported codes.
                     # Possibly should be fixed upstream: data[v] = ()
                     if data[v] is not None:

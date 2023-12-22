@@ -40,7 +40,6 @@ class ECFDownloadDialogue(ModalDialogueGo):
 # Probably best to delete all this, or at least move it to a tests or
 # samples directory.
 if __name__ == "__main__":
-
     import tkinter
 
     class R(tkinter.Tk):

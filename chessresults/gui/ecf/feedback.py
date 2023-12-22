@@ -153,7 +153,6 @@ class Feedback(panel.PlainPanel):
             )
 
         def update_ecf_player():
-
             # Unmerge not done by feedback merge line.
             # Currently wait for full Masterlist, but does absence of merge
             # line imply break merge if it does not exist?

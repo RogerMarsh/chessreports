@@ -5,7 +5,6 @@
 """Prepare League database dumps for Results input."""
 
 if __name__ == "__main__":
-
     application_name = "PrepareLeagueFormat"
     try:
         from solentware_misc.gui.startstop import (

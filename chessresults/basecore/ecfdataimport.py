@@ -396,7 +396,6 @@ def copy_ecf_players_post_2020_rules(
             # Find and delete them offline.
             # See gui.events_lite too.
             if mr.value.__dict__:
-
                 if mr.value.playercode is None:
                     if mr.value.playerecfcode is not None:
                         if ecfrecord.get_ecf_player_for_grading_code(
@@ -618,7 +617,6 @@ def copy_ecf_players_post_2011_rules(
             # Find and delete them offline.
             # See gui.events_lite too.
             if mr.value.__dict__:
-
                 if mr.value.playercode is None:
                     if mr.value.playerecfcode is not None:
                         if ecfrecord.get_ecf_player_for_grading_code(

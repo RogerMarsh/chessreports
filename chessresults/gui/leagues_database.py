@@ -403,7 +403,6 @@ class Leagues(leagues_validate.Leagues):
             ),
         )
         if dlg == tkinter.messagebox.YES:
-
             # Replicate _database_close replacing close_database() call with
             # delete_database() call.  The close_database() call just before
             # setting database to None is removed.  The 'database is None'

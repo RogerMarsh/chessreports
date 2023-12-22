@@ -5,7 +5,6 @@
 """Chess results database application with ECF online grading database."""
 
 if __name__ == "__main__":
-
     from . import APPLICATION_NAME
 
     application_name = "".join((APPLICATION_NAME, "OGD"))

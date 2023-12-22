@@ -330,7 +330,6 @@ class TextapiRoot:
             return (self._localdata.record_select, value)
 
     def _set_closed_state(self):
-
         self._table_link = None
         self.textlines = None
         self.record_count = None
@@ -523,7 +522,6 @@ class _CursorText:
     """
 
     def __init__(self, dbobject):
-
         self._dbobject = dbobject
         self._current = -1
 
@@ -597,6 +595,5 @@ class _CursorText:
             return r
 
     def _set_closed_state(self):
-
         self._dbobject = None
         self._current = None

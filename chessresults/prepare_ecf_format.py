@@ -5,7 +5,6 @@
 """Prepare ECF submission files for Results input."""
 
 if __name__ == "__main__":
-
     application_name = "PrepareECFFormat"
     try:
         from solentware_misc.gui.startstop import (

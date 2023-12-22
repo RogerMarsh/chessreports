@@ -5,7 +5,6 @@
 """Results database application using OGD interface."""
 
 if __name__ == "__main__":
-
     import chessresults.gui.resultsroot
     import chessresults.gui.leagues_ogd
 

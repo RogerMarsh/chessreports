@@ -5,7 +5,6 @@
 """Identify players sent to remote database who are reported as new players."""
 
 if __name__ == "__main__":
-
     application_name = "Identify"
     try:
         from solentware_misc.gui.startstop import (

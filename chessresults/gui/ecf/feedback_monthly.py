@@ -449,7 +449,6 @@ class FeedbackMonthly(panel.PlainPanel):
                     # Find and delete them offline.
                     # See gui.events_lite too.
                     if v.__dict__:
-
                         if v.playercode is None:
                             if v.playerecfcode is not None:
                                 if ecfrecord.get_ecf_player_for_grading_code(
@@ -509,7 +508,6 @@ class FeedbackMonthly(panel.PlainPanel):
                     # Find and delete them offline.
                     # See gui.events_lite too.
                     if v.__dict__:
-
                         if v.clubcode is None:
                             if v.clubecfcode is not None:
                                 if ecfrecord.get_ecf_club_for_club_code(

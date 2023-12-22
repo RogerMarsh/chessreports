@@ -94,5 +94,4 @@ class CreateChessResultsDatabase(create_database.CreateDatabase):
 
 
 if __name__ == "__main__":
-
     CreateChessResultsDatabase().root.mainloop()
