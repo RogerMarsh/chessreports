@@ -17,8 +17,6 @@ from solentware_misc.core.utilities import AppSysPersonName
 
 from chessvalidate.core import gameresults
 
-from chesscalc.gui import performance, prediction, population
-
 from ..core import (
     constants,
     filespec,
