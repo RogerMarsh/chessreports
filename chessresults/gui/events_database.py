@@ -258,7 +258,9 @@ class Events(panel.PanelGridSelector):
             pv = pr.value
             pr.set_database(database)
             rset = database.recordlist_ebm(filespec.PLAYER_FILE_DEF)
-            cursor = rset.create_recordset_cursor()
+            cursor = database.database_cursor(
+                filespec.PLAYER_FILE_DEF, None, recordset=rset
+            )
             try:
                 r = cursor.first()
                 while r:
@@ -273,7 +275,10 @@ class Events(panel.PanelGridSelector):
                     r = cursor.next()
             finally:
                 cursor.close()
-                rset.close()
+                try:
+                    rset.close()
+                except AttributeError:
+                    pass
 
             # get all games for events being exported
             if logwidget:
