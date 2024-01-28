@@ -676,9 +676,6 @@ class Leagues(leagues_validate.Leagues):
                 return getattr(module, name)
 
             self._database_class = import_name(_modulename, _ResultsDB)
-            self._datasourceset_class = import_name(
-                self._database_class._datasourceset_modulename, _DataSourceSet
-            )
             self._knownnames_class = import_name(
                 self._database_class._knownnames_modulename, _KnownNamesDS
             )

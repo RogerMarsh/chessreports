@@ -27,7 +27,6 @@ from ..basecore import database
 class ResultsDatabase(database.Database, berkeleydb_database.Database):
     """Methods and data structures to create, open, and close database."""
 
-    _datasourceset_modulename = "solentware_grid.core.datasourceset"
     _knownnames_modulename = "chessresults.basecore.knownnamesds"
 
     def __init__(

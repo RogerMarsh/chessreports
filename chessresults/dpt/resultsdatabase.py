@@ -17,8 +17,7 @@ from .. import APPLICATION_NAME
 class ResultsDatabase(database.Database, dpt_database.Database):
     """Provide access to a database of results of games of chess."""
 
-    _datasourceset_modulename = "solentware_grid.dpt.dptdatasourceset"
-    _knownnames_modulename = "chessresults.dpt.knownnames"
+    _knownnames_modulename = "chessresults.basecore.knownnamesds"
 
     def __init__(
         self,
