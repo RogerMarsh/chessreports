@@ -17,7 +17,6 @@ authors = [
 description = "Results database for chess games."
 classifiers = [
     "License :: OSI Approved :: BSD License",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -31,7 +30,7 @@ license = {file = "LICENCE"}
 readme = "README"
 dependencies = [
     "chesscalc==2.0.0.dev1",
-    "chessvalidate==2.0.2",
+    "chessvalidate==2.0.3.dev0",
     "solentware-base==5.2.dev1",
     "solentware-grid==3.0.dev0",
 ]
