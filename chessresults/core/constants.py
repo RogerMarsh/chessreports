@@ -444,27 +444,37 @@ PLAYER_SEARCH_URL = "player_search_url"
 DEFAULT_URLS = (
     (
         ACTIVE_CLUBS_URL,
-        "https://www.ecfrating.org.uk/v2/new/api.php?v2/clubs/all_active",
+        "".join(
+            (
+                "https://rating.englishchess.org.uk/v2/new/",
+                "api.php?v2/clubs/all_active",
+            )
+        ),
     ),
     (
         PLAYERS_RATINGS_URL,
-        "https://www.ecfrating.org.uk/v2/new/api.php?v2/rating_list",
+        "https://rating.englishchess.org.uk/v2/new/api.php?v2/rating_list",
     ),
     (
         PLAYER_INFO_URL,
-        "https://www.ecfrating.org.uk/v2/new/api.php?v2/players/code/",
+        "https://rating.englishchess.org.uk/v2/new/api.php?v2/players/code/",
     ),
     (
         MEMBER_INFO_URL,
-        "https://www.ecfrating.org.uk/v2/new/api.php?v2/players/mid/",
+        "https://rating.englishchess.org.uk/v2/new/api.php?v2/players/mid/",
     ),
     (
         CLUB_INFO_URL,
-        "https://www.ecfrating.org.uk/v2/new/api.php?v2/clubs/code/",
+        "https://rating.englishchess.org.uk/v2/new/api.php?v2/clubs/code/",
     ),
     (
         PLAYER_SEARCH_URL,
-        "https://www.ecfrating.org.uk/v2/new/list_players.php?mode=A&search=",
+        "".join(
+            (
+                "https://rating.englishchess.org.uk/v2/new/",
+                "list_players.php?mode=A&search=",
+            )
+        ),
     ),
 )
 

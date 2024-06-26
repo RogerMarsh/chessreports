@@ -65,8 +65,8 @@ _OTHER_OPTIONS_TEXT = " ".join(
         "or identical game options need to be selected.",
     )
 )
-_DEFAULT_LIVE_URL = "https://www.ecfrating.org.uk/v2/submit/"
-_DEFAULT_TEST_URL = "https://www.ecfrating.org.uk/sandbox/submit/"
+_DEFAULT_LIVE_URL = "https://rating.englishchess.org.uk/v2/submit/"
+_DEFAULT_TEST_URL = "https://rating.englishchess.org.uk/sandbox/submit/"
 _EVENT_DETAILS = "EVENT DETAILS"
 _EVENT_CODE = "EVENT CODE"
 _SUBMISSION_INDEX = "SUBMISSION INDEX"
@@ -318,7 +318,7 @@ class _UploadResults:
                 message="".join(
                     (
                         "URL not present ",
-                        "(eg: https://www.ecfrating.org.uk/v2/submit/)",
+                        "(eg: https://rating.englishchess.org.uk/v2/submit/)",
                     )
                 ),
             )
@@ -755,8 +755,8 @@ class SubmitResults(_UploadResults):
 
 # This is a guess at how to emulate the webpage 'Create new ECF codes' option
 # for PRINCIPAL users.  It is either wrong or not supported in the API at
-# https://www.ecfrating.org.uk/v2/submit/ after tests at 'sandbox' version
-# where the behaviour is same as seen in SubmitResults class.
+# https://rating.englishchess.org.uk/v2/submit/ after tests at 'sandbox'
+# version where the behaviour is same as seen in SubmitResults class.
 class SubmitResultsFromPrincipals(SubmitResults):
     """Submit and commit results file to the ECF.
 

@@ -140,7 +140,7 @@ class ECFEvents(panel.PanelGridSelector):
                         "'Check and Report' action cannot be done because",
                         "both 'curl' and 'requests' are not available.\n\nA",
                         "browser can be used to upload the submission file to",
-                        "https://www.ecfrating.org.uk/v2/submit/",
+                        "https://rating.englishchess.org.uk/v2/submit/",
                     )
                 ),
                 title="ECF Events",
@@ -162,7 +162,7 @@ class ECFEvents(panel.PanelGridSelector):
                         "'Submit' action cannot be done because",
                         "both 'curl' and 'requests' are not available.\n\nA",
                         "browser can be used to upload the submission file to",
-                        "https://www.ecfrating.org.uk/v2/submit/",
+                        "https://rating.englishchess.org.uk/v2/submit/",
                     )
                 ),
                 title="ECF Events",
