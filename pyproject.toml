@@ -9,8 +9,8 @@ build-backend = "setuptools.build_meta"
 line-length = 79
 
 [project]
-name = "chessresults"
-version = "7.1.2"
+name = "chessreports"
+version = "7.1.3"
 authors = [
   { name="Roger Marsh", email="roger.marsh@solentware.co.uk" },
 ]
@@ -42,28 +42,28 @@ Repository = "https://github.com/RogerMarsh/chessresults.git"
 
 [tool.setuptools]
 packages = [
-    "chessresults",
-    "chessresults.core",
-    "chessresults.core.ecf",
-    "chessresults.core.ogd",
-    "chessresults.help_",
-    "chessresults.basecore",
-    "chessresults.minorbases",
-    "chessresults.gui",
-    "chessresults.gui.ecf",
-    "chessresults.gui.lite",
-    "chessresults.gui.ogd",
-    "chessresults.gui.minorbases",
-    "chessresults.lmdb",
-    "chessresults.berkeleydb",
-    "chessresults.db",
-    "chessresults.db_tkinter",
-    "chessresults.dpt",
-    "chessresults.sqlite",
-    "chessresults.apsw",
-    "chessresults.unqlite",
-    "chessresults.vedis",
-    "chessresults.tools",
+    "chessreports",
+    "chessreports.core",
+    "chessreports.core.ecf",
+    "chessreports.core.ogd",
+    "chessreports.help_",
+    "chessreports.basecore",
+    "chessreports.minorbases",
+    "chessreports.gui",
+    "chessreports.gui.ecf",
+    "chessreports.gui.lite",
+    "chessreports.gui.ogd",
+    "chessreports.gui.minorbases",
+    "chessreports.lmdb",
+    "chessreports.berkeleydb",
+    "chessreports.db",
+    "chessreports.db_tkinter",
+    "chessreports.dpt",
+    "chessreports.sqlite",
+    "chessreports.apsw",
+    "chessreports.unqlite",
+    "chessreports.vedis",
+    "chessreports.tools",
 ]
 
 [tool.setuptools.package-data]
