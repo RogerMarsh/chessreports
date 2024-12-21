@@ -12,9 +12,11 @@ from solentware_bind.gui.exceptionhandler import ExceptionHandler
 class ECFErrorFrame(ExceptionHandler):
     """Display error reports."""
 
-    def __init__(self, parent, title, header, reports, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent, title, header, reports, cnf={}, **kargs):
         """Create the error reports and display them."""
-        super(ECFErrorFrame, self).__init__()
+        super().__init__()
         self.document = document = tkinter.Toplevel(master=parent)
         document.wm_title(title)
         caption = tkinter.Label(master=document, text=header)
@@ -40,7 +42,7 @@ class ECFErrorFrame(ExceptionHandler):
         if buttonrow:
             buttons_frame.grid_columnconfigure(len(b * 2), weight=1)
         else:
-            self.buttons_frame.grid_rowconfigure(len(b * 2), weight=1)
+            buttons_frame.grid_rowconfigure(len(b * 2), weight=1)
 
         caption.pack(side=tkinter.TOP, fill=tkinter.X)
         section = tkinter.Frame(master=document)
@@ -54,6 +56,7 @@ class ECFErrorFrame(ExceptionHandler):
 
     def on_ok(self, event=None):
         """Destroy the report."""
+        del event
         self.document.destroy()
 
 
@@ -62,7 +65,9 @@ class ECFErrorFrame(ExceptionHandler):
 class ErrorReport(ExceptionHandler):
     """Create an error report."""
 
-    def __init__(self, parent, report, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent, report, cnf={}, **kargs):
         """Create an error report."""
         super().__init__()
         self.frame = frame = tkinter.Frame(master=parent)

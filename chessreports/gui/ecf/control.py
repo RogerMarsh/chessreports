@@ -32,7 +32,7 @@ from solentware_misc.core.getconfigurationitem import get_configuration_item
 from .feedback_monthly import show_ecf_results_feedback_monthly_tab
 from . import ecfdownload
 from .. import control_database
-from ...minorbases.dbaseapi import dBaseapiError
+from ...minorbases.dbaseapi import DBaseapiError
 from ...core.filespec import (
     ECFPLAYER_FILE_DEF,
     ECFCLUB_FILE_DEF,
@@ -49,18 +49,20 @@ from ...core.ecf import ecfplayerdb
 class Control(control_database.Control):
     """The Control panel for a Results database."""
 
-    _btn_ecfresultsfeedback = "control_feedback"
-    _btn_ecfresultsfeedbackmonthly = "control_feedback_monthly"
+    btn_ecfresultsfeedback = "control_feedback"
+    btn_ecfresultsfeedbackmonthly = "control_feedback_monthly"
     _btn_ecfmasterfile = "control_master_file"
     _btn_quitecfzippedfiles = "control_quit"
-    _btn_copyecfmasterplayer = "control_copy_master_player"
-    _btn_copyecfmasterclub = "control_copy_master_club"
-    _btn_playersdownload = "control_players_download"
-    _btn_clubsdownload = "control_clubs_download"
+    btn_copyecfmasterplayer = "control_copy_master_player"
+    btn_copyecfmasterclub = "control_copy_master_club"
+    btn_playersdownload = "control_players_download"
+    btn_clubsdownload = "control_clubs_download"
 
-    def __init__(self, parent=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, cnf={}, **kargs):
         """Extend and define the results database control panel."""
-        super(Control, self).__init__(parent=parent, cnf=cnf, **kargs)
+        super().__init__(parent=parent, cnf=cnf, **kargs)
 
         self.ecf_reference_file = None
         self._ecf_reference_widget = None
@@ -70,15 +72,15 @@ class Control(control_database.Control):
 
     def close_update_resources(self):
         """Close any open files containing master data from ECF."""
-        if self.ecfplayerfile != None:
+        if self.ecfplayerfile is not None:
             self.ecfplayerfile.close_context()
             self._delete_dbase_files(self.ecfplayerfile)
             self.ecfplayerfile = None
-        if self.ecfclubfile != None:
+        if self.ecfclubfile is not None:
             self.ecfclubfile.close_context()
             self._delete_dbase_files(self.ecfclubfile)
             self.ecfclubfile = None
-        if self.ecfdatecontrol != None:
+        if self.ecfdatecontrol is not None:
             self.ecfdatecontrol.destroy()
             self.ecfdatecontrol = None
 
@@ -86,15 +88,17 @@ class Control(control_database.Control):
         """Define all action buttons that may appear on Control page."""
         super().describe_buttons()
         self.define_button(
-            self._btn_ecfresultsfeedback,
+            self.btn_ecfresultsfeedback,
             text="ECF Grading Feedback",
-            tooltip="Display a feedback email for a results submission to ECF.",
+            tooltip=(
+                "Display a feedback email for a results submission to ECF."
+            ),
             underline=4,
             switchpanel=True,
             command=self.on_ecf_results_feedback,
         )
         self.define_button(
-            self._btn_ecfresultsfeedbackmonthly,
+            self.btn_ecfresultsfeedbackmonthly,
             text="ECF Rating Feedback",
             tooltip="Display a feedback email for a results upload to ECF.",
             underline=18,
@@ -102,7 +106,7 @@ class Control(control_database.Control):
             command=self.on_ecf_results_feedback_monthly,
         )
         self.define_button(
-            self._btn_playersdownload,
+            self.btn_playersdownload,
             text="Rated Players Download",
             tooltip="Download list of rated players from ECF website",
             underline=7,
@@ -110,7 +114,7 @@ class Control(control_database.Control):
             command=self.on_ecf_players_download,
         )
         self.define_button(
-            self._btn_clubsdownload,
+            self.btn_clubsdownload,
             text="Active Clubs Download",
             tooltip="Download list of active clubs from ECF website",
             underline=4,
@@ -132,7 +136,7 @@ class Control(control_database.Control):
             command=self.on_quit_ecf_zipped_files,
         )
         self.define_button(
-            self._btn_copyecfmasterplayer,
+            self.btn_copyecfmasterplayer,
             text="Show Master File",
             tooltip="Build new Master file for players.",
             underline=3,
@@ -140,7 +144,7 @@ class Control(control_database.Control):
             command=self.on_copy_ecf_master_player,
         )
         self.define_button(
-            self._btn_copyecfmasterclub,
+            self.btn_copyecfmasterclub,
             text="Show Master Club File",
             tooltip="Build new Master file for clubs.",
             underline=1,
@@ -150,6 +154,7 @@ class Control(control_database.Control):
 
     def on_ecf_results_feedback(self, event=None):
         """Do ECF feedback actions."""
+        del event
         conf = configuration.Configuration()
         filepath = tkinter.filedialog.askopenfilename(
             parent=self.get_widget(),
@@ -161,25 +166,26 @@ class Control(control_database.Control):
             ),
         )
         if not filepath:
-            self.inhibit_context_switch(self._btn_ecfresultsfeedback)
+            self.inhibit_context_switch(self.btn_ecfresultsfeedback)
             return
         conf.set_configuration_value(
             constants.RECENT_FEEDBACK_EMAIL,
             conf.convert_home_directory_to_tilde(os.path.dirname(filepath)),
         )
         try:
-            feedbackfile = open(filepath, "rb")
-            try:
+            with open(filepath, "rb") as feedbackfile:
                 self.get_appsys().set_kwargs_for_next_tabclass_call(
-                    dict(datafile=(filepath, _get_feedback_text(feedbackfile)))
+                    {"datafile": (filepath, _get_feedback_text(feedbackfile))}
                 )
-            finally:
-                feedbackfile.close()
         except:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
-                    ("File\n", os.path.split(dlg)[-1], "\ndoes not exist")
+                    (
+                        "File\n",
+                        os.path.split(feedbackfile)[-1],
+                        "\ndoes not exist",
+                    )
                 ),
                 title=" ".join(["Open ECF feedback email or attachment"]),
             )
@@ -187,8 +193,9 @@ class Control(control_database.Control):
 
     def on_ecf_results_feedback_monthly(self, event=None):
         """Do ECF feedback actions."""
+        del event
         show_ecf_results_feedback_monthly_tab(
-            self, self._btn_ecfresultsfeedbackmonthly
+            self, self.btn_ecfresultsfeedbackmonthly
         )
 
     def _ecf_download(self, name, button, default_url, contexts, structure):
@@ -209,10 +216,15 @@ class Control(control_database.Control):
             wrap=tkinter.WORD,
         )
         dlg.go()
+        # Method is defined by setattr in a superclass.
+        # pylint: disable-next=no-member
         if dlg.cancel_pressed():
             self.inhibit_context_switch(button)
             return
+        # Method is defined by setattr in a superclass.
+        # pylint: disable-next=no-member
         if dlg.download_pressed():
+            conf = configuration
             dialogue_result = dialogue.ModalEntryApply(
                 parent=self.appsys,
                 title=title,
@@ -220,7 +232,7 @@ class Control(control_database.Control):
                     (
                         "URL",
                         get_configuration_item(
-                            configuration.Configuration().get_configuration_file_name(),
+                            conf.Configuration().get_configuration_file_name(),
                             default_url,
                             constants.DEFAULT_URLS,
                         ),
@@ -234,7 +246,22 @@ class Control(control_database.Control):
                 return
             urlname = dialogue_result["URL"]
             try:
-                url = urllib.request.urlopen(urlname)
+                with urllib.request.urlopen(urlname) as url:
+                    try:
+                        urldata = url.read()
+                    except Exception as exc:
+                        tkinter.messagebox.showinfo(
+                            parent=self.get_widget(),
+                            title=title,
+                            message="".join(
+                                (
+                                    "Exception raised trying to read URL\n\n",
+                                    str(exc),
+                                )
+                            ),
+                        )
+                        self.inhibit_context_switch(button)
+                        return
             except Exception as exc:
                 tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
@@ -246,24 +273,16 @@ class Control(control_database.Control):
                 self.inhibit_context_switch(button)
                 return
             try:
-                urldata = url.read()
-            except Exception as exc:
-                tkinter.messagebox.showinfo(
-                    parent=self.get_widget(),
-                    title=title,
-                    message="".join(
-                        ("Exception raised trying to read URL\n\n", str(exc))
-                    ),
-                )
-                self.inhibit_context_switch(button)
-                return
-            try:
                 data = structure(json.loads(urldata))
                 self.get_appsys().set_kwargs_for_next_tabclass_call(
-                    dict(
-                        datafile=(urlname, str(datetime.date.today()), data),
-                        closecontexts=contexts,
-                    )
+                    {
+                        "datafile": (
+                            urlname,
+                            str(datetime.date.today()),
+                            data,
+                        ),
+                        "closecontexts": contexts,
+                    }
                 )
             except Exception as exc:
                 tkinter.messagebox.showinfo(
@@ -284,6 +303,8 @@ class Control(control_database.Control):
                 self.inhibit_context_switch(button)
                 return
             return
+        # Method is defined by setattr in a superclass.
+        # pylint: disable-next=no-member
         if dlg.extract_pressed():
             open_title = " ".join(("Open downloaded", name_title))
             dlg = tkinter.filedialog.askopenfilename(
@@ -293,39 +314,45 @@ class Control(control_database.Control):
                 self.inhibit_context_switch(button)
                 return
             try:
-                urldata = open(dlg).read()
+                with open(dlg, encoding="utf8").read() as urldata:
+                    try:
+                        data = structure(json.loads(urldata))
+                        self.get_appsys().set_kwargs_for_next_tabclass_call(
+                            {
+                                "datafile": (
+                                    dlg,
+                                    str(datetime.date.today()),
+                                    data,
+                                ),
+                                "closecontexts": contexts,
+                            }
+                        )
+                    except Exception as exc:
+                        tkinter.messagebox.showinfo(
+                            parent=self.get_widget(),
+                            title=open_title,
+                            message="".join(
+                                (
+                                    "".join(
+                                        (
+                                            "Exception raised trying to ",
+                                            "extract ",
+                                            name,
+                                            " from URL\n\n",
+                                        )
+                                    ),
+                                    str(exc),
+                                )
+                            ),
+                        )
+                        self.inhibit_context_switch(button)
+                        return
             except Exception as exc:
                 tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     title=open_title,
                     message="".join(
                         ("Exception raised trying to read File\n\n", str(exc))
-                    ),
-                )
-                self.inhibit_context_switch(button)
-                return
-            try:
-                data = structure(json.loads(urldata))
-                self.get_appsys().set_kwargs_for_next_tabclass_call(
-                    dict(
-                        datafile=(dlg, str(datetime.date.today()), data),
-                        closecontexts=contexts,
-                    )
-                )
-            except Exception as exc:
-                tkinter.messagebox.showinfo(
-                    parent=self.get_widget(),
-                    title=open_title,
-                    message="".join(
-                        (
-                            name.join(
-                                (
-                                    "Exception raised trying to extract ",
-                                    " from URL\n\n",
-                                )
-                            ),
-                            str(exc),
-                        )
                     ),
                 )
                 self.inhibit_context_switch(button)
@@ -370,9 +397,10 @@ class Control(control_database.Control):
 
     def on_ecf_players_download(self, event=None):
         """Do list of rated players download actions."""
+        del event
         self._ecf_download(
             "rated players",
-            self._btn_playersdownload,
+            self.btn_playersdownload,
             constants.PLAYERS_RATINGS_URL,
             (ECFPLAYER_FILE_DEF, ECFTXN_FILE_DEF, MAPECFPLAYER_FILE_DEF),
             self._ecf_players_structure,
@@ -380,9 +408,10 @@ class Control(control_database.Control):
 
     def on_ecf_clubs_download(self, event=None):
         """Do ECF clubs download actions."""
+        del event
         self._ecf_download(
             "active clubs",
-            self._btn_clubsdownload,
+            self.btn_clubsdownload,
             constants.ACTIVE_CLUBS_URL,
             (ECFCLUB_FILE_DEF, ECFTXN_FILE_DEF),
             self._ecf_clubs_structure,
@@ -390,6 +419,7 @@ class Control(control_database.Control):
 
     def on_quit_ecf_zipped_files(self, event=None):
         """Do quit import ECF Master File actions."""
+        del event
         self._ecf_reference_widget.destroy()
         self._ecf_reference_widget = None
         self.datafilepath.configure(
@@ -401,48 +431,49 @@ class Control(control_database.Control):
 
     def on_copy_ecf_master_player(self, event=None):
         """Do copy ECF Master File (players) actions."""
-        dbspec = self._get_memory_dBaseIII_from_zipfile(
-            ecfplayerdb.ECFplayersDB
-        )
+        del event
+        dbspec = self._get_memory_dbase3_from_zipfile(ecfplayerdb.ECFplayersDB)
         if dbspec is None:
-            self.inhibit_context_switch(self._btn_copyecfmasterplayer)
+            self.inhibit_context_switch(self.btn_copyecfmasterplayer)
             return
         self.get_appsys().set_kwargs_for_next_tabclass_call(
-            dict(
-                datafilespec=(
+            {
+                "datafilespec": (
                     dbspec[0],
                     ecfplayerdb.PLAYERS,
                     ecfplayerdb.PLAYERS,
                 ),
-                datafilename=dbspec[1],
-                closecontexts=(
+                "datafilename": dbspec[1],
+                "closecontexts": (
                     ECFPLAYER_FILE_DEF,
                     ECFTXN_FILE_DEF,
                     MAPECFPLAYER_FILE_DEF,
                 ),
-                tabtitle="Master List",
-                copymethod=ecfdataimport.copy_ecf_players_post_2011_rules,
-            )
+                "tabtitle": "Master List",
+                "copymethod": ecfdataimport.copy_ecf_players_post_2011_rules,
+            }
         )
 
     def on_copy_ecf_master_club(self, event=None):
         """Do copy ECF club file actions."""
-        dbspec = self._get_memory_dBaseIII_from_zipfile(ecfclubdb.ECFclubsDB)
+        del event
+        dbspec = self._get_memory_dbase3_from_zipfile(ecfclubdb.ECFclubsDB)
         if dbspec is None:
-            self.inhibit_context_switch(self._btn_copyecfmasterclub)
+            self.inhibit_context_switch(self.btn_copyecfmasterclub)
             return
         self.get_appsys().set_kwargs_for_next_tabclass_call(
-            dict(
-                datafilespec=(dbspec[0], ecfclubdb.CLUBS, ecfclubdb.CLUBS),
-                datafilename=dbspec[1],
-                closecontexts=(ECFCLUB_FILE_DEF, ECFTXN_FILE_DEF),
-                tabtitle="Club List",
-                copymethod=ecfdataimport.copy_ecf_clubs_post_2011_rules,
-            )
+            {
+                "datafilespec": (dbspec[0], ecfclubdb.CLUBS, ecfclubdb.CLUBS),
+                "datafilename": dbspec[1],
+                "closecontexts": (ECFCLUB_FILE_DEF, ECFTXN_FILE_DEF),
+                "tabtitle": "Club List",
+                "copymethod": ecfdataimport.copy_ecf_clubs_post_2011_rules,
+            }
         )
 
     def on_ecf_master_file(self, event=None):
         """Do unzip ECF master file actions."""
+        del event
         if self.display_ecf_zipped_file_contents():
             self.show_buttons_for_ecf_master_file()
             self.create_buttons()
@@ -460,14 +491,13 @@ class Control(control_database.Control):
             ),
         )
         if not filepath:
-            return
+            return None
         conf.set_configuration_value(
             constants.RECENT_MASTERFILE,
             conf.convert_home_directory_to_tilde(os.path.dirname(filepath)),
         )
 
-        ziparchive = zipfile.ZipFile(filepath, "r")
-        try:
+        with zipfile.ZipFile(filepath, "r") as ziparchive:
             namelist = ziparchive.namelist()
             if len(namelist):
                 frame = tkinter.Frame(master=self.get_widget())
@@ -495,33 +525,30 @@ class Control(control_database.Control):
                 self.ecf_reference_file = listbox
                 self._ecf_reference_widget = frame
                 return True
-        finally:
-            ziparchive.close()
+            return None
 
     def open_file_from_ecf_zipped_master_file(
         self, dbdefinition, dbset, dbname, archive, element
     ):
         """Display ECF master data with date for confirmation of update."""
+        del dbset, dbname
         memory_file = None
-        ziparchive = zipfile.ZipFile(archive, "r")
-        try:
+        with zipfile.ZipFile(archive, "r") as ziparchive:
             for za in ziparchive.namelist():
                 if za == element:
                     memory_file = io.BytesIO(ziparchive.read(za))
                     break
-        finally:
-            ziparchive.close()
 
         ecffile = dbdefinition(memory_file)
         try:
             ecffile.open_context()
             return (ecffile, (archive, element))
-        except dBaseapiError as msg:
+        except DBaseapiError as msg:
             try:
                 ecffile.close_context()
             except:
                 pass
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=str(msg),
                 title=" ".join(["Open ECF player file"]),
@@ -531,21 +558,22 @@ class Control(control_database.Control):
                 ecffile.close_context()
             except:
                 pass
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join([str(Exception), str(msg)]),
                 title=" ".join(["Open ECF player file"]),
             )
+        return None
 
     def show_buttons_for_ecf_master_file(self):
         """Show buttons for actions allowed importing new ECF player data."""
         self.hide_panel_buttons()
         self.show_panel_buttons(
             (
-                self._btn_closedatabase,
+                self.btn_closedatabase,
                 self._btn_quitecfzippedfiles,
-                self._btn_copyecfmasterclub,
-                self._btn_copyecfmasterplayer,
+                self.btn_copyecfmasterclub,
+                self.btn_copyecfmasterplayer,
             )
         )
 
@@ -554,13 +582,13 @@ class Control(control_database.Control):
         self.hide_panel_buttons()
         self.show_panel_buttons(
             (
-                self._btn_closedatabase,
-                self._btn_ecfresultsfeedbackmonthly,
-                self._btn_ecfresultsfeedback,
-                self._btn_playersdownload,
-                self._btn_clubsdownload,
+                self.btn_closedatabase,
+                self.btn_ecfresultsfeedbackmonthly,
+                self.btn_ecfresultsfeedback,
+                self.btn_playersdownload,
+                self.btn_clubsdownload,
                 self._btn_ecfmasterfile,
-                self._btn_importevents,
+                self.btn_importevents,
             )
         )
 
@@ -569,18 +597,19 @@ class Control(control_database.Control):
         if not dbaseobject:
             return False
 
-        for obj in dbaseobject.dBasefiles.values():
-            if os.path.isfile(obj._file):
+        for obj in dbaseobject.dbasefiles.values():
+            if os.path.isfile(obj.file_name):
                 try:
-                    os.remove(obj._file)
+                    os.remove(obj.file_name)
                 except:
                     pass
+        return None
 
-    def _get_memory_dBaseIII_from_zipfile(self, dbdefinition):
+    def _get_memory_dbase3_from_zipfile(self, dbdefinition):
         """Create 'in-memory' dBaseIII file from zipped file."""
         selection = self.ecf_reference_file.curselection()
         if not selection:
-            return
+            return None
         selected_file = self.datafilepath.cget("text")
         selected_element = self.ecf_reference_file.get(selection)
         return self.open_file_from_ecf_zipped_master_file(

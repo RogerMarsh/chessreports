@@ -24,59 +24,61 @@ class ECFrefDBrowECFdate(ECFrefDBrecordECFdate, DataRow):
     header_specification = [
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Date", anchor=tkinter.CENTER),
-            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="etdate"),
+            WIDGET_CONFIGURE: {"text": "Date", "anchor": tkinter.CENTER},
+            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "etdate"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Data Type", anchor=tkinter.CENTER),
-            GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="ettype"),
+            WIDGET_CONFIGURE: {"text": "Data Type", "anchor": tkinter.CENTER},
+            GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "ettype"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Action", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="etaction"),
+            WIDGET_CONFIGURE: {"text": "Action", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "etaction"},
             ROW: 0,
         },
     ]
 
     def __init__(self, database=None):
         """Extend, link ECF master file date record to database."""
-        super(ECFrefDBrowECFdate, self).__init__()
+        super().__init__()
         self.set_database(database)
         self.row_specification = [
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
                 ROW: 0,
             },
         ]
 
-    def grid_row(self, **kargs):
+    def grid_row(self, textitems=(), **kargs):
         """Return tuple of instructions to create row.
 
         Create textitems argument for ECFrefDBrowECFdate instance.
 
+        textitems arguments is ignored and is present for compatibility.
+
         """
-        return super(ECFrefDBrowECFdate, self).grid_row(
+        return super().grid_row(
             textitems=(
                 self.key.ECFdate,
                 self.value.ECFobjtype,

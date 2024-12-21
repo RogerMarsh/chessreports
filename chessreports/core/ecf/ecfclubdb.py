@@ -10,15 +10,10 @@ from os.path import split
 from solentware_base.core.record import KeydBaseIII, Value, RecorddBaseIII
 
 from ...minorbases.dbaseapi import (
-    dBaseapi,
-    FOLDER,
+    DBaseapi,
     FIELDS,
     FILE,
     C,
-    N,
-    L,
-    D,
-    F,
     LENGTH,
     TYPE,
     START,
@@ -27,12 +22,12 @@ from ...minorbases.dbaseapi import (
 CLUBS = "clubs"
 
 # The RECTYPE values on an ECF club update file and interpretation
-_addclub = "A"  # add a new club
-_updateclub = "U"  # update details of existing club
-_deleteclub = "D"  # delete a club
+ADDCLUB = "A"  # add a new club
+UPDATECLUB = "U"  # update details of existing club
+DELETECLUB = "D"  # delete a club
 
 
-class ECFclubsDB(dBaseapi):
+class ECFclubsDB(DBaseapi):
     """Access a club master file published by ECF."""
 
     def __init__(self, DBpath):
@@ -53,10 +48,10 @@ class ECFclubsDB(dBaseapi):
             },
         }
 
-        dBaseapi.__init__(self, dbnames, d)
+        DBaseapi.__init__(self, dbnames, d)
 
 
-class ECFclubsUpdateDB(dBaseapi):
+class ECFclubsUpdateDB(DBaseapi):
     """Access a club update file published by ECF."""
 
     def __init__(self, DBpath):
@@ -78,13 +73,11 @@ class ECFclubsUpdateDB(dBaseapi):
             },
         }
 
-        dBaseapi.__init__(self, dbnames, d)
+        DBaseapi.__init__(self, dbnames, d)
 
 
 class ECFclubsDBkey(KeydBaseIII):
     """Club key."""
-
-    pass
 
 
 class ECFclubsDBvalue(Value):
@@ -92,7 +85,7 @@ class ECFclubsDBvalue(Value):
 
     # def load(self, value):
     #    """Convert bytes values from dbaseIII record to string"""
-    #    super(ECFclubsDBvalue, self).load(value)
+    #    super().load(value)
     #    for a in self.__dict__:
     #        self.__dict__[a] = self.__dict__[a]
 
@@ -102,4 +95,4 @@ class ECFclubsDBrecord(RecorddBaseIII):
 
     def __init__(self, keyclass=ECFclubsDBkey, valueclass=ECFclubsDBvalue):
         """Customise RecorddBaseIII with ECFclubsDBkey and ECFclubsDBvalue."""
-        super(ECFclubsDBrecord, self).__init__(keyclass, valueclass)
+        super().__init__(keyclass, valueclass)

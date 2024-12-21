@@ -2,19 +2,44 @@
 # Copyright 2017 Roger Marsh
 # Licence: See LICENCE (BSD licence)
 
-"""Provide a datasource cursor for the recordset from KnownNames class.
-
-The KnownNamesDS class in this module supports the apsw, db, and sqlite3,
-intefaces to a database.
-
-See the ..dpt.knownnames module for the KnownNamesDS class for DPT.
-
-"""
+"""Provide datasource cursor for map of new to known names in an event."""
 
 from solentware_grid.core.datasourcecursor import DataSourceCursor
 
-from .knownnames import KnownNames
+from .playerfind import find_player_names_in_other_editions_of_event
 
 
-class KnownNamesDS(DataSourceCursor, KnownNames):
-    """Extend KnownNmaes with a DataSourceCursor."""
+class KnownNamesDS(DataSourceCursor):
+    """Extend DataSourceCursor to handle known names in an event."""
+
+    def __init__(self, *a, **k):
+        """Provide map of new players to known players for event."""
+        super().__init__(*a, **k)
+
+        # Event used to select player names in other editions of event.
+        self.event = None
+
+        # Map alias record for name, in other event editions, to person record.
+        self.map_newplayer_to_knownplayer = {}
+
+    def get_known_names(self, event):
+        """Find records with same player name in other editions of event."""
+        recordset = self.dbhome.recordlist_nil(self.dbset)
+        if event:
+            map_np_to_kp = find_player_names_in_other_editions_of_event(
+                self.dbhome, event
+            )
+            for alias_recno in map_np_to_kp:
+                recordset.place_record_number(alias_recno)
+        else:
+            map_np_to_kp = {}
+        self.set_recordset(recordset)
+        self.event = event
+        self.map_newplayer_to_knownplayer = map_np_to_kp
+
+    def remove_record_from_recordset(self, record_number):
+        """Remove record_number from self.recordset.
+
+        Method exists for compatibility with DPT.
+        """
+        self.recordset.remove_record_number(record_number)

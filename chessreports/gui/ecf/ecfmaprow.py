@@ -18,7 +18,6 @@ from solentware_grid.gui.datarow import (
 
 from ...core import resultsrecord
 from ...core.ecf import ecfmaprecord
-from ...core.ecf import ecfrecord
 
 
 class ECFmapDBrowNewPlayer(ecfmaprecord.ECFmapDBrecordClub, DataRow):
@@ -27,84 +26,87 @@ class ECFmapDBrowNewPlayer(ecfmaprecord.ECFmapDBrecordClub, DataRow):
     header_specification = [
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(
-                text="ECF club detail", anchor=tkinter.CENTER
-            ),
-            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="enpeccode"),
+            WIDGET_CONFIGURE: {
+                "text": "ECF club detail",
+                "anchor": tkinter.CENTER,
+            },
+            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "enpeccode"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Name", anchor=tkinter.CENTER),
-            GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="enpname"),
+            WIDGET_CONFIGURE: {"text": "Name", "anchor": tkinter.CENTER},
+            GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "enpname"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Event details", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="enpevent"),
+            WIDGET_CONFIGURE: {"text": "Event details", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "enpevent"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="enpsection"),
+            WIDGET_CONFIGURE: {"text": "", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "enpsection"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Association", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=4, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="enpaff"),
+            WIDGET_CONFIGURE: {"text": "Association", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 4, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "enpaff"},
             ROW: 0,
         },
     ]
 
     def __init__(self, database=None):
         """Extend, link player club record without affiliation to database."""
-        super(ECFmapDBrowNewPlayer, self).__init__()
+        super().__init__()
         self.set_database(database)
         self.row_specification = [
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=4, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 4, "sticky": tkinter.EW},
                 ROW: 0,
             },
         ]
 
-    def grid_row(self, **kargs):
+    def grid_row(self, textitems=(), **kargs):
         """Return tuple of instructions to create row.
 
         Create textitems argument for ECFmapDBrowNewPlayer instance.
+
+        textitems arguments is ignored and is present for compatibility.
 
         """
         v = self.value
@@ -119,9 +121,7 @@ class ECFmapDBrowNewPlayer(ecfmaprecord.ECFmapDBrecordClub, DataRow):
                 self.database, self.value.playerkey
             )
         )
-        return super(ECFmapDBrowNewPlayer, self).grid_row(
-            textitems=tuple(ecfclubdetails), **kargs
-        )
+        return super().grid_row(textitems=tuple(ecfclubdetails), **kargs)
 
 
 class ECFmapDBrowPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
@@ -130,100 +130,103 @@ class ECFmapDBrowPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
     header_specification = [
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Grading code", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="epgcode"),
+            WIDGET_CONFIGURE: {"text": "Grading code", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "epgcode"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(
-                text="ECF club affiliation", anchor=tkinter.W
-            ),
-            GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="epccode"),
+            WIDGET_CONFIGURE: {
+                "text": "ECF club affiliation",
+                "anchor": tkinter.W,
+            },
+            GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "epccode"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Name", anchor=tkinter.CENTER),
-            GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="epname"),
+            WIDGET_CONFIGURE: {"text": "Name", "anchor": tkinter.CENTER},
+            GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "epname"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Event details", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="epevent"),
+            WIDGET_CONFIGURE: {"text": "Event details", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "epevent"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=4, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="epsection"),
+            WIDGET_CONFIGURE: {"text": "", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 4, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "epsection"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Association", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=5, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="epaff"),
+            WIDGET_CONFIGURE: {"text": "Association", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 5, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "epaff"},
             ROW: 0,
         },
     ]
 
     def __init__(self, database=None):
         """Extend, link player club record with affiliation to database."""
-        super(ECFmapDBrowPlayer, self).__init__()
+        super().__init__()
         self.set_database(database)
         self.row_specification = [
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=4, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 4, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=5, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 5, "sticky": tkinter.EW},
                 ROW: 0,
             },
         ]
 
-    def grid_row(self, **kargs):
+    def grid_row(self, textitems=(), **kargs):
         """Return tuple of instructions to create row.
 
         Create textitems argument for ECFmapDBrowPlayer instance.
 
+        textitems arguments is ignored and is present for compatibility.
+
         """
-        return super(ECFmapDBrowPlayer, self).grid_row(
+        return super().grid_row(
             textitems=(
                 ecfmaprecord.get_grading_code_for_person(
                     self.database,
@@ -251,71 +254,74 @@ class ECFmapDBrowNewPerson(ecfmaprecord.ECFmapDBrecordPlayer, DataRow):
     header_specification = [
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(
-                text="New ECF detail", anchor=tkinter.CENTER
-            ),
-            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="enpeccode"),
+            WIDGET_CONFIGURE: {
+                "text": "New ECF detail",
+                "anchor": tkinter.CENTER,
+            },
+            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "enpeccode"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Name", anchor=tkinter.CENTER),
-            GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="enpename"),
+            WIDGET_CONFIGURE: {"text": "Name", "anchor": tkinter.CENTER},
+            GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "enpename"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Event details", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="enpeevent"),
+            WIDGET_CONFIGURE: {"text": "Event details", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "enpeevent"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="enpesection"),
+            WIDGET_CONFIGURE: {"text": "", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "enpesection"},
             ROW: 0,
         },
     ]
 
     def __init__(self, database=None):
         """Extend, link player record without grading code to database."""
-        super(ECFmapDBrowNewPerson, self).__init__()
+        super().__init__()
         self.set_database(database)
         self.row_specification = [
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
                 ROW: 0,
             },
         ]
 
-    def grid_row(self, **kargs):
+    def grid_row(self, textitems=(), **kargs):
         """Return tuple of instructions to create row.
 
         Create textitems argument for ECFmapDBrowNewPerson instance.
+
+        textitems arguments is ignored and is present for compatibility.
 
         """
         if self.value.playercode:
@@ -329,7 +335,8 @@ class ECFmapDBrowNewPerson(ecfmaprecord.ECFmapDBrecordPlayer, DataRow):
         name, event, section, affiliation = resultsrecord.get_alias_details(
             self.database, self.value.playerkey
         )
-        return super(ECFmapDBrowNewPerson, self).grid_row(
+        del affiliation
+        return super().grid_row(
             textitems=(code, name, event, section), **kargs
         )
 
@@ -340,72 +347,77 @@ class ECFmapDBrowPerson(resultsrecord.ResultsDBrecordPlayer, DataRow):
     header_specification = [
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Grading code", anchor=tkinter.CENTER),
-            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="epeccode"),
+            WIDGET_CONFIGURE: {
+                "text": "Grading code",
+                "anchor": tkinter.CENTER,
+            },
+            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "epeccode"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Name", anchor=tkinter.CENTER),
-            GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="epename"),
+            WIDGET_CONFIGURE: {"text": "Name", "anchor": tkinter.CENTER},
+            GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "epename"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Event details", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="epeevent"),
+            WIDGET_CONFIGURE: {"text": "Event details", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "epeevent"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="epesection"),
+            WIDGET_CONFIGURE: {"text": "", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "epesection"},
             ROW: 0,
         },
     ]
 
     def __init__(self, database=None):
         """Extend, link player record without grading code to database."""
-        super(ECFmapDBrowPerson, self).__init__()
+        super().__init__()
         self.set_database(database)
         self.row_specification = [
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
                 ROW: 0,
             },
         ]
 
-    def grid_row(self, **kargs):
+    def grid_row(self, textitems=(), **kargs):
         """Return tuple of instructions to create row.
 
         Create textitems argument for ECFmapDBrowPerson instance.
 
+        textitems arguments is ignored and is present for compatibility.
+
         """
-        return super(ECFmapDBrowPerson, self).grid_row(
+        return super().grid_row(
             textitems=(
                 ecfmaprecord.get_grading_code_for_person(
                     self.database,

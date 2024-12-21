@@ -17,15 +17,13 @@ import tkinter.filedialog
 
 from solentware_bind.gui.exceptionhandler import ExceptionHandler
 
-from ..core import constants as cc
-
 
 class Prepare(ExceptionHandler):
     """Convert from League or ECF submission format to Results format."""
 
     def __init__(self, format_class):
         """Initialise attributes and tkinter.Tk instance to control process."""
-        super(Prepare, self).__init__()
+        super().__init__()
         self.format_class = format_class
         self.format_error = None
         self.importdata = None
@@ -38,11 +36,13 @@ class Prepare(ExceptionHandler):
         """Return toplevel widget."""
         return self.root
 
-    def open_submission(self, folder):
+    def open_submission(self):
         """Create dialogue to save results from folder in internal format."""
         self.format_error = []
+        folder = tkinter.filedialog.askdirectory(
+            parent=self.root, initialdir="~"
+        )
         if folder:
-            print(folder)
             self.root.wm_title(
                 string="Please wait while processing selected folder"
             )
@@ -65,7 +65,7 @@ class Prepare(ExceptionHandler):
                         msg.append("First file.\n")
                     else:
                         msg.append("".join(("Previous file is ", fp, "\n")))
-            if len(msg):
+            if msg:
                 msg[:0] = [
                     "Errors found processing the listed files.\n",
                     "The first error found is reported for each file.\n",
@@ -77,8 +77,8 @@ class Prepare(ExceptionHandler):
                     ),
                     " ".join(
                         (
-                            "if the error is detected before the current file's",
-                            "event is",
+                            "if the error is detected before the current ",
+                            "file's event is",
                         )
                     ),
                     "found.\n",
@@ -87,9 +87,10 @@ class Prepare(ExceptionHandler):
                 msg.append(
                     " ".join(
                         (
-                            "Note that mixing files of different types is an error:",
-                            "probably reporting affilateECODE and #EVENT DETAILS",
-                            "keywords if the processed files are otherwise ok",
+                            "Note that mixing files of different types is an",
+                            "error: probably reporting affilateECODE and",
+                            "#EVENT DETAILS keywords if the processed files",
+                            "are otherwise ok",
                         )
                     )
                 )
@@ -127,22 +128,22 @@ class Prepare(ExceptionHandler):
                     (
                         "Summary of derivation.",
                         "\n\n",
-                        "ECF submission files and League database dumps in the ",
-                        "selected folder and any subfolders have been copied and ",
-                        "any items not needed for the Results database removed. ",
-                        "This includes ECF codes and dates of birth which may be ",
-                        "present on the imported files.",
+                        "ECF submission files and League database dumps in ",
+                        "the selected folder and any subfolders have been ",
+                        "copied and any items not needed for the Results ",
+                        "database removed. This includes ECF codes and dates ",
+                        "of birth which may be present on the imported files.",
                         "\n\n",
-                        "The Pin can be used to merge players on import to the ",
-                        "new database. All players with the same Pin in the ",
-                        "selected folder, and subfolders, are assumed to be the ",
-                        "same player. ",
-                        "But where the ECF grading code is used as the Pin then ",
-                        "players from different submission files will not be ",
-                        "merged for you.",
+                        "The Pin can be used to merge players on import to ",
+                        "the new database. All players with the same Pin in ",
+                        "the selected folder, and subfolders, are assumed ",
+                        "to be the same player. ",
+                        "But where the ECF grading code is used as the Pin ",
+                        "then players from different submission files will ",
+                        "not be merged for you.",
                         "\n\n",
-                        "A player's Pin after import will almost certainly be ",
-                        "different to the Pin before import.",
+                        "A player's Pin after import will almost certainly ",
+                        "be different to the Pin before import.",
                     )
                 )
                 fbuttons = tkinter.Frame(master=self.root)
@@ -163,14 +164,14 @@ class Prepare(ExceptionHandler):
                 helptext.insert(tkinter.END, text)
                 helptext.pack(fill=tkinter.BOTH, expand=tkinter.TRUE)
             return True
-        else:
-            tkinter.messagebox.showinfo(
-                parent=self.get_widget(),
-                title="Prepare data for Results database",
-                message="Folder containining import data not specified",
-            )
-            self.root.destroy()
-            self.root = None
+        tkinter.messagebox.showinfo(
+            parent=self.get_widget(),
+            title="Prepare data for Results database",
+            message="Folder containining import data not specified",
+        )
+        self.root.destroy()
+        self.root = None
+        return None
 
     def quit_submission(self):
         """Quit application if confirmed in a dialogue."""
@@ -198,8 +199,8 @@ class Prepare(ExceptionHandler):
             if tkinter.messagebox.askyesno(
                 parent=self.get_widget(), title="Save Files", message=msg
             ):
-                for s in savefiles:
-                    self.importdata.write_file(s, savefiles[s], folder)
+                for key, value in savefiles.items():
+                    self.importdata.write_file(key, value, folder)
                 toplevel.destroy()
 
         folder = tkinter.filedialog.askdirectory(
@@ -207,7 +208,7 @@ class Prepare(ExceptionHandler):
         )
         if not folder:
             return
-        savefiles = dict()
+        savefiles = {}
         allexist = True
         noneexist = True
         for f in self.importdata.files:
@@ -264,20 +265,6 @@ class Prepare(ExceptionHandler):
 class PrepareECF(Prepare):
     """Convert from ECF submission format to Results format."""
 
-    def open_submission(self):
-        """Get input directory from dialog and delegate."""
-        folder = tkinter.filedialog.askdirectory(
-            parent=self.root, initialdir="~"
-        )
-        return super(PrepareECF, self).open_submission(folder)
-
 
 class PrepareLeague(Prepare):
     """Convert from League format to Results format."""
-
-    def open_submission(self):
-        """Get input directory from dialog and delegate."""
-        folder = tkinter.filedialog.askopenfilename(
-            parent=self.root, initialdir="~"
-        )
-        return super(PrepareLeague, self).open_submission(folder)

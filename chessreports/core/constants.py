@@ -8,118 +8,52 @@ Constants shared with the ChessResultsReport version are imported from
 the chessreports.core.constants module.
 
 """
-from chessvalidate.core.constants import (
-    LOSS,
-    DRAWN,
-    WIN,
-    HWIN,
-    AWIN,
-    DRAW,
-    HWIN_DEFAULT,
-    AWIN_DEFAULT,
-    DOUBLEDEFAULT,
-    DRAWDEFAULT,
-    HBYE,
-    ABYE,
-    HBYEHALF,
-    ABYEHALF,
-    TOBEREPORTED,
-    VOID_GAME,
-    NOTARESULT,
-    DEFAULTED,
-    TBRSTRING,
-    RESULT_01,
-    RESULT_55,
-    RESULT_10,
-    ECF_RESULT_DD,
-    ECF_RESULT_1D,
-    ECF_RESULT_D1,
-    RECENT_EMAIL_SELECTION,
-    RECENT_EMAIL_EXTRACTION,
-    RECENT_CSV_DOWNLOAD,
-    RECENT_DOCUMENT,
-    REPORT_SECTION,
-    REPORT_DAY,
-    REPORT_DATE,
-    REPORT_ROUND,
-    REPORT_HOME_TEAM,
-    REPORT_HOME_TEAM_SCORE,
-    REPORT_HOME_PLAYER,
-    REPORT_RESULT,
-    REPORT_AWAY_PLAYER,
-    REPORT_AWAY_TEAM_SCORE,
-    REPORT_AWAY_TEAM,
-    REPORT_BOARD,
-    REPORT_HOME_PLAYER_COLOUR,
-    REPORT_EVENT,
-    TABULAR_REPORT_ROW_ORDER,
-    FIRST_PLAYER_WHITE_PIECES,
-    FIRST_PLAYER_BLACK_PIECES,
-    NULL_PLAYER,
-    HOME_PLAYER_WHITE,
-    GRADING_ONLY,
-    SECTION,
-    HOME_TEAM_NAME,
-    AWAY_TEAM_NAME,
-    HOME_PLAYER,
-    AWAY_PLAYER,
-    GAME_COUNT,
-    MATCH_SCORE,
-    ONLY_REPORT,
-    AUTHORIZATION,
-    ROUND_DUP_REP,
-    COMPETITION_DUP_REP,
-    SOURCE_DUP_REP,
-    BOARD_DUP_REP,
-    RESULT_DUP_REP,
-)
-
 # Keys in <key>=<value> in data transfer files. Value ended by '\n'.
-_event = "event"
-_startdate = "startdate"
-_enddate = "enddate"
-_eventsection = "eventsection"
-_eventsections = "eventsections"
-_homeplayerwhite = "homeplayerwhite"
-_date = "date"
-_board = "board"
-_round = "round"
-_hometeam = "hometeam"
-_awayteam = "awayteam"
-_section = "section"
-_sections = "sections"
-_homeplayer = "homeplayer"
-_homename = "homename"
-_homepin = "homepin"
-_homepinfalse = "homepinfalse"
-_homeaffiliation = "homeaffiliation"
-_homereportedcodes = "homereportedcodes"
-_awayplayer = "awayplayer"
-_awayname = "awayname"
-_awaypin = "awaypin"
-_awaypinfalse = "awaypinfalse"
-_awayaffiliation = "awayaffiliation"
-_awayreportedcodes = "awayreportedcodes"
-_result = "result"
-_name = "name"
-_pin = "pin"
-_pinfalse = "pinfalse"
-_affiliation = "affiliation"
-_exportedeventplayer = "exportedeventplayer"
-_exportedplayer = "exportedplayer"
-_player = "player"
-_aliases = "aliases"
-_newidentity = "newidentity"
-_knownidentity = "knownidentity"
-_sectionname = "sectionname"
-_uniquesection = "uniquesection"
-_serial = "serial"
-_homeserial = "homeserial"
-_awayserial = "awayserial"
-_identified = "identified"
+EVENT = "event"
+STARTDATE = "startdate"
+ENDDATE = "enddate"
+EVENTSECTION = "eventsection"
+EVENTSECTIONS = "eventsections"
+HOMEPLAYERWHITE = "homeplayerwhite"
+DATE = "date"
+BOARD_LOWER = "board"  # BOARD = "BOARD" statement occurs later.
+ROUND_LOWER = "round"  # ROUND = "ROUND" statement occurs later.
+HOMETEAM = "hometeam"
+AWAYTEAM = "awayteam"
+SECTION = "section"
+SECTIONS = "sections"
+HOMEPLAYER = "homeplayer"
+HOMENAME = "homename"
+HOMEPIN = "homepin"
+HOMEPINFALSE = "homepinfalse"
+HOMEAFFILIATION = "homeaffiliation"
+HOMEREPORTEDCODES = "homereportedcodes"
+AWAYPLAYER = "awayplayer"
+AWAYNAME = "awayname"
+AWAYPIN = "awaypin"
+AWAYPINFALSE = "awaypinfalse"
+AWAYAFFILIATION = "awayaffiliation"
+AWAYREPORTEDCODES = "awayreportedcodes"
+RESULT = "result"
+NAME_LOWER = "name"  # NAME = "NAME" statement occurs later.
+PIN_LOWER = "pin"  # PIN = "PIN" statement occurs later.
+PINFALSE = "pinfalse"
+AFFILIATION = "affiliation"
+EXPORTEDEVENTPLAYER = "exportedeventplayer"
+EXPORTEDPLAYER = "exportedplayer"
+PLAYER = "player"
+ALIASES = "aliases"
+NEWIDENTITY = "newidentity"
+KNOWNIDENTITY = "knownidentity"
+SECTIONNAME = "sectionname"
+UNIQUESECTION = "uniquesection"
+SERIAL = "serial"
+HOMESERIAL = "homeserial"
+AWAYSERIAL = "awayserial"
+IDENTIFIED = "identified"
 
 # To figure out team names and affiliations.
-_names = "names"
+NAMES = "names"
 
 # Chosen way of presenting game results in readable format.
 TBR = "tbr"
@@ -166,8 +100,8 @@ COLOR_NOT_SPECIFIED = "notspecified"
 # from "0".  Thus avoiding problems that may arise from the conventional
 # use of "zero_not_0" by this program to cope with the ECF submission file
 # conventional use of "0".
-ECF_RESULT_0d = "0d"
-ECF_RESULT_d0 = "d0"
+ECF_RESULT_0D = "0d"
+ECF_RESULT_D0 = "d0"
 ECF_COLOUR_WHITE = "white"
 ECF_COLOUR_BLACK = "black"
 ECF_COLOUR_W = "w"
@@ -180,23 +114,23 @@ ECF_COLOURDEFAULT_UNKNOWN = "unknown"
 ECF_ZERO_NOT_0 = "zero_not_0"
 
 # Encoding of values used on league database extract.
-result_0 = "0"
-result_1 = "1"
-result_2 = "2"
-result_3 = "3"
-result_4 = "4"
-result_5 = "5"
-result_6 = "6"
-result_7 = "7"
-result_8 = "8"
-colour_0 = "0"
-colour_1 = "1"
-colour_2 = "2"
-colourdefault_0 = "0"
-colourdefault_1 = "1"
-colourdefault_2 = "2"
-colourdefault_3 = "3"
-colourdefault_4 = "4"
+RESULT_0 = "0"
+RESULT_1 = "1"
+RESULT_2 = "2"
+RESULT_3 = "3"
+RESULT_4 = "4"
+RESULT_5 = "5"
+RESULT_6 = "6"
+RESULT_7 = "7"
+RESULT_8 = "8"
+COLOUR_0 = "0"
+COLOUR_1 = "1"
+COLOUR_2 = "2"
+COLOURDEFAULT_0 = "0"
+COLOURDEFAULT_1 = "1"
+COLOURDEFAULT_2 = "2"
+COLOURDEFAULT_3 = "3"
+COLOURDEFAULT_4 = "4"
 
 # Keys used on league database extract.
 ECODE = "ECODE"
@@ -268,46 +202,46 @@ GUSEMATCHDATE = "GUSEMATCHDATE"
 TCODE = "TCODE"
 TNAME = "TNAME"
 RPAIRING = "RPAIRING"
-represent = "represent"
-club = "clu"
-player = "player"
-game = "game"
-affiliate = "affiliate"
-team = "team"
-event = "event"
-match = "match"
+LREPRESENT = "represent"
+LCLUB = "clu"  # Is "clu" a typo here, or what the originator gives?
+LPLAYER = "player"
+LGAME = "game"
+LAFFILIATE = "affiliate"
+LTEAM = "team"
+LEVENT = "event"
+LMATCH = "match"
 
 # Dictionary key for values extracted from submission files or league
 # database extract. These keys are the same as field names on League database
 # unless the value is used in the results database structure.
-_ecode = ECODE
-_ename = _event  # ENAME
-_edate = _startdate  # EDATE
-_efinaldate = _enddate  # EFINALDATE
-_pcode = PCODE
-_pname = _player  # PNAME
-_mcode = MCODE
-_mname = MNAME
-_mdate = MDATE
-_pcode1 = PCODE1
-_pcode2 = PCODE2
-_gcode = GCODE
-_ground = _round  # GROUND
-_gboard = _board  # GBOARD
-_gcolor = GCOLOR
-_gresult = _result  # GRESULT
-_gdate = _date  # GDATE
-_mcolor = MCOLOR
-_mtype = MTYPE
-_cname = CNAME
-_ccode = CCODE
-_tcode = TCODE
-_tcode1 = TCODE1
-_tcode2 = TCODE2
-_tname = TNAME
-_rpairing = RPAIRING
-_plennickname = PLENNICKNAME
-_plenforename = PLENFORENAME
+LECODE = ECODE
+LENAME = EVENT  # ENAME
+LEDATE = STARTDATE  # EDATE
+LEFINALDATE = ENDDATE  # EFINALDATE
+LPCODE = PCODE
+LPNAME = PLAYER  # PNAME
+LMCODE = MCODE
+LMNAME = MNAME
+LMDATE = MDATE
+LPCODE1 = PCODE1
+LPCODE2 = PCODE2
+LGCODE = GCODE
+LGROUND = ROUND_LOWER  # GROUND
+LGBOARD = BOARD_LOWER  # GBOARD
+LGCOLOR = GCOLOR
+LGRESULT = RESULT  # GRESULT
+LGDATE = DATE  # GDATE
+LMCOLOR = MCOLOR
+LMTYPE = MTYPE
+LCNAME = CNAME
+LCCODE = CCODE
+LTCODE = TCODE
+LTCODE1 = TCODE1
+LTCODE2 = TCODE2
+LTNAME = TNAME
+LRPAIRING = RPAIRING
+LPLENNICKNAME = PLENNICKNAME
+LPLENFORENAME = PLENFORENAME
 
 # Keys used on ECF submission files.
 
@@ -374,23 +308,19 @@ COLUMN = "COLUMN"
 
 # Submission files earlier than about 2001 may use SURNAME FORENAME and
 # INITIALS instead of NAME. Used to build PNAME if necessary.
-_surname = SURNAME
-_forename = FORENAME
-_initials = INITIALS
-
-# Used by control.py
-_resultsdata = "games"
-_ecfdata = "data"
+E_SURNAME = SURNAME
+E_FORENAME = FORENAME
+E_INITIALS = INITIALS
 
 # Used in validation of ECF codes, formerly Grading codes.
 GRADING_CODE_LENGTH = 7
 GRADING_CODE_CHECK_CHARACTERS = "ABCDEFGHJKL"
 
 # Used by merges.py preparesource.py mainly.
-_section_is_match = "M"
-_event_matches = "Event Matches"
-_yes = "yes"
-_no = "no"
+SECTION_IS_MATCH = "M"
+EVENT_MATCHES = "Event Matches"
+YES = "yes"
+NO = "no"
 TAKEON_ECF_FORMAT = "takeon_ecf_format"
 TAKEON_LEAGUE_FORMAT = "takeon_league_format"
 TAKEON_EXT = {".txt"}

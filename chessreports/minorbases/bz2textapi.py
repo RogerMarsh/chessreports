@@ -34,7 +34,5 @@ class BZ2TextapiRoot(textapi.TextapiRoot):
             self._table_link = bz2.BZ2File(self.filename, "rb")
             self.textlines = self._table_link.read().splitlines()
             self.record_count = len(self.textlines)
-            self.record_number = None
-            self.record_select = None
         except:
             self._table_link = None

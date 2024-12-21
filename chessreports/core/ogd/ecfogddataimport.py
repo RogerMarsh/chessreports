@@ -43,13 +43,13 @@ def _do_ecf_ogd_data_import(
     results.do_database_task(
         import_method,
         logwidget=logwidget,
-        taskmethodargs=dict(
-            ecffile=ecffile,
-            parent=widget.get_widget(),
-            playercode_field=playercode_field,
-            playername_field=playername_field,
-            playerclubs_fields=playerclubs_fields,
-        ),
+        taskmethodargs={
+            "ecffile": ecffile,
+            "parent": widget.get_widget(),
+            "playercode_field": playercode_field,
+            "playername_field": playername_field,
+            "playerclubs_fields": playerclubs_fields,
+        },
         use_specification_items=specification_items,
     )
 

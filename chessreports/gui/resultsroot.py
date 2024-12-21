@@ -10,12 +10,11 @@ import chessvalidate.gui.resultsroot
 
 from .. import APPLICATION_NAME
 from . import help_
-from . import configure
-from . import selectemail
 
 # Cannot set by set_application_name() because chessvalidate.gui.resultsroot
 # has already done a call to this method.
 # ExceptionHandler.set_application_name(APPLICATION_NAME)
+# pylint: disable-next=protected-access
 ExceptionHandler._application_name = APPLICATION_NAME
 
 
@@ -25,7 +24,7 @@ class Results(chessvalidate.gui.resultsroot.Results):
     def make_tools_menu(self, menubar):
         """Extend.  Return Tools menu with URL entry."""
         menu3 = super().make_tools_menu(menubar)
-        self.app_module._add_ecf_url_item(menu3)
+        self.app_module.add_ecf_url_item(menu3)
         return menu3
 
     def make_help_menu(self, menubar):

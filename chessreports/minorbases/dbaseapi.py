@@ -53,13 +53,11 @@ _EXISTS = 32  # as _DELETED
 _PRESENT = {_DELETED: None, _EXISTS: None}
 
 
-class dBaseapiError(Exception):  # DatabaseError):
+class DBaseapiError(Exception):  # DatabaseError):
     """Exception class for dbaseapi module."""
 
-    pass
 
-
-class dBaseapi:  # (Database):
+class DBaseapi:  # (Database):
     """Define a dBaseIII database structure.
 
     The database is read only.
@@ -75,10 +73,10 @@ class dBaseapi:  # (Database):
 
     """
 
-    def __init__(self, dBasefiles, dBasefolder):
+    def __init__(self, dbasefiles, dbasefolder):
         """Define database structure.
 
-        dBasefiles = {
+        dbasefiles = {
             file:{
                 folder:name,
                 fields:{
@@ -89,32 +87,32 @@ class dBaseapi:  # (Database):
         Field names and properties specified are constraints that must
         be true of the file
 
-        dBasefolder = folder for files unless overridden in dBasefiles
+        dbasefolder = folder for files unless overridden in dbasefiles
 
         """
-        # The database definition from dBasefiles after validation
-        self.dBasefiles = None
+        # The database definition from dbasefiles after validation
+        self.dbasefiles = None
 
-        # The folder from dBasefolder after validation
-        self.dBasefolder = None
+        # The folder from dbasefolder after validation
+        self.dbasefolder = None
 
-        files = dict()
-        pathnames = dict()
+        files = {}
+        pathnames = {}
         sfi = 0
 
-        if dBasefolder is not False:
+        if dbasefolder is not False:
             try:
-                dBasefolder = os.path.abspath(dBasefolder)
-            except:
+                dbasefolder = os.path.abspath(dbasefolder)
+            except Exception as exc:
                 msg = " ".join(
-                    ["Main folder name", str(dBasefolder), "is not valid"]
+                    ["Main folder name", str(dbasefolder), "is not valid"]
                 )
-                raise dBaseapiError(msg)
+                raise DBaseapiError(msg) from exc
 
-        for dd in dBasefiles:
+        for dd in dbasefiles:
             try:
-                folder = dBasefiles[dd].get(FOLDER, None)
-            except:
+                folder = dbasefiles[dd].get(FOLDER, None)
+            except Exception as exc:
                 msg = " ".join(
                     [
                         "dBase file definition for",
@@ -122,21 +120,21 @@ class dBaseapi:  # (Database):
                         "must be a dictionary",
                     ]
                 )
-                raise dBaseapiError(msg)
+                raise DBaseapiError(msg) from exc
 
-            if folder == None:
-                folder = dBasefolder
-            if dBasefolder is not False:
+            if folder is None:
+                folder = dbasefolder
+            if dbasefolder is not False:
                 try:
                     folder = os.path.abspath(folder)
                     fname = os.path.join(
-                        folder, dBasefiles[dd].get(FILE, None)
+                        folder, dbasefiles[dd].get(FILE, None)
                     )
-                except:
+                except Exception as exc:
                     msg = " ".join(["File name for", dd, "is invalid"])
-                    raise dBaseapiError(msg)
+                    raise DBaseapiError(msg) from exc
             else:
-                fname = dBasefiles[dd].get(FILE, None)
+                fname = dbasefiles[dd].get(FILE, None)
 
             if fname in pathnames:
                 msg = " ".join(
@@ -149,19 +147,19 @@ class dBaseapi:  # (Database):
                         dd,
                     ]
                 )
-                raise dBaseapiError(msg)
+                raise DBaseapiError(msg)
 
             pathnames[fname] = dd
-            files[dd] = self.make_root(dd, fname, dBasefiles[dd], sfi)
+            files[dd] = self.make_root(dd, fname, dbasefiles[dd], sfi)
             sfi += 1
 
-        self.dBasefiles = files
-        self.dBasefolder = dBasefolder
+        self.dbasefiles = files
+        self.dbasefolder = dbasefolder
 
     def close_context(self):
         """Close files."""
-        for n in self.dBasefiles:
-            self.dBasefiles[n].close()
+        for n in self.dbasefiles:
+            self.dbasefiles[n].close()
 
     def exists(self, dbset, dbname):
         """Return True if dbname is one of the defined files.
@@ -169,7 +167,8 @@ class dBaseapi:  # (Database):
         dbset is ignored.  It is present for compatibility with bsddb.
 
         """
-        return dbname in self.dBasefiles
+        del dbset
+        return dbname in self.dbasefiles
 
     def database_cursor(
         self, dbname, indexname, keyrange=None, recordset=None
@@ -180,21 +179,17 @@ class dBaseapi:  # (Database):
         recordset is ignored.  It is present for compatibility with others.
 
         """
-        return self.dBasefiles[dbname].make_cursor(indexname, keyrange)
+        del recordset
+        return self.dbasefiles[dbname].make_cursor(indexname, keyrange)
 
-    # def get_database(self, dbset, dbname):
     def get_table_connection(self, dbname):
-        """Return file for dbname.
-
-        dbset is ignored.  It is present for compatibility with bsddb.
-
-        """
-        return self.dBasefiles[dbname]._dbaseobject
+        """Return file for dbname."""
+        return self.dbasefiles[dbname].dbaseobject
 
     def get_primary_record(self, dbname, key):
         """Return primary record (key, value) given primary key on dbname."""
         try:
-            return self.get_database(None, dbname).setat(key)
+            return self.get_table_connection(dbname).setat(key)
         except:
             return None
 
@@ -205,6 +200,7 @@ class dBaseapi:  # (Database):
         with bsddb.
 
         """
+        del dbset, dbname
         return True
 
     def is_primary_recno(self, dbname):
@@ -213,6 +209,7 @@ class dBaseapi:  # (Database):
         dbname is ignored.  It is present for compatibility with bsddb.
 
         """
+        del dbname
         return True
 
     def is_recno(self, dbset, dbname):
@@ -222,16 +219,17 @@ class dBaseapi:  # (Database):
         with bsddb.
 
         """
+        del dbset, dbname
         return True
 
     def open_context(self):
         """Open all files."""
-        for n in self.dBasefiles:
+        for n in self.dbasefiles:
             try:
-                self.dBasefiles[n].open_root()
+                self.dbasefiles[n].open_root()
             except:
-                for m in self.dBasefiles:
-                    self.dBasefiles[n].close()
+                for m in self.dbasefiles:
+                    self.dbasefiles[m].close()
                 raise
 
     def decode_as_primary_key(self, dbname, srkey):
@@ -240,11 +238,12 @@ class dBaseapi:  # (Database):
         dbname is ignored.  It is present for compatibility with bsddb.
 
         """
+        del dbname
         return srkey
 
     def make_root(self, dd, fname, dptdesc, sfi):
-        """Return dBaseapiRoot instance."""
-        return dBaseapiRoot(dd, fname, dptdesc, sfi)
+        """Return DBaseapiRoot instance."""
+        return DBaseapiRoot(dd, fname, dptdesc, sfi)
 
     def start_read_only_transaction(self):
         """Do nothing, present for compatibility with Symas LMMD."""
@@ -253,7 +252,7 @@ class dBaseapi:  # (Database):
         """Do nothing, present for compatibility with Symas LMMD."""
 
 
-class dBaseIII:
+class DBaseIII:
     """Emulate Berkeley DB file and record structure for dBase III files.
 
     The first, last, nearest, next, prior, and Set methods return the
@@ -266,13 +265,28 @@ class dBaseIII:
     def __init__(self, filename):
         """Initialise dBaseIII file "filename" in closed state."""
         self._localdata = threading.local()
-        self._lock_dBaseIII = threading.Lock()
-        self._lock_dBaseIII.acquire()
-        try:
+        self._lock_dbase = threading.Lock()
+        with self._lock_dbase:
             self.filename = filename
-            self._set_closed_state()
-        finally:
-            self._lock_dBaseIII.release()
+            # Avoid a host of pylint W0201 attribute-defined-outside-init
+            # reports by not calling _set_closed_state to do this
+            # initialization.
+            # self._set_closed_state()
+            self._table_link = None
+            self.version = None
+            self.record_count = None
+            self.first_record_seek = None
+            self.record_length = None
+            self.fields = {}
+            self._localdata.record_number = None
+            self._localdata.record_select = None
+            self._localdata.record_control = None
+            # most recent _get_record() return
+            self._localdata.record_data = None
+            # 1 header + n field definitions each 32 bytes
+            self.file_header = []
+            self.fieldnames = None
+            self.sortedfieldnames = None
 
     def __del__(self):
         """Close dBaseIII file when instance deleted."""
@@ -280,8 +294,7 @@ class dBaseIII:
 
     def close(self):
         """Close dBaseIII file."""
-        self._lock_dBaseIII.acquire()
-        try:
+        with self._lock_dbase:
             try:
                 try:
                     self._table_link.close()
@@ -289,8 +302,6 @@ class dBaseIII:
                     pass
             finally:
                 self._set_closed_state()
-        finally:
-            self._lock_dBaseIII.release()
 
     def encode_number(self, number):
         """Convert integer to base 256 string length 4 and return.
@@ -310,13 +321,10 @@ class dBaseIII:
 
     def make_cursor(self):
         """Create and return a record cursor on the dBaseIII file."""
-        self._lock_dBaseIII.acquire()
-        try:
+        with self._lock_dbase:
             if self._table_link is None:
-                return
+                return None
             return CursordBaseIII(self)
-        finally:
-            self._lock_dBaseIII.release()
 
     def first(self):
         """Return first record not marked as deleted."""
@@ -324,9 +332,10 @@ class dBaseIII:
         while value:
             if self._localdata.record_control == _EXISTS:
                 return (self._localdata.record_select, repr(value))
-            elif self._localdata.record_control not in _PRESENT:
+            if self._localdata.record_control not in _PRESENT:
                 return None
             value = self._next_record()
+        return None
 
     def last(self):
         """Return last record not marked as deleted."""
@@ -334,9 +343,10 @@ class dBaseIII:
         while value:
             if self._localdata.record_control == _EXISTS:
                 return (self._localdata.record_select, repr(value))
-            elif self._localdata.record_control not in _PRESENT:
+            if self._localdata.record_control not in _PRESENT:
                 return None
             value = self._prior_record()
+        return None
 
     def nearest(self, current):
         """Return nearest record not marked as deleted."""
@@ -345,9 +355,10 @@ class dBaseIII:
         while value:
             if self._localdata.record_control == _EXISTS:
                 return (self._localdata.record_select, repr(value))
-            elif self._localdata.record_control not in _PRESENT:
+            if self._localdata.record_control not in _PRESENT:
                 return None
             value = self._next_record()
+        return None
 
     def next(self, current):
         """Return next record not marked as deleted."""
@@ -356,14 +367,14 @@ class dBaseIII:
         while value:
             if self._localdata.record_control == _EXISTS:
                 return (self._localdata.record_select, repr(value))
-            elif self._localdata.record_control not in _PRESENT:
+            if self._localdata.record_control not in _PRESENT:
                 return None
             value = self._next_record()
+        return None
 
     def open_dbf(self):
         """Open dBaseIII file and extract field names."""
-        self._lock_dBaseIII.acquire()
-        try:
+        with self._lock_dbase:
             try:
                 # file header consists of 32 bytes
                 if isinstance(self.filename, io.BytesIO):
@@ -385,7 +396,8 @@ class dBaseIII:
                 terminator = fielddef[0]
                 while terminator != b"\r"[0]:
                     if len(fielddef) != 32:
-                        self._table_link = self.close()
+                        self.close()
+                        self._table_link = None
                         break
                     self.file_header.append(fielddef)
                     nullbyte = fielddef.find(b"\x00", 0)
@@ -415,8 +427,6 @@ class dBaseIII:
                 self.sortedfieldnames = tuple(fieldnames)
             except:
                 self._table_link = None
-        finally:
-            self._lock_dBaseIII.release()
 
     def prior(self, current):
         """Return prior record not marked as deleted."""
@@ -425,9 +435,10 @@ class dBaseIII:
         while value:
             if self._localdata.record_control == _EXISTS:
                 return (self._localdata.record_select, repr(value))
-            elif self._localdata.record_control not in _PRESENT:
+            if self._localdata.record_control not in _PRESENT:
                 return None
             value = self._prior_record()
+        return None
 
     def setat(self, current):
         """Return current record.  Return None if deleted."""
@@ -436,6 +447,7 @@ class dBaseIII:
         if value:
             if self._localdata.record_control == _EXISTS:
                 return (self._localdata.record_select, repr(value))
+        return None
 
     def _set_closed_state(self):
         self._table_link = None
@@ -443,7 +455,7 @@ class dBaseIII:
         self.record_count = None
         self.first_record_seek = None
         self.record_length = None
-        self.fields = dict()
+        self.fields = {}
         self._localdata.record_number = None
         self._localdata.record_select = None
         self._localdata.record_control = None
@@ -463,14 +475,13 @@ class dBaseIII:
         Copy record deleted/exists marker to self.record_control.
 
         """
-        self._lock_dBaseIII.acquire()
-        try:
-            if self._table_link == None:
+        with self._lock_dbase:
+            if self._table_link is None:
                 return None
             if self._localdata.record_select < 0:
                 self._localdata.record_select = -1
                 return None
-            elif self._localdata.record_select >= self.record_count:
+            if self._localdata.record_select >= self.record_count:
                 self._localdata.record_select = self.record_count
                 return None
             self._localdata.record_number = self._localdata.record_select
@@ -498,10 +509,7 @@ class dBaseIII:
                         s:f
                     ].strip()
                 return result
-            else:
-                return None
-        finally:
-            self._lock_dBaseIII.release()
+            return None
 
     def _last_record(self):
         """Position at and return last record."""
@@ -572,7 +580,7 @@ class CursordBaseIII:
         """Initialise cursor on dBaseIII dbobject."""
         # super().__init__(dbobject)
         super().__init__()
-        if isinstance(dbobject, dBaseIII):
+        if isinstance(dbobject, DBaseIII):
             self._dbobject = dbobject
             self._current = -1
         else:
@@ -594,6 +602,7 @@ class CursordBaseIII:
         if r:
             self._current = r[0]
             return r
+        return None
 
     def is_cursor_open(self):
         """Return True if cursor available for use and False otherwise."""
@@ -605,6 +614,7 @@ class CursordBaseIII:
         if r:
             self._current = r[0]
             return r
+        return None
 
     def next(self):
         """Return next record not marked as deleted."""
@@ -612,6 +622,7 @@ class CursordBaseIII:
         if r:
             self._current = r[0]
             return r
+        return None
 
     def prev(self):
         """Return prior record not marked as deleted."""
@@ -619,14 +630,16 @@ class CursordBaseIII:
         if r:
             self._current = r[0]
             return r
+        return None
 
     def setat(self, record):
         """Return current record.  Return None if deleted."""
-        k, v = record
+        k = record[0]
         r = self._dbobject.setat(k)
         if r:
             self._current = r[0]
             return r
+        return None
 
     def cursor_count(self):
         """Return count of records on file."""
@@ -664,14 +677,14 @@ class _dBaseapiRoot:
         # These functions introduced to allow dbapi.py and dptapi.py to be
         # interchangeable for user classes. Another use found.
 
-        fields = dptdesc.get(FIELDS, dict())
+        fields = dptdesc.get(FIELDS, {})
         if not isinstance(fields, dict):
             msg = " ".join(
                 ["Field description of file", repr(dd), "must be a dictionary"]
             )
-            raise dBaseapiError(msg)
+            raise DBaseapiError(msg)
 
-        sequence = dict()
+        sequence = {}
         for fieldname in fields:
             if not isinstance(fieldname, str):
                 msg = " ".join(
@@ -682,7 +695,7 @@ class _dBaseapiRoot:
                         dd,
                     ]
                 )
-                raise dBaseapiError(msg)
+                raise DBaseapiError(msg)
 
             if not fieldname.isupper():
                 msg = " ".join(
@@ -694,11 +707,11 @@ class _dBaseapiRoot:
                         "must be upper case",
                     ]
                 )
-                raise dBaseapiError(msg)
+                raise DBaseapiError(msg)
 
             attributes = fields[fieldname]
-            if attributes == None:
-                attributes = dict()
+            if attributes is None:
+                attributes = {}
                 fields[fieldname] = attributes
             if not isinstance(attributes, dict):
                 msg = " ".join(
@@ -710,7 +723,7 @@ class _dBaseapiRoot:
                         'must be a dictionary or "None"',
                     ]
                 )
-                raise dBaseapiError(msg)
+                raise DBaseapiError(msg)
 
             for a in attributes:
                 if a not in DBASE_FIELDATTS:
@@ -725,7 +738,7 @@ class _dBaseapiRoot:
                             "is not allowed",
                         ]
                     )
-                    raise dBaseapiError(msg)
+                    raise DBaseapiError(msg)
 
                 if not isinstance(attributes[a], DBASE_FIELDATTS[a]):
                     msg = " ".join(
@@ -738,7 +751,7 @@ class _dBaseapiRoot:
                             "is wrong type",
                         ]
                     )
-                    raise dBaseapiError(msg)
+                    raise DBaseapiError(msg)
 
                 if a == TYPE:
                     if attributes[a] not in _FIELDTYPE:
@@ -752,7 +765,7 @@ class _dBaseapiRoot:
                                 str(list(_FIELDTYPE.keys())),
                             ]
                         )
-                        raise dBaseapiError(msg)
+                        raise DBaseapiError(msg)
 
             if START in attributes:
                 if attributes[START] in sequence:
@@ -765,11 +778,11 @@ class _dBaseapiRoot:
                             "starts at",
                             str(attributes[START]),
                             "duplicating field",
-                            sequence[attibutes[start]],
+                            sequence[attributes[START]],
                             "start",
                         ]
                     )
-                    raise dBaseapiError(msg)
+                    raise DBaseapiError(msg)
 
                 sequence[attributes[START]] = fieldname
 
@@ -796,14 +809,14 @@ class _dBaseapiRoot:
                                 dd,
                             ]
                         )
-                        raise dBaseapiError(msg)
+                        raise DBaseapiError(msg)
 
-        primary = dptdesc.get(PRIMARY, dict())
+        primary = dptdesc.get(PRIMARY, {})
         if not isinstance(primary, dict):
             msg = " ".join(
                 ["Field mapping of file", repr(dd), "must be a dictionary"]
             )
-            raise dBaseapiError(msg)
+            raise DBaseapiError(msg)
 
         for p in primary:
             if not isinstance(p, str):
@@ -816,10 +829,10 @@ class _dBaseapiRoot:
                         "must be a string",
                     ]
                 )
-                raise dBaseapiError(msg)
+                raise DBaseapiError(msg)
 
             f = primary[p]
-            if f == None:
+            if f is None:
                 f = p.upper()
                 primary[p] = f
             elif not isinstance(f, str):
@@ -834,7 +847,7 @@ class _dBaseapiRoot:
                         "must be a string",
                     ]
                 )
-                raise dBaseapiError(msg)
+                raise DBaseapiError(msg)
 
             if f not in fields:
                 msg = " ".join(
@@ -848,24 +861,24 @@ class _dBaseapiRoot:
                         "must have a field description",
                     ]
                 )
-                raise dBaseapiError(msg)
+                raise DBaseapiError(msg)
 
-        secondary = dptdesc.get(SECONDARY, dict())
+        secondary = dptdesc.get(SECONDARY, {})
         if not isinstance(secondary, dict):
             msg = " ".join(
                 ["Index definition of file", repr(dd), "must be a dictionary"]
             )
-            raise dBaseapiError(msg)
+            raise DBaseapiError(msg)
 
         for s in secondary:
             if not isinstance(s, str):
                 msg = " ".join(
                     ["Index name", str(s), "for", dd, "must be a string"]
                 )
-                raise dBaseapiError(msg)
+                raise DBaseapiError(msg)
 
             i = secondary[s]
-            if i == None:
+            if i is None:
                 i = (s.upper(),)
                 secondary[s] = i
             elif not isinstance(i, tuple):
@@ -880,7 +893,7 @@ class _dBaseapiRoot:
                         "must be a tuple of strings",
                     ]
                 )
-                raise dBaseapiError(msg)
+                raise DBaseapiError(msg)
 
             for f in i:
                 if not isinstance(f, str):
@@ -895,7 +908,7 @@ class _dBaseapiRoot:
                             "must be a string",
                         ]
                     )
-                    raise dBaseapiError(msg)
+                    raise DBaseapiError(msg)
 
                 if f not in fields:
                     msg = " ".join(
@@ -909,11 +922,21 @@ class _dBaseapiRoot:
                             "must have a field description",
                         ]
                     )
-                    raise dBaseapiError(msg)
+                    raise DBaseapiError(msg)
 
         self._fields = fields
         self._primary = primary
         self._secondary = secondary
+
+    @property
+    def file_name(self):
+        """Return self._file."""
+        return self._file
+
+    @property
+    def dbaseobject(self):
+        """Return self._dbaseobject."""
+        return self._dbaseobject
 
     def close(self):
         """Close file."""
@@ -929,42 +952,41 @@ class _dBaseapiRoot:
 
     def open_root(self):
         """Open DBaseIII file."""
-        if self._dbaseobject == True:
-            opendb = dBaseIII(self._file)
+        if self._dbaseobject is True:
+            opendb = DBaseIII(self._file)
             opendb.open_dbf()
             for f in self._fields:
                 if f not in opendb.fields:
-                    raise dBaseapiError(
+                    raise DBaseapiError(
                         " ".join(("Field", f, "not in file", self._ddname))
                     )
-                else:
-                    for a in self._fields[f]:
-                        if self._fields[f][a] != opendb.fields[f][a]:
-                            raise dBaseapiError(
-                                " ".join(
-                                    (
-                                        "Declared field attribute",
-                                        a,
-                                        "for field",
-                                        f,
-                                        "does not match value on file",
-                                        self._ddname,
-                                    )
+                for a in self._fields[f]:
+                    if self._fields[f][a] != opendb.fields[f][a]:
+                        raise DBaseapiError(
+                            " ".join(
+                                (
+                                    "Declared field attribute",
+                                    a,
+                                    "for field",
+                                    f,
+                                    "does not match value on file",
+                                    self._ddname,
                                 )
                             )
-            for f in opendb.fields:
-                if f not in self._fields:
-                    self._primary[f] = f
-                    self._fields[f] = dict()
-                for a in opendb.fields[f]:
-                    if a not in self._fields[f]:
-                        self._fields[f][a] = opendb.fields[f][a]
+                        )
+            for key, value in opendb.fields.items():
+                if key not in self._fields:
+                    self._primary[key] = key
+                    self._fields[key] = {}
+                for a in value:
+                    if a not in self._fields[key]:
+                        self._fields[key][a] = value[a]
             self._dbaseobject = opendb
-        elif self._dbaseobject == False:
-            raise dBaseapiError("Create dBase file not supported")
+        elif self._dbaseobject is False:
+            raise DBaseapiError("Create dBase file not supported")
 
 
-class dBaseapiRoot(_dBaseapiRoot):
+class DBaseapiRoot(_dBaseapiRoot):
     """Provide record level access to a dBaseIII file."""
 
     def __init__(self, dd, fname, dptdesc, sfi):
@@ -974,10 +996,11 @@ class dBaseapiRoot(_dBaseapiRoot):
         sfi - for compatibility with bsddb
 
         """
+        del sfi
         super().__init__(dd, fname, dptdesc)
 
         # All active Cursor objects opened by database_cursor
-        self._clientcursors = dict()
+        self._clientcursors = {}
 
     def close(self):
         """Close file and cursors."""
@@ -999,8 +1022,7 @@ class dBaseapiRoot(_dBaseapiRoot):
             if c:
                 self._clientcursors[c] = True
             return c
-        else:
-            raise dBaseapiError("Indexes not supported")
+        raise DBaseapiError("Indexes not supported")
 
     def _get_deferable_update_files(self, defer, dd):
         """Return a dictionary of empty lists for the dBaseIII files.
@@ -1016,7 +1038,6 @@ class dBaseapiRoot(_dBaseapiRoot):
         Provided for compatibility with DPT.
 
         """
-        return None  # return the pickled dictionary of field values
 
     def open_root(self):
         """Open dBaseIII file."""
@@ -1024,22 +1045,22 @@ class dBaseapiRoot(_dBaseapiRoot):
             self._dbaseobject = True
         else:
             pathname = self._file
-            foldername, filename = os.path.split(pathname)
+            foldername = os.path.split(pathname)[0]
             if os.path.exists(foldername):
                 if not os.path.isdir(foldername):
                     msg = " ".join([foldername, "exists but is not a folder"])
-                    raise dBaseapiError(msg)
+                    raise DBaseapiError(msg)
 
             else:
                 os.makedirs(foldername)
             if os.path.exists(pathname):
                 if not os.path.isfile(pathname):
                     msg = " ".join([pathname, "exists but is not a file"])
-                    raise dBaseapiError(msg)
+                    raise DBaseapiError(msg)
 
-                if self._dbaseobject == None:
+                if self._dbaseobject is None:
                     self._dbaseobject = True
-            elif self._dbaseobject == None:
+            elif self._dbaseobject is None:
                 self._dbaseobject = False
 
         super().open_root()
@@ -1071,6 +1092,7 @@ class Cursor(CursordBaseIII):  # , cursor.Cursor):
         kargs - absorb argunents relevant to other database engines.
 
         """
+        del keyrange, kargs
         super().__init__(dbobject=dbasedb)
 
     def count_records(self):
@@ -1093,7 +1115,6 @@ class Cursor(CursordBaseIII):  # , cursor.Cursor):
         The _partial_key attribute is ignored.
 
         """
-        pass
 
     def get_position_of_record(self, record=None):
         """Return position of record in file or 0 (zero)."""
@@ -1101,7 +1122,6 @@ class Cursor(CursordBaseIII):  # , cursor.Cursor):
             return 0
         start = self.first
         step = self.next
-        keycount = self.count_records()
         position = 0
         k = record[0]
         r = start()
@@ -1123,7 +1143,6 @@ class Cursor(CursordBaseIII):  # , cursor.Cursor):
         else:
             start = self.first
             step = self.next
-        keycount = self.count_records()
         count = 0
         r = start()
         while r:
@@ -1133,3 +1152,4 @@ class Cursor(CursordBaseIII):  # , cursor.Cursor):
             r = step()
         if r is not None:
             return r
+        return None

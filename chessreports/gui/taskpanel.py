@@ -9,19 +9,19 @@ interaction with the task log when no obvious display is available.
 
 """
 
-import tkinter
-
 from solentware_misc.gui import logpanel
 
 
 class TaskPanel(logpanel.TextAndLogPanel):
     """The background task panel for a Results database."""
 
-    _btn_closebackgroundtask = "taskpanel_close"
+    btn_closebackgroundtask = "taskpanel_close"
 
-    def __init__(self, parent=None, starttaskmsg=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, starttaskmsg=None, cnf={}, **kargs):
         """Extend and define the results ECF reference data import tab."""
-        super(TaskPanel, self).__init__(parent=parent, cnf=cnf, **kargs)
+        super().__init__(parent=parent, cnf=cnf, **kargs)
 
         if starttaskmsg is not None:
             self.tasklog.append_text(starttaskmsg)

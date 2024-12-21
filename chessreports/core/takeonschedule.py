@@ -5,7 +5,7 @@
 """Take on events schedule class."""
 
 
-class TakeonSchedule(object):
+class TakeonSchedule:
     """Schedule extracted from event schedule file.
 
     Team names are derived from match names.  This class supports editing of
@@ -60,11 +60,9 @@ class TakeonSchedule(object):
             return get_match_name
 
         self.textlines = textlines
-        state = None
         process = get_match_name
         for tl in self.textlines:
             tl = tl.strip()
             if len(tl) == 0:
                 continue
-            state = process
             process = process(tl)

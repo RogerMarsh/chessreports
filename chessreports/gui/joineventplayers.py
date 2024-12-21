@@ -26,21 +26,25 @@ class JoinEventPlayers(panel.PanedPanelGridSelector):
     """The New Players panel for a Results database."""
 
     _btn_join = "joineventplayers_join"
-    _btn_cancel = "joineventplayers_cancel"
+    btn_cancel = "joineventplayers_cancel"
     _btn_person = "joineventplayers_person"
 
-    def __init__(self, parent=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, cnf={}, **kargs):
         """Extend and define the results database events panel."""
         self.joineventplayersgrid = None
         super().__init__(parent=parent, cnf=cnf, **kargs)
         self.show_join_event_players_panel_actions_allowed_buttons()
         self.create_buttons()
+        # pylint W0632 unbalanced-tuple-unpacking.
+        # self.make_grids returns a list with same length as argument.
         (self.joineventplayersgrid,) = self.make_grids(
             (
-                dict(
-                    grid=eventplayergrids.EventPlayerGrid,
-                    gridfocuskey="<KeyPress-F7>",
-                ),
+                {
+                    "grid": eventplayergrids.EventPlayerGrid,
+                    "gridfocuskey": "<KeyPress-F7>",
+                },
             )
         )
 
@@ -66,7 +70,7 @@ class JoinEventPlayers(panel.PanedPanelGridSelector):
             command=self.on_person,
         )
         self.define_button(
-            self._btn_cancel,
+            self.btn_cancel,
             text="Cancel",
             tooltip="Return to Event panel without joining selected players",
             underline=5,
@@ -81,7 +85,7 @@ class JoinEventPlayers(panel.PanedPanelGridSelector):
         pbkm = self.joineventplayersgrid.bookmarks
 
         if len(psel) + len(pbkm) == 0:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="No players selected for join.",
                 title=msgtitle,
@@ -157,10 +161,10 @@ class JoinEventPlayers(panel.PanedPanelGridSelector):
         Used, at least, as callback from AppSysFrame container.
 
         """
-        pass
 
     def on_person(self, event=None):
         """Display details for a player."""
+        del event
         self.display_player_details()
         return "break"
 
@@ -169,7 +173,7 @@ class JoinEventPlayers(panel.PanedPanelGridSelector):
         title = "Player Details"
         psel = self.joineventplayersgrid.selection
         if len(psel) == 0:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (
@@ -204,7 +208,7 @@ class JoinEventPlayers(panel.PanedPanelGridSelector):
                 )
                 found = True
         if not found:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (

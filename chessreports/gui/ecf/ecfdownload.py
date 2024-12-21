@@ -24,6 +24,7 @@ class ECFDownloadDialogue(ModalDialogueGo):
 
     def __init__(self, text="data", scroll=False, **kargs):
         """Create ECF download dialogue."""
+        del scroll
         text = "".join(
             (
                 "Click 'Download' to download the '",
@@ -76,7 +77,10 @@ if __name__ == "__main__":
         """Run a test."""
 
         class Q(tkinter.Tk):
+            """Customise Tk with get_widget() method."""
+
             def get_widget(self):
+                """Return self."""
                 return self
 
         root = Q()

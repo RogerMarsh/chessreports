@@ -25,96 +25,101 @@ from ..taskpanel import TaskPanel
 class Events(events_database.Events):
     """The Events panel for a Results database."""
 
-    _btn_performance = "events_performance"
-    _btn_prediction = "events_prediction"
-    _btn_population = "events_population"
+    btn_performance = "events_performance"
+    btn_prediction = "events_prediction"
+    btn_population = "events_population"
 
-    def __init__(self, parent=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, cnf={}, **kargs):
         """Extend and define the results database events panel."""
-        super(Events, self).__init__(parent=parent, cnf=cnf, **kargs)
+        super().__init__(parent=parent, cnf=cnf, **kargs)
 
     def on_performance(self, event=None):
         """Calculate player performances in selected events."""
+        del event
         self.get_appsys().set_kwargs_for_next_tabclass_call(
-            dict(
-                runmethod=self.get_appsys()
+            {
+                "runmethod": self.get_appsys()
                 .get_results_database()
                 .do_database_task,
-                starttaskmsg="Player performances task started",
-                tabtitle="Performances",
-                runmethodargs=dict(
-                    taskmethod=self.calculate_player_performances
-                ),
-                taskbuttons={
-                    TaskPanel._btn_closebackgroundtask: dict(
-                        text="Cancel",
-                        tooltip="Dismiss the Performance task log.",
-                        underline=0,
-                        switchpanel=True,
-                        command=False,  # use default on_dismiss
-                    ),
+                "starttaskmsg": "Player performances task started",
+                "tabtitle": "Performances",
+                "runmethodargs": {
+                    "taskmethod": self.calculate_player_performances
                 },
-                starttaskbuttons=(TaskPanel._btn_closebackgroundtask,),
-            )
+                "taskbuttons": {
+                    TaskPanel.btn_closebackgroundtask: {
+                        "text": "Cancel",
+                        "tooltip": "Dismiss the Performance task log.",
+                        "underline": 0,
+                        "switchpanel": True,
+                        "command": False,  # use default on_dismiss
+                    },
+                },
+                "starttaskbuttons": (TaskPanel.btn_closebackgroundtask,),
+            }
         )
 
     def on_prediction(self, event=None):
-        """Calculate predicted performances for selected events over seasons."""
+        """Predict performances for selected events over seasons."""
+        del event
         self.get_appsys().set_kwargs_for_next_tabclass_call(
-            dict(
-                runmethod=self.get_appsys()
+            {
+                "runmethod": self.get_appsys()
                 .get_results_database()
                 .do_database_task,
-                starttaskmsg="Predictions task started",
-                tabtitle="Predictions",
-                runmethodargs=dict(
-                    taskmethod=self.calculate_performance_predictions
-                ),
-                taskbuttons={
-                    TaskPanel._btn_closebackgroundtask: dict(
-                        text="Cancel",
-                        tooltip="Dismiss the Predictions task log.",
-                        underline=0,
-                        switchpanel=True,
-                        command=False,  # use default on_dismiss
-                    ),
+                "starttaskmsg": "Predictions task started",
+                "tabtitle": "Predictions",
+                "runmethodargs": {
+                    "taskmethod": self.calculate_performance_predictions
                 },
-                starttaskbuttons=(TaskPanel._btn_closebackgroundtask,),
-            )
+                "taskbuttons": {
+                    TaskPanel.btn_closebackgroundtask: {
+                        "text": "Cancel",
+                        "tooltip": "Dismiss the Predictions task log.",
+                        "underline": 0,
+                        "switchpanel": True,
+                        "command": False,  # use default on_dismiss
+                    },
+                },
+                "starttaskbuttons": (TaskPanel.btn_closebackgroundtask,),
+            }
         )
 
     def on_population(self, event=None):
         """Calculate populations."""
+        del event
         self.get_appsys().set_kwargs_for_next_tabclass_call(
-            dict(
-                runmethod=self.get_appsys()
+            {
+                "runmethod": self.get_appsys()
                 .get_results_database()
                 .do_database_task,
-                starttaskmsg="Population map analysis task started",
-                tabtitle="Populations",
-                runmethodargs=dict(
-                    taskmethod=self.calculate_population_map_analysis
-                ),
-                taskbuttons={
-                    TaskPanel._btn_closebackgroundtask: dict(
-                        text="Cancel",
-                        tooltip=(
+                "starttaskmsg": "Population map analysis task started",
+                "tabtitle": "Populations",
+                "runmethodargs": {
+                    "taskmethod": self.calculate_population_map_analysis
+                },
+                "taskbuttons": {
+                    TaskPanel.btn_closebackgroundtask: {
+                        "text": "Cancel",
+                        "tooltip": (
                             "Dismiss the Population map analysis task log."
                         ),
-                        underline=0,
-                        switchpanel=True,
-                        command=False,  # use default on_dismiss
-                    ),
+                        "underline": 0,
+                        "switchpanel": True,
+                        "command": False,  # use default on_dismiss
+                    },
                 },
-                starttaskbuttons=(TaskPanel._btn_closebackgroundtask,),
-            )
+                "starttaskbuttons": (TaskPanel.btn_closebackgroundtask,),
+            }
         )
 
     def describe_buttons(self):
         """Define all action buttons that may appear on events page."""
         super().describe_buttons()
         self.define_button(
-            self._btn_performance,
+            self.btn_performance,
             text="Performances",
             tooltip="Calculate player performances in selected events.",
             underline=3,
@@ -122,7 +127,7 @@ class Events(events_database.Events):
             command=self.on_performance,
         )
         self.define_button(
-            self._btn_prediction,
+            self.btn_prediction,
             text="Predictions",
             tooltip="Calculate performance predictions in selected events.",
             underline=5,
@@ -130,7 +135,7 @@ class Events(events_database.Events):
             command=self.on_prediction,
         )
         self.define_button(
-            self._btn_population,
+            self.btn_population,
             text="Population",
             tooltip="Calculate population map analysis in selected events.",
             underline=1,
@@ -144,13 +149,13 @@ class Events(events_database.Events):
         self.show_panel_buttons(
             (
                 self._btn_dropevent,
-                self._btn_join_event_new_players,
-                self._btn_exportevents,
-                self._btn_performance,
-                self._btn_prediction,
-                self._btn_population,
-                self._btn_game_summary,
-                self._btn_event_summary,
+                self.btn_join_event_new_players,
+                self.btn_exportevents,
+                self.btn_performance,
+                self.btn_prediction,
+                self.btn_population,
+                self.btn_game_summary,
+                self.btn_event_summary,
             )
         )
 
@@ -177,7 +182,7 @@ class Events(events_database.Events):
                 )
                 logwidget.append_text_only("")
                 return
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (
@@ -283,7 +288,7 @@ class Events(events_database.Events):
                 )
                 logwidget.append_text_only("")
                 return
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (
@@ -385,7 +390,7 @@ class Events(events_database.Events):
                 )
                 logwidget.append_text_only("")
                 return
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (

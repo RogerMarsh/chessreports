@@ -19,6 +19,7 @@ class TakeonReport(convertresults.ConvertResults):
 
     def __init__(self, **kargs):
         """Extend to handle match names with default pinprefix of ''."""
+        del kargs
         super().__init__(pinprefix="")
         self.textlines = None
         self.error = []
@@ -32,10 +33,9 @@ class TakeonReport(convertresults.ConvertResults):
         self.textlines = []
 
         if keymap is None:
-            keymap = dict()
+            keymap = {}
 
-        data = dict()
-        plist = {cc.MNAME, cc.MTYPE}
+        data = {}
         for t in textlines:
             ts = t.rstrip().split("=", 1)
             key, value = ts[0], ts[-1]
@@ -63,7 +63,7 @@ class TakeonReport(convertresults.ConvertResults):
         if self.error:
             return
 
-        self.translate_results_format()
+        self._translate_results_format()
 
     def get_lines(self):
         """Return lines of text from file.
@@ -76,7 +76,8 @@ class TakeonReport(convertresults.ConvertResults):
 
     def report_games(self, master=None):
         """Delegate and return generated report."""
-        er, par, pgr, gr = super(TakeonReport, self).report_games()
+        del master
+        er, par, pgr, gr = super().report_games()
         return (
             (("Inconsistent Affiliations and Team Names", pgr),),
             (
@@ -90,10 +91,13 @@ class TakeonReport(convertresults.ConvertResults):
 class TakeonSubmission(convertresults.ConvertSubmissionFile, TakeonReport):
     """Import data from file formatted as ECF results submission file."""
 
-    def build_results(self, textlines, schedule, pinprefix):
+    def build_results(
+        self, textlines, schedule, pinprefix, keymap=None, tidyup=None
+    ):
         """Populate the event report from self.textlines."""
 
         def set_match(data, key, value, matchnames):
+            del data, matchnames
             if value in schedule.match_names:
                 self.textlines.append(
                     "=".join((key, schedule.match_names[value]))
@@ -131,14 +135,12 @@ class TakeonSubmission(convertresults.ConvertSubmissionFile, TakeonReport):
             cc.TAKEON_MATCH_RESULTS: set_match,
         }
 
-        super(TakeonSubmission, self).build_results(
-            textlines, schedule, pinprefix, keymap=keymap
-        )
+        super().build_results(textlines, schedule, pinprefix, keymap=keymap)
 
     def get_lines(self):
         """Delimiter is # optionally preceded by newline sequence."""
         text = []
-        for t in "".join(super(TakeonSubmission, self).get_lines()).split("#"):
+        for t in "".join(super().get_lines()).split("#"):
             ts = t.split("=", 1)
             key, value = ts[0], ts[-1]
             # replace match name placeholder with edited name
@@ -151,9 +153,11 @@ class TakeonLeagueDump(convertresults.ConvertLeagueDump, TakeonReport):
 
     def __init__(self):
         """Extend with default pinprefix of ''."""
-        super(TakeonLeagueDump, self).__init__(pinprefix="")
+        super().__init__(pinprefix="")
 
-    def build_results(self, textlines, schedule, pinprefix):
+    def build_results(
+        self, textlines, schedule, pinprefix, keymap=None, tidyup=None
+    ):
         """Populate the event report from self.textlines."""
 
         def get_match(data, key, value, matchnames):
@@ -167,9 +171,11 @@ class TakeonLeagueDump(convertresults.ConvertLeagueDump, TakeonReport):
                 tidyup(data, matchnames)
 
         def set_context(data, key, value, matchnames):
+            del data, value, matchnames
             self.textlines.append(key)
 
-        def tidyup(data, matchnames):
+        def tidyup_(data, matchnames):
+            del matchnames
             if cc.MTYPE in data:
                 self.textlines.append("=".join((cc.MTYPE, data[cc.MTYPE])))
                 value = data[cc.MNAME]
@@ -213,15 +219,15 @@ class TakeonLeagueDump(convertresults.ConvertLeagueDump, TakeonReport):
             data.clear()
 
         keymap = {
-            cc.player: set_context,
-            cc.game: set_context,
-            cc.team: set_context,
-            cc.event: set_context,
-            cc.match: set_context,
+            cc.LPLAYER: set_context,
+            cc.LGAME: set_context,
+            cc.LTEAM: set_context,
+            cc.LEVENT: set_context,
+            cc.LMATCH: set_context,
             cc.MNAME: get_match,
             cc.MTYPE: get_matchtype,
         }
 
-        super(TakeonLeagueDump, self).build_results(
-            textlines, schedule, pinprefix, keymap=keymap, tidyup=tidyup
+        super().build_results(
+            textlines, schedule, pinprefix, keymap=keymap, tidyup=tidyup_
         )

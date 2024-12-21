@@ -28,11 +28,12 @@ def validate_and_copy_ecf_ogd_players_post_2006_rules(
     widget - the manager object for the ecf data import tab
 
     """
+    del parent
     gcodes = validate_ecf_ogd_players_post_2006_rules(
         logwidget, ecffile, **kwargs
     )
     if gcodes is False:
-        return
+        return None
     return copy_ecf_ogd_players_post_2006_rules(results, logwidget, gcodes)
 
 
@@ -45,6 +46,7 @@ def validate_ecf_ogd_players_post_2006_rules(
     **kwargs
 ):
     """Return dict of update records if valid, or False if not."""
+    del kwargs
     if logwidget:
         logwidget.append_text("", timestamp=False)
         logwidget.append_text(
@@ -53,7 +55,7 @@ def validate_ecf_ogd_players_post_2006_rules(
 
     # Get all ECF grading codes in Online Grading Database download file.
     ogdfile = ecffile.main[ecfogddb.PLAYERS]
-    gcodes = dict()
+    gcodes = {}
     duplicates = []
     checkfails = []
     r = csv.DictReader(
@@ -91,14 +93,14 @@ def validate_ecf_ogd_players_post_2006_rules(
             else:
                 if tokens[-1] != "ABCDEFGHJKL"[checkdigit % 11]:
                     checkfails.append(k)
-    if len(duplicates) or len(checkfails):
+    if duplicates or checkfails:
         if logwidget:
             logwidget.append_text(
                 "Import from Online Grading Database abandonned."
             )
-            if len(duplicates):
+            if duplicates:
                 logwidget.append_text_only("Duplicate grading codes exist.")
-            if len(checkfails):
+            if checkfails:
                 logwidget.append_text_only(
                     "Grading codes exist that fail the checkdigit test."
                 )
@@ -128,7 +130,7 @@ def copy_ecf_ogd_players_post_2006_rules(results, logwidget, gcodes):
             newrec = ogdplayerrec.clone()
             if code in gcodes:
                 newrec.value.ECFOGDname = gcodes[code][0][0]
-                newrec.value.ECFOGDclubs = [c for c in gcodes[code][0][1]]
+                newrec.value.ECFOGDclubs = list(gcodes[code][0][1])
                 del gcodes[code]
             else:
                 newrec.value.ECFOGDname = None
@@ -173,7 +175,7 @@ def copy_ecf_ogd_players_post_2006_rules(results, logwidget, gcodes):
         ogdplayerrec.key.recno = None
         ogdplayerrec.value.ECFOGDcode = k
         ogdplayerrec.value.ECFOGDname = v[0][0]
-        ogdplayerrec.value.ECFOGDclubs = [c for c in v[0][1]]
+        ogdplayerrec.value.ECFOGDclubs = list(v[0][1])
         ogdplayerrec.put_record(results, filespec.ECFOGDPLAYER_FILE_DEF)
     if logwidget:
         logwidget.append_text("Commit database update.")

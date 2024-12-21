@@ -7,27 +7,28 @@
 import tkinter
 import tkinter.messagebox
 
-from solentware_misc.gui import panel, frame
+from solentware_misc.gui import panel
 
 from ...core.ecf import ecfrecord
 from ...core import resultsrecord
 from ...core import filespec
-from .ecfeventcopy import ECFEventCopy
 
 
 class NewEvent(panel.PlainPanel):
     """The NewEvent panel for a Results database."""
 
     _btn_ok = "newevent_ok"
-    _btn_copy = "newevent_copy"
+    btn_copy = "newevent_copy"
     _btn_refresh = "newevent_refresh"
-    _btn_cancel = "newevent_cancel"
+    btn_cancel = "newevent_cancel"
 
-    def __init__(self, parent=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, cnf={}, **kargs):
         """Extend and define the results database new event panel."""
-        super(NewEvent, self).__init__(parent=parent, cnf=cnf, **kargs)
+        super().__init__(parent=parent, cnf=cnf, **kargs)
         self.show_panel_buttons(
-            (self._btn_ok, self._btn_copy, self._btn_refresh, self._btn_cancel)
+            (self._btn_ok, self.btn_copy, self._btn_refresh, self.btn_cancel)
         )
         self.create_buttons()
 
@@ -371,7 +372,6 @@ class NewEvent(panel.PlainPanel):
         Used, at least, as callback from AppSysFrame container.
 
         """
-        pass
 
     def describe_buttons(self):
         """Define all action buttons that may appear on events page."""
@@ -384,7 +384,7 @@ class NewEvent(panel.PlainPanel):
             command=self.on_ok,
         )
         self.define_button(
-            self._btn_copy,
+            self.btn_copy,
             text="Copy from list",
             tooltip=" ".join(
                 (
@@ -404,7 +404,7 @@ class NewEvent(panel.PlainPanel):
             command=self.on_refresh,
         )
         self.define_button(
-            self._btn_cancel,
+            self.btn_cancel,
             text="Back to list",
             tooltip=" ".join(
                 (
@@ -508,8 +508,8 @@ class NewEvent(panel.PlainPanel):
             errors.append("Only session rate of play not specified.")
         if self.adjudication.get() == 0:
             errors.append("Adjudication option not specified.")
-        if len(errors):
-            dlg = tkinter.messagebox.showinfo(
+        if errors:
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="\n".join(errors),
                 title="Event Detail",
@@ -533,8 +533,8 @@ class NewEvent(panel.PlainPanel):
                     # _change_value(rop, v)
                     rop.delete(0, tkinter.END)
                     rop.insert(tkinter.END, v)
-        if len(errors):
-            dlg = tkinter.messagebox.showinfo(
+        if errors:
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="\n".join(errors),
                 title="Event Detail",
@@ -614,7 +614,7 @@ class NewEvent(panel.PlainPanel):
             title="Event Detail",
         ):
             return
-        self.inhibit_context_switch(self._btn_cancel)
+        self.inhibit_context_switch(self.btn_cancel)
 
     def on_refresh(self, event=None):
         """Clear event details form."""

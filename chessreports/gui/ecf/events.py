@@ -17,12 +17,15 @@ class Events(events_database.Events):
 
     _btn_ecfplayers = "events_players"
 
-    def __init__(self, parent=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, cnf={}, **kargs):
         """Extend and define the results database events panel."""
-        super(Events, self).__init__(parent=parent, cnf=cnf, **kargs)
+        super().__init__(parent=parent, cnf=cnf, **kargs)
 
     def on_ecf_players(self, event=None):
         """Do processing for buttons with command set to on_ecf_players."""
+        del event
         self.update_players_to_ecf()
         return "break"
 
@@ -45,11 +48,11 @@ class Events(events_database.Events):
         self.show_panel_buttons(
             (
                 self._btn_dropevent,
-                self._btn_join_event_new_players,
+                self.btn_join_event_new_players,
                 self._btn_ecfplayers,
-                self._btn_exportevents,
-                self._btn_game_summary,
-                self._btn_event_summary,
+                self.btn_exportevents,
+                self.btn_game_summary,
+                self.btn_event_summary,
             )
         )
 
@@ -65,7 +68,7 @@ class Events(events_database.Events):
                 update_events.append(e)
 
         if len(update_events) == 0:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (
@@ -76,24 +79,23 @@ class Events(events_database.Events):
                 title="Events",
             )
             return
+        if len(update_events) == 1:
+            txt = "One event"
         else:
-            if len(update_events) == 1:
-                txt = "One event"
-            else:
-                txt = " ".join((str(len(update_events)), "events"))
-            if not tkinter.messagebox.askyesno(
-                parent=self.get_widget(),
-                message=" ".join(
-                    (
-                        txt,
-                        "selected for updating lists of events and",
-                        "players for submission to ECF.\nDo",
-                        "you wish to continue?",
-                    )
-                ),
-                title="Events",
-            ):
-                return
+            txt = " ".join((str(len(update_events)), "events"))
+        if not tkinter.messagebox.askyesno(
+            parent=self.get_widget(),
+            message=" ".join(
+                (
+                    txt,
+                    "selected for updating lists of events and",
+                    "players for submission to ECF.\nDo",
+                    "you wish to continue?",
+                )
+            ),
+            title="Events",
+        ):
+            return
 
         mapclub = ecfmaprecord.ECFmapDBrecordClub()
         mapplayer = ecfmaprecord.ECFmapDBrecordPlayer()
@@ -122,17 +124,17 @@ class Events(events_database.Events):
                         db, resultsrecord.get_aliases_for_games(db, games)
                     )
                     persons = resultsrecord.get_persons(db, players)
-                    for p in players:
-                        skey = db.encode_record_number(players[p].key.recno)
+                    for value in players.values():
+                        skey = db.encode_record_number(value.key.recno)
                         r = mapclubcursor.nearest(skey)
                         if r is not None:
                             if db.encode_record_selector(r[0]) == skey:
                                 continue
                         mapclub.empty()
-                        mapclub.value.playerkey = repr(players[p].key.recno)
-                        mapclub.value.playername = players[
-                            p
-                        ].value.identity_packed()
+                        mapclub.value.playerkey = repr(value.key.recno)
+                        mapclub.value.playername = (
+                            value.value.identity_packed()
+                        )
                         mapclub.key.recno = None
                         mapclub.put_record(db, filespec.MAPECFCLUB_FILE_DEF)
                         ccount += 1
@@ -146,17 +148,17 @@ class Events(events_database.Events):
                             filespec.PLAYERALIASID_FIELD_DEF,
                         )
 
-                    for p in persons:
-                        skey = db.encode_record_number(persons[p].key.recno)
+                    for value in persons.values():
+                        skey = db.encode_record_number(value.key.recno)
                         r = mapplayercursor.nearest(skey)
                         if r is not None:
                             if db.encode_record_selector(r[0]) == skey:
                                 continue
                         mapplayer.empty()
-                        mapplayer.value.playerkey = repr(persons[p].key.recno)
-                        mapplayer.value.playername = persons[
-                            p
-                        ].value.identity_packed()
+                        mapplayer.value.playerkey = repr(value.key.recno)
+                        mapplayer.value.playername = (
+                            value.value.identity_packed()
+                        )
                         mapplayer.key.recno = None
                         mapplayer.put_record(
                             db, filespec.MAPECFPLAYER_FILE_DEF
@@ -228,7 +230,7 @@ class Events(events_database.Events):
                     "attachment to ECF clubs",
                 )
             )
-        dlg = tkinter.messagebox.showinfo(
+        tkinter.messagebox.showinfo(
             parent=self.get_widget(),
             message="\n".join((pmsg, cmsg)),
             title="Events",

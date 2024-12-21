@@ -24,7 +24,9 @@ class ConfigureDialogHack(ConfigureDialog):
         dialog_title="Text editor dialogue",
         dialog_cancel_hint="Quit without applying changes",
         dialog_update_hint="Apply changes",
-        cnf=dict(),
+        # pylint W0102 dangerous-default-value.
+        # cnf intended as tkinter.Text argument, which defaults to {}.
+        cnf={},
         **kargs
     ):
         """Create a configuration file text editor dialogue."""

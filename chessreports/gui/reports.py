@@ -10,7 +10,6 @@ import os
 from solentware_misc.gui.reports import AppSysReport
 
 from ..core import (
-    constants,
     configuration,
 )
 
@@ -29,22 +28,22 @@ class ChessResultsReport(AppSysReport):
     def on_save(self, event=None):
         """Override to support initialdir argument."""
         conf = configuration.Configuration()
+        # Attribute is defined as a class attribute in a superclass.
+        # pylint: disable-next=no-member
+        configuration_item = self.configuration_item
         filepath = tkinter.filedialog.asksaveasfilename(
             parent=self._toplevel,
             title=self._save_title,
-            initialdir=conf.get_configuration_value(self.configuration_item),
+            initialdir=conf.get_configuration_value(configuration_item),
             defaultextension=".txt",
         )
         if not filepath:
             return
         conf.set_configuration_value(
-            self.configuration_item,
+            configuration_item,
             conf.convert_home_directory_to_tilde(os.path.dirname(filepath)),
         )
-        outfile = open(filepath, mode="wb")
-        try:
+        with open(filepath, mode="wb") as outfile:
             outfile.write(
                 self.textreport.get("1.0", tkinter.END).encode("utf8")
             )
-        finally:
-            outfile.close()

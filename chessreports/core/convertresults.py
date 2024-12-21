@@ -30,10 +30,10 @@ a single file making it difficult to forget some data.)
 
 """
 
-import os
 import collections
 
 from chessvalidate.core import gameresults
+import chessvalidate.core.constants as cvcc
 
 from . import matchteams
 from . import constants as cc
@@ -42,19 +42,19 @@ from . import constants as cc
 homeplayerwhitemap = {True: "yes", False: "no"}
 
 
-class ConvertResults(object):
+class ConvertResults:
     """Class for importing results data."""
 
     def __init__(self, pinprefix):
         """Initialise data structes for converting data to internal format."""
-        super(ConvertResults, self).__init__()
+        super().__init__()
         self.pinprefix = pinprefix
         self.converterror = None
-        self.player = dict()
-        self.game = dict()
-        self.event = dict()
-        self.match = dict()
-        self.eventteams = dict()
+        self.player = {}
+        self.game = {}
+        self.event = {}
+        self.match = {}
+        self.eventteams = {}
 
     def cycle_name(self, name):
         """Generate versions of name starting with non-initials."""
@@ -77,47 +77,52 @@ class ConvertResults(object):
 
         """
         items = (
-            cc._startdate,
-            cc._enddate,
-            cc._event,
-            cc._section,
-            cc._date,
-            # cc._homeplayerwhite,
-            cc._homeplayer,
-            cc._awayplayer,
+            cc.STARTDATE,
+            cc.ENDDATE,
+            cc.EVENT,
+            cc.SECTION,
+            cc.DATE,
+            # cc.HOMEPLAYERWHITE,
+            cc.HOMEPLAYER,
+            cc.AWAYPLAYER,
         )
         if pins:
             pin_items = (
-                (cc._homepin, cc._homepin),
-                (cc._awaypin, cc._awaypin),
+                (cc.HOMEPIN, cc.HOMEPIN),
+                (cc.AWAYPIN, cc.AWAYPIN),
             )
         else:
             pin_items = (
-                (cc._homepin, cc._homeserial),
-                (cc._awaypin, cc._awayserial),
+                (cc.HOMEPIN, cc.HOMESERIAL),
+                (cc.AWAYPIN, cc.AWAYSERIAL),
             )
-        optional_items = (cc._hometeam, cc._awayteam, cc._board, cc._round)
+        optional_items = (
+            cc.HOMETEAM,
+            cc.AWAYTEAM,
+            cc.BOARD_LOWER,
+            cc.ROUND_LOWER,
+        )
 
         players = self.player
         matches = self.match
         exportgames = []
         for game in self.game.values():
             homeplayerwhite = homeplayerwhitemap.get(
-                game.get(cc._gcolor, game.get(cc._homeplayerwhite)), ""
+                game.get(cc.LGCOLOR, game.get(cc.HOMEPLAYERWHITE)), ""
             )
-            game[cc._homeplayerwhite] = homeplayerwhite
+            game[cc.HOMEPLAYERWHITE] = homeplayerwhite
             homeaffiliation = players[
                 get_player_identifier_from_game(
-                    game, cc._homeplayer, cc._homeserial
+                    game, cc.HOMEPLAYER, cc.HOMESERIAL
                 )
-            ][cc._affiliation]
+            ][cc.AFFILIATION]
             awayaffiliation = players[
                 get_player_identifier_from_game(
-                    game, cc._awayplayer, cc._awayserial
+                    game, cc.AWAYPLAYER, cc.AWAYSERIAL
                 )
-            ][cc._affiliation]
-            sectionname = matches[game[cc._mcode]][cc._mname]
-            uniquesection = game[cc._mcode]
+            ][cc.AFFILIATION]
+            sectionname = matches[game[cc.LMCODE]][cc.LMNAME]
+            uniquesection = game[cc.LMCODE]
             for i in items:
                 exportgames.append("=".join((i, game[i])))
             for i, j in pin_items:
@@ -126,18 +131,12 @@ class ConvertResults(object):
                 e = game.get(i)
                 if e is not None:
                     exportgames.append("=".join((i, e)))
-            exportgames.append(
-                "=".join((cc._homeplayerwhite, homeplayerwhite))
-            )
-            exportgames.append(
-                "=".join((cc._homeaffiliation, homeaffiliation))
-            )
-            exportgames.append(
-                "=".join((cc._awayaffiliation, awayaffiliation))
-            )
-            exportgames.append("=".join((cc._sectionname, sectionname)))
-            exportgames.append("=".join((cc._uniquesection, uniquesection)))
-            exportgames.append("=".join((cc._result, game[cc._result])))
+            exportgames.append("=".join((cc.HOMEPLAYERWHITE, homeplayerwhite)))
+            exportgames.append("=".join((cc.HOMEAFFILIATION, homeaffiliation)))
+            exportgames.append("=".join((cc.AWAYAFFILIATION, awayaffiliation)))
+            exportgames.append("=".join((cc.SECTIONNAME, sectionname)))
+            exportgames.append("=".join((cc.UNIQUESECTION, uniquesection)))
+            exportgames.append("=".join((cc.RESULT, game[cc.RESULT])))
 
         return exportgames
 
@@ -156,12 +155,12 @@ class ConvertResults(object):
         hometeam = set()
         awayteam = set()
         for match in self.match.values():
-            eventteams = self.eventteams.setdefault(match[cc._ecode], dict())
+            eventteams = self.eventteams.setdefault(match[cc.LECODE], {})
             matchteam = eventteams.setdefault(
-                match[cc._mcode],
+                match[cc.LMCODE],
                 matchteams.MatchTeams(
-                    string=match[cc._mname],
-                    split=match[cc._mtype] == cc._section_is_match,
+                    string=match[cc.LMNAME],
+                    split=match[cc.LMTYPE] == cc.SECTION_IS_MATCH,
                 ),
             )
             for h, a in matchteam.teamsplits:
@@ -172,68 +171,62 @@ class ConvertResults(object):
         for eventteams in self.eventteams.values():
             for key, matchteam in eventteams.items():
                 matchteam.teamsplits = tuple(
-                    [
-                        (h, a)
-                        for h, a in matchteam.teamsplits
-                        if h in teams and a in teams
-                    ]
+                    (h, a)
+                    for h, a in matchteam.teamsplits
+                    if h in teams and a in teams
                 )
                 try:
-                    self.match[key][cc._hometeam] = matchteam.teamsplits[-1][0]
-                    self.match[key][cc._awayteam] = matchteam.teamsplits[-1][
-                        -1
-                    ]
+                    self.match[key][cc.HOMETEAM] = matchteam.teamsplits[-1][0]
+                    self.match[key][cc.AWAYTEAM] = matchteam.teamsplits[-1][-1]
                 except:
                     teamnames = TeamNames(matchteam.string, teams)
                     matchteam.teamsplits = (
-                        (teamnames(cc._hometeam), teamnames(cc._awayteam)),
+                        (teamnames(cc.HOMETEAM), teamnames(cc.AWAYTEAM)),
                     )
-                    self.match[key][cc._hometeam] = matchteam.teamsplits[-1][0]
-                    self.match[key][cc._awayteam] = matchteam.teamsplits[-1][
-                        -1
-                    ]
+                    self.match[key][cc.HOMETEAM] = matchteam.teamsplits[-1][0]
+                    self.match[key][cc.AWAYTEAM] = matchteam.teamsplits[-1][-1]
 
     def add_match_section_to_events(self):
         """Generate section name for all matches in every event."""
         # collect all the non-match section names
         for match in self.match.values():
-            if match[cc._mtype] != cc._section_is_match:
-                event = self.event[match[cc._ecode]]
-                sections = event.setdefault(cc._sections, [])
-                if match[cc._mname] not in sections:
-                    sections.append(match[cc._mname])
+            if match[cc.LMTYPE] != cc.SECTION_IS_MATCH:
+                event = self.event[match[cc.LECODE]]
+                sections = event.setdefault(cc.SECTIONS, [])
+                if match[cc.LMNAME] not in sections:
+                    sections.append(match[cc.LMNAME])
                 else:
                     self.converterror = (
                         "Section name ",
-                        match[cc._mname],
+                        match[cc.LMNAME],
                         " duplicated in ",
-                        event[cc._ename],
+                        event[cc.LENAME],
                         " event",
                     )
                     return self.empty_extract()
 
         # check that the system generated match section name is not used
         for match in self.match.values():
-            if match[cc._mtype] == cc._section_is_match:
-                event = self.event[match[cc._ecode]]
-                sections = event.get(cc._sections, [])
-                if cc._event_matches in sections:
+            if match[cc.LMTYPE] == cc.SECTION_IS_MATCH:
+                event = self.event[match[cc.LECODE]]
+                sections = event.get(cc.SECTIONS, [])
+                if cc.EVENT_MATCHES in sections:
                     self.converterror = (
                         "Section name for matches (",
-                        cc._event_matches,
+                        cc.EVENT_MATCHES,
                         ") is already in ",
-                        event[cc._ename],
+                        event[cc.LENAME],
                         " event. Change that section name to proceed.",
                     )
                     return self.empty_extract()
 
         # add the system generated match section to all events with matches
         for match in self.match.values():
-            if match[cc._mtype] == cc._section_is_match:
-                event = self.event[match[cc._ecode]]
-                sections = event.setdefault(cc._sections, [])
-                if cc._event_matches not in sections:
-                    sections.append(cc._event_matches)
+            if match[cc.LMTYPE] == cc.SECTION_IS_MATCH:
+                event = self.event[match[cc.LECODE]]
+                sections = event.setdefault(cc.SECTIONS, [])
+                if cc.EVENT_MATCHES not in sections:
+                    sections.append(cc.EVENT_MATCHES)
         self.get_team_names_from_match_names()
         return True
 
@@ -245,14 +238,14 @@ class ConvertResults(object):
         copy player details from game to player for both players
 
         """
-        match = self.match[game[cc._mcode]]
-        if match[cc._mtype] == cc._section_is_match:
-            eventsection = cc._event_matches
+        match = self.match[game[cc.LMCODE]]
+        if match[cc.LMTYPE] == cc.SECTION_IS_MATCH:
+            eventsection = cc.EVENT_MATCHES
         else:
-            eventsection = match[cc._mname]
-        for gplayer, gserial, side, pin, pcode in (
-            (cc._homeplayer, cc._homeserial, 0, cc._homepin, cc._pcode1),
-            (cc._awayplayer, cc._awayserial, -1, cc._awaypin, cc._pcode2),
+            eventsection = match[cc.LMNAME]
+        for gplayer, gserial, side, pin in (
+            (cc.HOMEPLAYER, cc.HOMESERIAL, 0, cc.HOMEPIN),
+            (cc.AWAYPLAYER, cc.AWAYSERIAL, -1, cc.AWAYPIN),
         ):
             player = self.player.setdefault(
                 get_player_identifier_from_game(game, gplayer, gserial), {}
@@ -262,7 +255,7 @@ class ConvertResults(object):
             self.set_potential_names(
                 player,
                 side,
-                self.eventteams[match[cc._ecode]][game[cc._mcode]],
+                self.eventteams[match[cc.LECODE]][game[cc.LMCODE]],
                 eventsection,
             )
 
@@ -270,30 +263,30 @@ class ConvertResults(object):
         """Copy identifiers to games."""
         # copy event and player identifiers to game
         for game in self.game.values():
-            match = self.match[game[cc._mcode]]
-            event = self.event[match[cc._ecode]]
-            for a in cc._event, cc._startdate, cc._enddate:
+            match = self.match[game[cc.LMCODE]]
+            event = self.event[match[cc.LECODE]]
+            for a in cc.EVENT, cc.STARTDATE, cc.ENDDATE:
                 game[a] = event[a]
-            s = match[cc._mname]
-            is_match = match[cc._mtype] == cc._section_is_match
+            s = match[cc.LMNAME]
+            is_match = match[cc.LMTYPE] == cc.SECTION_IS_MATCH
             if is_match:
-                game[cc._section] = cc._event_matches
+                game[cc.SECTION] = cc.EVENT_MATCHES
             else:
-                game[cc._section] = s
-            c = game.get(cc._gcolor, None)
+                game[cc.SECTION] = s
+            c = game.get(cc.LGCOLOR, None)
             if c == cc.WHITE:
-                game[cc._homeplayerwhite] = cc._yes
+                game[cc.HOMEPLAYERWHITE] = cc.YES
             elif c == cc.BLACK:
-                game[cc._homeplayerwhite] = cc._no
+                game[cc.HOMEPLAYERWHITE] = cc.NO
             else:
-                game[cc._homeplayerwhite] = cc.NOCOLOR
+                game[cc.HOMEPLAYERWHITE] = cc.NOCOLOR
             for player, pin, serial, pcode in (
-                (cc._homeplayer, cc._homepin, cc._homeserial, cc._pcode1),
-                (cc._awayplayer, cc._awaypin, cc._awayserial, cc._pcode2),
+                (cc.HOMEPLAYER, cc.HOMEPIN, cc.HOMESERIAL, cc.LPCODE1),
+                (cc.AWAYPLAYER, cc.AWAYPIN, cc.AWAYSERIAL, cc.LPCODE2),
             ):
-                game[player] = self.player[game[pcode]][cc._player]
-                game[pin] = self.player[game[pcode]][cc._pcode]
-                game[serial] = self.player[game[pcode]][cc._serial]
+                game[player] = self.player[game[pcode]][cc.PLAYER]
+                game[pin] = self.player[game[pcode]][cc.LPCODE]
+                game[serial] = self.player[game[pcode]][cc.SERIAL]
         return True
 
     def empty_extract(self):
@@ -305,7 +298,7 @@ class ConvertResults(object):
         self.eventteams.clear()
         return False
 
-    def translate_results_format(
+    def _translate_results_format(
         self,
         context=None,
         keymap=None,
@@ -321,19 +314,20 @@ class ConvertResults(object):
         """
 
         def null(data, context):
-            pass
+            """Do nothing."""  # Avoid pylint W0613 if 'pass' instead.
+            del data, context
 
         process = null
 
         if context is None:
-            context = dict()
+            context = {}
         for c in context:
             if not isinstance(context[c], collections.abc.Callable):
                 context[c] = null
         if keymap is None:
-            keymap = dict()
+            keymap = {}
         if validmap is None:
-            validmap = dict()
+            validmap = {}
         if pinreadmap is None:
             pinreadmap = set()
         if pinmap is None:
@@ -341,9 +335,11 @@ class ConvertResults(object):
         if gradingcodemap is None:
             gradingcodemap = set()
 
-        pinvaluemap = dict()
-        data = dict()
-        for e, t in enumerate(self.get_lines()):
+        pinvaluemap = {}
+        data = {}
+        # Subclasses provide the get_lines method.
+        # pylint: disable-next=no-member.
+        for t in self.get_lines():
             ts = t.split("=", 1)
             key, value = ts[0], ts[-1]
             if key not in validmap:
@@ -388,7 +384,7 @@ class ConvertResults(object):
                 if len(data):
                     process(data, contextkey)
                 process = context[key]
-                data = dict()
+                data = {}
                 contextkey = key
             if key in keymap:
                 if key in pinmap:
@@ -409,28 +405,28 @@ class ConvertResults(object):
                 else:
                     data[keymap[key]] = value
             elif key in gradingcodemap:
-                if cc._pcode in data:
+                if cc.LPCODE in data:
                     if len(value) == cc.GRADING_CODE_LENGTH:
-                        if value[:-1] in data[cc._pcode]:
+                        if value[:-1] in data[cc.LPCODE]:
                             self.converterror = (
                                 "Grading code ",
                                 value,
                                 " is included in player pin ",
-                                data[cc._pcode],
+                                data[cc.LPCODE],
                             )
                             return self.empty_extract()
 
         if len(data):
             process(data, contextkey)
 
-        self.prune(self.match, self.game, cc._mcode)
-        self.prune(self.event, self.match, cc._ecode)
+        self.prune(self.match, self.game, cc.LMCODE)
+        self.prune(self.event, self.match, cc.LECODE)
         return True
 
     def get_game_players(self):
         """Return the set of players who have played games."""
         gplayers = set()
-        codes = (cc._pcode1, cc._pcode2)
+        codes = (cc.LPCODE1, cc.LPCODE2)
         for g in self.game.values():
             for pc in codes:
                 if pc in g:
@@ -468,31 +464,31 @@ class ConvertResults(object):
         Games for players with affiliation doubts sorted by player.
 
         """
-        gamesbysection = dict()
-        problemplayers = dict()
+        gamesbysection = {}
+        problemplayers = {}
 
         for k, game in self.game.items():
             section = gamesbysection.setdefault(
                 (
-                    game[cc._startdate],
-                    game[cc._enddate],
-                    game[cc._event],
-                    game[cc._section],
-                    game[cc._mcode],
+                    game[cc.STARTDATE],
+                    game[cc.ENDDATE],
+                    game[cc.EVENT],
+                    game[cc.SECTION],
+                    game[cc.LMCODE],
                 ),
                 [],
             )
             section.append(k)
-            if self.match[game[cc._mcode]][cc._mtype] != cc._section_is_match:
+            if self.match[game[cc.LMCODE]][cc.LMTYPE] != cc.SECTION_IS_MATCH:
                 continue
             for teamplayer, teamserial, team in (
-                (cc._homeplayer, cc._homeserial, cc._hometeam),
-                (cc._awayplayer, cc._awayserial, cc._awayteam),
+                (cc.HOMEPLAYER, cc.HOMESERIAL, cc.HOMETEAM),
+                (cc.AWAYPLAYER, cc.AWAYSERIAL, cc.AWAYTEAM),
             ):
                 p = get_player_identifier_from_game(
                     game, teamplayer, teamserial
                 )
-                if self.player[p][cc._affiliation] not in game[team]:
+                if self.player[p][cc.AFFILIATION] not in game[team]:
                     pp = problemplayers.setdefault(p, set())
                     pp.add(k)
 
@@ -503,34 +499,34 @@ class ConvertResults(object):
             for g in gamesbysection[gbs]:
                 game = self.game[g]
                 if not home:
-                    if cc._hometeam in game:
-                        home = game[cc._hometeam]
+                    if cc.HOMETEAM in game:
+                        home = game[cc.HOMETEAM]
                 if not away:
-                    if cc._awayteam in game:
-                        away = game[cc._awayteam]
+                    if cc.AWAYTEAM in game:
+                        away = game[cc.AWAYTEAM]
                 sectiongames.append(
                     "".join(
                         (
                             "\t\t",
-                            game[cc._homeplayer],
+                            game[cc.HOMEPLAYER],
                             "\t\t\t",
                             self.player[
                                 get_player_identifier_from_game(
-                                    game, cc._homeplayer, cc._homeserial
+                                    game, cc.HOMEPLAYER, cc.HOMESERIAL
                                 )
-                            ][cc._affiliation],
+                            ][cc.AFFILIATION],
                             "\t\t\t",
-                            gameresults.storeresults[game[cc._result]],
+                            gameresults.storeresults[game[cc.RESULT]],
                             "\t\t",
-                            game[cc._awayplayer],
+                            game[cc.AWAYPLAYER],
                             "\t\t\t",
                             self.player[
                                 get_player_identifier_from_game(
-                                    game, cc._awayplayer, cc._awayserial
+                                    game, cc.AWAYPLAYER, cc.AWAYSERIAL
                                 )
-                            ][cc._affiliation],
+                            ][cc.AFFILIATION],
                             "\t\t\t",
-                            game[cc._date],
+                            game[cc.DATE],
                         )
                     )
                 )
@@ -549,7 +545,7 @@ class ConvertResults(object):
         lines = []
         for name, pp in sorted(
             [
-                (self.player[p][cc._player], p)
+                (self.player[p][cc.PLAYER], p)
                 for p in list(problemplayers.keys())
             ]
         ):
@@ -558,13 +554,13 @@ class ConvertResults(object):
                 (
                     name,
                     "\t\t\t",
-                    self.player[pp][cc._affiliation],
+                    self.player[pp][cc.AFFILIATION],
                     "\t\t\t",
-                    self.player[pp][cc._startdate],
+                    self.player[pp][cc.STARTDATE],
                     " ",
-                    self.player[pp][cc._enddate],
+                    self.player[pp][cc.ENDDATE],
                     "\t\t\t",
-                    self.player[pp][cc._event],
+                    self.player[pp][cc.EVENT],
                 )
             )
             for pg in problemplayers[pp]:
@@ -573,15 +569,15 @@ class ConvertResults(object):
                     "".join(
                         (
                             "\t\t\t",
-                            game[cc._date],
+                            game[cc.DATE],
                             "\t\t\t",
-                            game[cc._homeplayer],
+                            game[cc.HOMEPLAYER],
                             "\t\t\t",
-                            game[cc._hometeam],
+                            game[cc.HOMETEAM],
                             "\t\t\t",
-                            game[cc._awayteam],
+                            game[cc.AWAYTEAM],
                             "\t\t\t",
-                            game[cc._awayplayer],
+                            game[cc.AWAYPLAYER],
                         )
                     )
                 )
@@ -592,7 +588,7 @@ class ConvertResults(object):
         playeraffiliations = []
         for k, v in self.player.items():
             startdate, enddate, event, player, section, serial = k
-            affiliation = v[cc._affiliation]
+            affiliation = v[cc.AFFILIATION]
             for p in self.cycle_name(player):
                 playeraffiliations.append(
                     (
@@ -618,10 +614,10 @@ class ConvertResults(object):
         for e in self.event.values():
             events.append(
                 (
-                    e[cc._startdate],
-                    e[cc._enddate],
-                    e[cc._event],
-                    e[cc._sections],
+                    e[cc.STARTDATE],
+                    e[cc.ENDDATE],
+                    e[cc.EVENT],
+                    e[cc.SECTIONS],
                 )
             )
         events.sort()
@@ -636,7 +632,7 @@ class ConvertResults(object):
                         "\t\t",
                         e,
                         "\n\t\t\t\t",
-                        "\n\t\t\t\t".join([s for s in sections]),
+                        "\n\t\t\t\t".join(list(sections)),
                         "\n",
                     )
                 )
@@ -654,16 +650,16 @@ class ConvertResults(object):
     def set_player_detail(self, player, game, gplayer, gpin):
         """Copy name and pin detail from game to player."""
         if not player:
-            player[cc._player] = game[gplayer]
-            player[cc._pin] = game[gpin]
-            for a in cc._event, cc._section, cc._startdate, cc._enddate:
+            player[cc.PLAYER] = game[gplayer]
+            player[cc.PIN_LOWER] = game[gpin]
+            for a in cc.EVENT, cc.SECTION, cc.STARTDATE, cc.ENDDATE:
                 player[a] = game[a]
 
     def set_potential_names(self, player, side, eventteams, section):
-        """Add potential team names and affiliations to player[cc._names]."""
-        names = player.setdefault(cc._names, {})
+        """Add potential team names and affiliations to player[cc.NAMES]."""
+        names = player.setdefault(cc.NAMES, {})
         names[section] = names.setdefault(section, {})
-        phrases = dict()
+        phrases = {}
         for ts in eventteams.teamsplits:
             phrases[ts[side]] = phrases.setdefault(ts[side], 0) + 1
         for p in phrases:
@@ -679,27 +675,27 @@ class ConvertResults(object):
         for eps, player in self.player.items():
             # pick most common phrase as player affiliation
             # if it is not the match name it is a potential team name
-            for phrases in player[cc._names].values():
+            for phrases in player[cc.NAMES].values():
                 phrase = sorted(
                     [(c.get_weight(), c) for c in phrases.values()],
                     reverse=True,
                 )[0][-1]
-                player[cc._affiliation] = phrase.chars
+                player[cc.AFFILIATION] = phrase.chars
                 if not phrase.equal:
                     teams.add(phrase.chars)
                 # remove if not finished with deleted names
-                player[cc._names] = [c for c in phrases.values() if c.equal]
+                player[cc.NAMES] = [c for c in phrases.values() if c.equal]
 
         # pick team names that are best fit to match name as affiliations
         for eps, player in self.player.items():
-            if eps[-1] != cc._event_matches:
+            if eps[-1] != cc.EVENT_MATCHES:
                 continue
             # affiliation is a match name or a team name
             # find best match between affiliation and potential team names
             # if there is a best match make that the affiliation
             # if not (it is a tie) set affiliation to the choices
-            affiliation = player[cc._affiliation]
-            if affiliation not in player[cc._names]:
+            affiliation = player[cc.AFFILIATION]
+            if affiliation not in player[cc.NAMES]:
                 if affiliation in teams:
                     # affiliation is a team so nothing needs doing
                     continue
@@ -715,56 +711,54 @@ class ConvertResults(object):
                 if t in teams:
                     ateam = t
             tcounts = {}
-            for phrase in player[cc._names]:
+            for phrase in player[cc.NAMES]:
                 for t in ateam, hteam:
                     if t:
                         if t in phrase.chars:
                             tcounts[t] = tcounts.setdefault(t, 0) + 1
             # adjust the affiliation
             if tcounts.get(ateam, 0) > tcounts.get(hteam, 0):
-                player[cc._affiliation] = ateam
+                player[cc.AFFILIATION] = ateam
             elif tcounts.get(hteam, 0) > tcounts.get(ateam, 0):
-                player[cc._affiliation] = hteam
+                player[cc.AFFILIATION] = hteam
             else:
-                player[cc._affiliation] = (hteam, ateam)
+                player[cc.AFFILIATION] = (hteam, ateam)
 
         # set team names for game
         match = self.match
         for game in self.game.values():
-            if match[game[cc._mcode]][cc._mtype] != cc._section_is_match:
+            if match[game[cc.LMCODE]][cc.LMTYPE] != cc.SECTION_IS_MATCH:
                 continue
-            for team in cc._hometeam, cc._awayteam:
-                game[team] = match[game[cc._mcode]][team]
+            for team in cc.HOMETEAM, cc.AWAYTEAM:
+                game[team] = match[game[cc.LMCODE]][team]
 
         # where player affiliation has not been resolved to a team name use
         # the last suitable game team name encountered as affiliation but
         # give priority to a name in the affiliation tuple
         for game in self.game.values():
-            if self.match[game[cc._mcode]][cc._mtype] != cc._section_is_match:
+            if self.match[game[cc.LMCODE]][cc.LMTYPE] != cc.SECTION_IS_MATCH:
                 continue
             # set player affiliation same as game team
-            event = self.match[game[cc._mcode]][cc._ecode]
-            section = game[cc._section]
-            for teamplayer, team, pin, serial in (
-                (cc._homeplayer, cc._hometeam, cc._homepin, cc._homeserial),
-                (cc._awayplayer, cc._awayteam, cc._awaypin, cc._awayserial),
+            for teamplayer, team, serial in (
+                (cc.HOMEPLAYER, cc.HOMETEAM, cc.HOMESERIAL),
+                (cc.AWAYPLAYER, cc.AWAYTEAM, cc.AWAYSERIAL),
             ):
                 player = self.player[
                     get_player_identifier_from_game(game, teamplayer, serial)
                 ]
-                if isinstance(player[cc._affiliation], str):
+                if isinstance(player[cc.AFFILIATION], str):
                     # affiliation already set
                     continue
-                player[cc._affiliation] = game[team]
+                player[cc.AFFILIATION] = game[team]
 
 
 class ConvertSubmissionFile(ConvertResults):
     """Import data from file formatted as ECF results submission file."""
 
     results = {
-        cc.RESULT_01: cc.AWIN,  # cc._loss,
-        cc.RESULT_55: cc.DRAW,  # cc._draw,
-        cc.RESULT_10: cc.HWIN,  # cc._win,
+        cvcc.RESULT_01: cvcc.AWIN,  # cc._loss,
+        cvcc.RESULT_55: cvcc.DRAW,  # cc._draw,
+        cvcc.RESULT_10: cvcc.HWIN,  # cc._win,
     }
     colour = {
         cc.ECF_COLOUR_WHITE: True,  # cc.WHITE,
@@ -785,81 +779,84 @@ class ConvertSubmissionFile(ConvertResults):
 
         def convert_colour_text(data):
             # try:
-            # data[cc._gcolor] = ConvertSubmissionFile.colour[
-            # data[cc._gcolor].lower()]
+            # data[cc.LGCOLOR] = ConvertSubmissionFile.colour[
+            # data[cc.LGCOLOR].lower()]
             # except:
-            # data[cc._gcolor] = cc.NOCOLOR
+            # data[cc.LGCOLOR] = cc.NOCOLOR
             try:
-                data[cc._gcolor] = ConvertSubmissionFile.colour[
-                    data[cc._gcolor].lower()
+                data[cc.LGCOLOR] = ConvertSubmissionFile.colour[
+                    data[cc.LGCOLOR].lower()
                 ]
             except:
-                data[cc._gcolor] = None  # cc.NOCOLOR
+                data[cc.LGCOLOR] = None  # cc.NOCOLOR
 
         def convert_colour_default_text(data):
             try:
-                data[cc._mcolor] = ConvertSubmissionFile.colourdefault[
-                    data[cc._mcolor].lower()
+                data[cc.LMCOLOR] = ConvertSubmissionFile.colourdefault[
+                    data[cc.LMCOLOR].lower()
                 ]
             except:
-                data[cc._mcolor] = cc.NOCOLOR
+                data[cc.LMCOLOR] = cc.NOCOLOR
 
         def convert_result_text(data):
             try:
-                data[cc._gresult] = ConvertSubmissionFile.results[
-                    data[cc._gresult]
+                data[cc.LGRESULT] = ConvertSubmissionFile.results[
+                    data[cc.LGRESULT]
                 ]
             except:
-                data[cc._gresult] = cc.VOID
+                data[cc.LGRESULT] = cc.VOID
 
         def get_event(data, context):
+            del context
             k = str(len(self.event) + 1)
             self.event[k] = data
-            if cc._ecode in data:
-                data[cc._ecode] = k
-            convert_date_to_iso(data, cc._edate)
-            convert_date_to_iso(data, cc._efinaldate)
+            if cc.LECODE in data:
+                data[cc.LECODE] = k
+            convert_date_to_iso(data, cc.LEDATE)
+            convert_date_to_iso(data, cc.LEFINALDATE)
 
         def get_game(data, context):
+            del context
             convert_result_text(data)
             if (
-                data[cc._gresult] in gameresults.storeresults
+                data[cc.LGRESULT] in gameresults.storeresults
             ):  # cc._storeresults:
                 k = str(len(self.game) + 1)
                 self.game[k] = data
-                data[cc._gcode] = k
-                data[cc._mcode] = str(len(self.match))
+                data[cc.LGCODE] = k
+                data[cc.LMCODE] = str(len(self.match))
                 e = str(len(self.event))
-                for p in (cc._pcode1, cc._pcode2):
+                for p in (cc.LPCODE1, cc.LPCODE2):
                     data[p] = (e, data[p])
-                convert_date_to_iso(data, cc._gdate)
+                convert_date_to_iso(data, cc.LGDATE)
                 convert_colour_text(data)
 
         def get_match(data, context):
             k = str(len(self.match) + 1)
             self.match[k] = data
-            data[cc._mcode] = k
-            data[cc._ecode] = str(len(self.event))
+            data[cc.LMCODE] = k
+            data[cc.LECODE] = str(len(self.event))
             if context in sectiontypemap:
-                data[cc._mtype] = sectiontypemap[context]
-            convert_date_to_iso(data, cc._mdate)
+                data[cc.LMTYPE] = sectiontypemap[context]
+            convert_date_to_iso(data, cc.LMDATE)
             convert_colour_default_text(data)
 
         def get_player(data, context):
-            self.player[(str(len(self.event)), data[cc._pcode])] = data
-            data[cc._serial] = str(len(self.player))
-            if cc._cname in data:
-                if data[cc._cname][-1] == "*":
-                    data[cc._cname] = data[cc._cname][:-1].strip()
-            if cc._pname not in data:
-                if cc._surname in data:
-                    data[cc._pname] = " ".join(
+            del context
+            self.player[(str(len(self.event)), data[cc.LPCODE])] = data
+            data[cc.SERIAL] = str(len(self.player))
+            if cc.LCNAME in data:
+                if data[cc.LCNAME][-1] == "*":
+                    data[cc.LCNAME] = data[cc.LCNAME][:-1].strip()
+            if cc.LPNAME not in data:
+                if cc.E_SURNAME in data:
+                    data[cc.LPNAME] = " ".join(
                         (
-                            "".join((data.get(cc._surname, ""), ",")),
+                            "".join((data.get(cc.E_SURNAME, ""), ",")),
                             " ".join(
                                 (
-                                    data.get(cc._forename, ""),
-                                    data.get(cc._initials, ""),
+                                    data.get(cc.E_FORENAME, ""),
+                                    data.get(cc.E_INITIALS, ""),
                                 )
                             ).strip(),
                         )
@@ -877,29 +874,29 @@ class ConvertSubmissionFile(ConvertResults):
         }
 
         keymap = {
-            cc.EVENT_CODE: cc._ecode,
-            cc.EVENT_NAME: cc._ename,
-            cc.EVENT_DATE: cc._edate,
-            cc.FINAL_RESULT_DATE: cc._efinaldate,
-            cc.PIN: cc._pcode,
-            cc.NAME: cc._pname,
-            cc.OTHER_RESULTS: cc._mname,
-            cc.MATCH_RESULTS: cc._mname,
-            cc.SECTION_RESULTS: cc._mname,
-            cc.RESULTS_DATE: cc._mdate,
-            cc.PIN1: cc._pcode1,
-            cc.PIN2: cc._pcode2,
-            cc.ROUND: cc._ground,
-            cc.BOARD: cc._gboard,
-            cc.COLOUR: cc._gcolor,
-            cc.SCORE: cc._gresult,
-            cc.GAME_DATE: cc._gdate,
-            cc.WHITE_ON: cc._mcolor,
-            # cc.CLUB:cc._cname, #League program for CLUB NAME
-            # cc.CLUB_NAME:cc._cname,
-            cc.SURNAME: cc._surname,
-            cc.INITIALS: cc._initials,
-            cc.FORENAME: cc._forename,
+            cc.EVENT_CODE: cc.LECODE,
+            cc.EVENT_NAME: cc.LENAME,
+            cc.EVENT_DATE: cc.LEDATE,
+            cc.FINAL_RESULT_DATE: cc.LEFINALDATE,
+            cc.PIN: cc.LPCODE,
+            cc.NAME: cc.LPNAME,
+            cc.OTHER_RESULTS: cc.LMNAME,
+            cc.MATCH_RESULTS: cc.LMNAME,
+            cc.SECTION_RESULTS: cc.LMNAME,
+            cc.RESULTS_DATE: cc.LMDATE,
+            cc.PIN1: cc.LPCODE1,
+            cc.PIN2: cc.LPCODE2,
+            cc.ROUND: cc.LGROUND,
+            cc.BOARD: cc.LGBOARD,
+            cc.COLOUR: cc.LGCOLOR,
+            cc.SCORE: cc.LGRESULT,
+            cc.GAME_DATE: cc.LGDATE,
+            cc.WHITE_ON: cc.LMCOLOR,
+            # cc.CLUB:cc.LCNAME, #League program for CLUB NAME
+            # cc.CLUB_NAME:cc.LCNAME,
+            cc.SURNAME: cc.E_SURNAME,
+            cc.INITIALS: cc.E_INITIALS,
+            cc.FORENAME: cc.E_FORENAME,
         }
 
         sectiontypemap = {
@@ -908,12 +905,10 @@ class ConvertSubmissionFile(ConvertResults):
             cc.SECTION_RESULTS: cc.TOURNAMENT_TYPE,
         }
 
-        """
-        validmap rejects at least one field that is mandatory on a valid
-        submission file, SUBMISSION_INDEX, and at least one set from which one
-        will be present on a valid submission file, BCF_CODE CLUB_NAME or CLUB,
-        for each player.
-        """
+        # validmap rejects at least one field that is mandatory on a valid
+        # submission file, SUBMISSION_INDEX, and at least one set from which
+        # one will be present on a valid submission file, BCF_CODE CLUB_NAME
+        # or CLUB, for each player.
         # validmap should be identical to version in preparesource.py with
         # relevant entries commented out.
         validmap = {
@@ -1017,7 +1012,7 @@ class ConvertSubmissionFile(ConvertResults):
             },
         }
 
-        extract = super(ConvertSubmissionFile, self).translate_results_format(
+        extract = super()._translate_results_format(
             context=context,
             keymap=keymap,
             validmap=validmap,
@@ -1048,36 +1043,36 @@ class ConvertLeagueDump(ConvertResults):
     """Import data from dump of League program database."""
 
     results = {
-        cc.result_0: cc.TBR,
-        cc.result_1: cc.AWIN,  # cc._loss,
-        cc.result_2: cc.DRAW,  # cc._draw,
-        cc.result_3: cc.HWIN,  # cc._win,
-        cc.result_4: cc.AWAYDEFAULT,
-        cc.result_5: cc.HOMEDEFAULT,
-        cc.result_6: cc.VOID,
-        cc.result_7: cc.WINBYE,
-        cc.result_8: cc.DRAWBYE,
+        cc.RESULT_0: cc.TBR,
+        cc.RESULT_1: cvcc.AWIN,  # cc._loss,
+        cc.RESULT_2: cvcc.DRAW,  # cc._draw,
+        cc.RESULT_3: cvcc.HWIN,  # cc._win,
+        cc.RESULT_4: cc.AWAYDEFAULT,
+        cc.RESULT_5: cc.HOMEDEFAULT,
+        cc.RESULT_6: cc.VOID,
+        cc.RESULT_7: cc.WINBYE,
+        cc.RESULT_8: cc.DRAWBYE,
     }
     colour = {
-        cc.colour_1: True,  # cc.WHITE,
-        cc.colour_2: False,  # cc.BLACK,
-        cc.colour_0: None,  # cc.NOCOLOR,
+        cc.COLOUR_1: True,  # cc.WHITE,
+        cc.COLOUR_2: False,  # cc.BLACK,
+        cc.COLOUR_0: None,  # cc.NOCOLOR,
     }
     colourdefault = {
-        cc.colourdefault_1: cc.WHITE_ON_ALL,
-        cc.colourdefault_4: cc.BLACK_ON_ODD,
-        cc.colourdefault_0: cc.COLOR_NOT_SPECIFIED,
-        cc.colourdefault_2: cc.WHITE_ON_ODD,
-        cc.colourdefault_3: cc.BLACK_ON_ALL,
+        cc.COLOURDEFAULT_1: cc.WHITE_ON_ALL,
+        cc.COLOURDEFAULT_4: cc.BLACK_ON_ODD,
+        cc.COLOURDEFAULT_0: cc.COLOR_NOT_SPECIFIED,
+        cc.COLOURDEFAULT_2: cc.WHITE_ON_ODD,
+        cc.COLOURDEFAULT_3: cc.BLACK_ON_ALL,
     }
 
     def __init__(self, pinprefix):
         """Initialise data structures."""
-        super(ConvertLeagueDump, self).__init__(pinprefix=pinprefix)
-        self.affiliate = dict()
-        self.club = dict()
+        super().__init__(pinprefix=pinprefix)
+        self.affiliate = {}
+        self.club = {}
         self.represent = set()
-        self.team = dict()
+        self.team = {}
 
     def empty_extract(self):
         """Clear data structures."""
@@ -1085,24 +1080,25 @@ class ConvertLeagueDump(ConvertResults):
         self.club.clear()
         self.represent.clear()
         self.team.clear()
-        return super(ConvertLeagueDump, self).empty_extract()
+        return super().empty_extract()
 
     def translate_match_field(self):
         """Translate matches to internal format."""
         fixturelines = []
         reportlines = []
         matchresults = {}
+        # Method translate_match_field is not called.
+        # pylint: disable-next=no-member.
         for tf in sorted(self.files):
             mname = ""
-            fi = open(tf, "r")  # 'r' or 'rb'?
-            try:
-                for tt in fi:
+            with open(tf, "r", encoding="utf8") as infi:  # 'r' or 'rb'?
+                for tt in infi:
                     ts = tt.split("=", 1)
                     f = ts[0]
-                    if f == cc._mname:
+                    if f == cc.LMNAME:
                         mname = ts[-1]
-                    elif f == cc._mtype:
-                        if ts[-1].rstrip() == cc._section_is_match:
+                    elif f == cc.LMTYPE:
+                        if ts[-1].rstrip() == cc.SECTION_IS_MATCH:
                             mn = "_".join(
                                 (cc.TAKEON_MATCH, str(len(matchresults) + 1))
                             )
@@ -1116,223 +1112,238 @@ class ConvertLeagueDump(ConvertResults):
                             reportlines.append(tt.rstrip())
                     else:
                         reportlines.append(tt.rstrip())
-            finally:
-                fi.close()
         return (fixturelines, reportlines, matchresults)
 
     def translate_results_format(self):
         """Translate results to internal format."""
+        # pylint W0612 unused-variable.
+        # context dict has commented 'affiliate' key.
+        # def get_affiliate(data, context):
+        #     del context
+        #     self.affiliate[(data[cc.LECODE], data[cc.LPCODE])] = data
+        #     if cc.LPNAME in data:
+        #         del data[cc.LPNAME]
+        #     if cc.LEDATE in data:
+        #         del data[cc.LEDATE]
 
-        def get_affiliate(data, context):
-            self.affiliate[(data[cc._ecode], data[cc._pcode])] = data
-            if cc._pname in data:
-                del data[cc._pname]
-            if cc._edate in data:
-                del data[cc._edate]
-
-        def get_club(data, context):
-            self.club[data[cc._ccode]] = data
-            if cc._cname in data:
-                if data[cc._cname][-1] == "*":
-                    data[cc._cname] = data[cc._cname][:-1].strip()
+        # pylint W0612 unused-variable.
+        # context dict has commented 'club' key.
+        # def get_club(data, context):
+        #     del context
+        #     self.club[data[cc.LCCODE]] = data
+        #     if cc.LCNAME in data:
+        #         if data[cc.LCNAME][-1] == "*":
+        #             data[cc.LCNAME] = data[cc.LCNAME][:-1].strip()
 
         def convert_colour_text(data):
             try:
-                data[cc._gcolor] = ConvertLeagueDump.colour[data[cc._gcolor]]
+                data[cc.LGCOLOR] = ConvertLeagueDump.colour[data[cc.LGCOLOR]]
             except:
-                data[cc._gcolor] = cc.NOCOLOR
+                data[cc.LGCOLOR] = cc.NOCOLOR
 
         def convert_colour_default_text(data):
             try:
-                data[cc._mcolor] = ConvertLeagueDump.colourdefault[
-                    data[cc._mcolor].lower()
+                data[cc.LMCOLOR] = ConvertLeagueDump.colourdefault[
+                    data[cc.LMCOLOR].lower()
                 ]
             except:
-                data[cc._mcolor] = cc.NOCOLOR
+                data[cc.LMCOLOR] = cc.NOCOLOR
 
         def convert_result_text(data):
             try:
-                data[cc._gresult] = ConvertLeagueDump.results[
-                    data[cc._gresult]
+                data[cc.LGRESULT] = ConvertLeagueDump.results[
+                    data[cc.LGRESULT]
                 ]
             except:
-                data[cc._gresult] = cc.VOID
+                data[cc.LGRESULT] = cc.VOID
 
         def get_event(data, context):
-            self.event[data[cc._ecode]] = data
-            convert_date_to_iso(data, cc._edate)
-            convert_date_to_iso(data, cc._efinaldate)
+            del context
+            self.event[data[cc.LECODE]] = data
+            convert_date_to_iso(data, cc.LEDATE)
+            convert_date_to_iso(data, cc.LEFINALDATE)
 
         def get_game(data, context):
+            del context
             convert_result_text(data)
             if (
-                data[cc._gresult] in gameresults.storeresults
+                data[cc.LGRESULT] in gameresults.storeresults
             ):  # cc._storeresults:
-                self.game[data[cc._gcode]] = data
-                convert_date_to_iso(data, cc._gdate)
+                self.game[data[cc.LGCODE]] = data
+                convert_date_to_iso(data, cc.LGDATE)
                 convert_colour_text(data)
 
         def get_match(data, context):
-            self.match[data[cc._mcode]] = data
-            convert_date_to_iso(data, cc._mdate)
+            del context
+            self.match[data[cc.LMCODE]] = data
+            convert_date_to_iso(data, cc.LMDATE)
             convert_colour_default_text(data)
 
         def get_player(data, context):
-            self.player[data[cc._pcode]] = data
-            data[cc._serial] = str(len(self.player))
-            lnn = int(data[cc._plennickname])
-            lfn = int(data[cc._plenforename])
-            n = data[cc._pname]
+            del context
+            self.player[data[cc.LPCODE]] = data
+            data[cc.SERIAL] = str(len(self.player))
+            lnn = int(data[cc.LPLENNICKNAME])
+            lfn = int(data[cc.LPLENFORENAME])
+            n = data[cc.LPNAME]
             if lnn and lfn:
-                data[cc._pname] = " ".join(
+                # pycodestyle E203 whitespace before ':'.
+                # black formatting insists on the space.
+                data[cc.LPNAME] = " ".join(
                     ("".join((n[: -lfn - lnn - 4], ",")), n[-lfn - lnn - 3 :])
                 )
             elif lfn:
-                data[cc._pname] = " ".join(
+                data[cc.LPNAME] = " ".join(
                     ("".join((n[: -lfn - 1], ",")), n[-lfn:])
                 )
             elif lnn:
-                data[cc._pname] = " ".join(
+                # pycodestyle E203 whitespace before ':'.
+                # black formatting insists on the space.
+                data[cc.LPNAME] = " ".join(
                     ("".join((n[: -lnn - 3], ",")), n[-lnn - 2 :])
                 )
 
-        def get_represent(data, context):
-            self.represent.add((data[cc._tcode], data[cc._pcode]))
+        # pylint W0612 unused-variable.
+        # context dict has commented 'represent' key.
+        # def get_represent(data, context):
+        #     del context
+        #     self.represent.add((data[cc.LTCODE], data[cc.LPCODE]))
 
         def get_team(data, context):
-            self.team[data[cc._tcode]] = data
+            del context
+            self.team[data[cc.LTCODE]] = data
 
         context = {
-            # cc.represent:get_represent,
-            # cc.club:None,
-            cc.player: get_player,
-            cc.game: get_game,
-            # cc.affiliate:None,
-            cc.team: get_team,
-            cc.event: get_event,
-            cc.match: get_match,
+            # cc.LREPRESENT:get_represent,
+            # cc.LCLUB:None,
+            cc.LPLAYER: get_player,
+            cc.LGAME: get_game,
+            # cc.LAFFILIATE:None,
+            cc.LTEAM: get_team,
+            cc.LEVENT: get_event,
+            cc.LMATCH: get_match,
         }
 
         keymap = {
-            cc.ECODE: cc._ecode,
-            cc.ENAME: cc._ename,
-            cc.EDATE: cc._edate,
-            cc.EFINALDATE: cc._efinaldate,
-            cc.PCODE: cc._pcode,
-            cc.PNAME: cc._pname,
-            cc.MCODE: cc._mcode,
-            cc.MNAME: cc._mname,
-            cc.MDATE: cc._mdate,
-            cc.PCODE1: cc._pcode1,
-            cc.PCODE2: cc._pcode2,
-            cc.GCODE: cc._gcode,
-            cc.GROUND: cc._ground,
-            cc.GBOARD: cc._gboard,
-            cc.GCOLOR: cc._gcolor,
-            cc.GRESULT: cc._gresult,
-            cc.GDATE: cc._gdate,
-            cc.MCOLOR: cc._mcolor,
-            cc.MTYPE: cc._mtype,
-            # cc.CCODE:cc._ccode,
-            # cc.CNAME:cc._cname,
-            cc.TCODE: cc._tcode,
-            cc.TNAME: cc._tname,
-            # cc.RPAIRING:cc._rpairing,
-            cc.TCODE1: cc._tcode1,
-            cc.TCODE2: cc._tcode2,
-            cc.PLENFORENAME: cc._plenforename,
-            cc.PLENNICKNAME: cc._plennickname,
+            cc.ECODE: cc.LECODE,
+            cc.ENAME: cc.LENAME,
+            cc.EDATE: cc.LEDATE,
+            cc.EFINALDATE: cc.LEFINALDATE,
+            cc.PCODE: cc.LPCODE,
+            cc.PNAME: cc.LPNAME,
+            cc.MCODE: cc.LMCODE,
+            cc.MNAME: cc.LMNAME,
+            cc.MDATE: cc.LMDATE,
+            cc.PCODE1: cc.LPCODE1,
+            cc.PCODE2: cc.LPCODE2,
+            cc.GCODE: cc.LGCODE,
+            cc.GROUND: cc.LGROUND,
+            cc.GBOARD: cc.LGBOARD,
+            cc.GCOLOR: cc.LGCOLOR,
+            cc.GRESULT: cc.LGRESULT,
+            cc.GDATE: cc.LGDATE,
+            cc.MCOLOR: cc.LMCOLOR,
+            cc.MTYPE: cc.LMTYPE,
+            # cc.CCODE:cc.LCCODE,
+            # cc.CNAME:cc.LCNAME,
+            cc.TCODE: cc.LTCODE,
+            cc.TNAME: cc.LTNAME,
+            # cc.RPAIRING:cc.LRPAIRING,
+            cc.TCODE1: cc.LTCODE1,
+            cc.TCODE2: cc.LTCODE2,
+            cc.PLENFORENAME: cc.LPLENFORENAME,
+            cc.PLENNICKNAME: cc.LPLENNICKNAME,
         }
 
         validmap = {
-            cc.ECODE: {cc.event: None, cc.match: None, cc.affiliate: None},
-            cc.ENAME: cc.event,
-            # cc.EBCF:cc.event,
-            cc.EDATE: {cc.event: None, cc.affiliate: None},
-            cc.EFINALDATE: cc.event,
-            # cc.ESUBMISSION:cc.event,
-            # cc.ETREASURER:cc.event,
-            # cc.EADDRESS1:cc.event,
-            # cc.EADDRESS2:cc.event,
-            # cc.EADDRESS3:cc.event,
-            # cc.EADDRESS4:cc.event,
-            # cc.EPOSTCODE:cc.event,
-            # cc.EGRADER:cc.event,
-            # cc.EGADDRESS1:cc.event,
-            # cc.EGADDRESS2:cc.event,
-            # cc.EGADDRESS3:cc.event,
-            # cc.EGADDRESS4:cc.event,
-            # cc.EGPOSTCODE:cc.event,
-            # cc.EFIRSTMOVES:cc.event,
-            # cc.EFIRSTMINUTES:cc.event,
-            # cc.ENEXTMOVES:cc.event,
-            # cc.ENEXTMINUTES:cc.event,
-            # cc.ERESTMINUTES:cc.event,
-            # cc.EALLMINUTES:cc.event,
-            # cc.ESECPERMOVE:cc.event,
-            # cc.EADJUDICATED:cc.event,
-            # cc.EGRANDPRIX:cc.event,
-            # cc.EFIDE:cc.event,
-            # cc.ECHESSMOVES:cc.event,
-            # cc.EEAST:cc.event,
-            # cc.EMIDLAND:cc.event,
-            # cc.ENORTH:cc.event,
-            # cc.ESOUTH:cc.event,
-            # cc.EWEST:cc.event,
-            # cc.ECOLOR:cc.event,
-            # cc.CCODE:{cc.club:None, cc.team:None, cc.affiliate:None},
-            # cc.CNAME:cc.club,
-            # cc.CBCF:cc.club,
-            # cc.CBCFCOUNTY:cc.club,
+            cc.ECODE: {cc.LEVENT: None, cc.LMATCH: None, cc.LAFFILIATE: None},
+            cc.ENAME: cc.LEVENT,
+            # cc.EBCF:cc.LEVENT,
+            cc.EDATE: {cc.LEVENT: None, cc.LAFFILIATE: None},
+            cc.EFINALDATE: cc.LEVENT,
+            # cc.ESUBMISSION:cc.LEVENT,
+            # cc.ETREASURER:cc.LEVENT,
+            # cc.EADDRESS1:cc.LEVENT,
+            # cc.EADDRESS2:cc.LEVENT,
+            # cc.EADDRESS3:cc.LEVENT,
+            # cc.EADDRESS4:cc.LEVENT,
+            # cc.EPOSTCODE:cc.LEVENT,
+            # cc.EGRADER:cc.LEVENT,
+            # cc.EGADDRESS1:cc.LEVENT,
+            # cc.EGADDRESS2:cc.LEVENT,
+            # cc.EGADDRESS3:cc.LEVENT,
+            # cc.EGADDRESS4:cc.LEVENT,
+            # cc.EGPOSTCODE:cc.LEVENT,
+            # cc.EFIRSTMOVES:cc.LEVENT,
+            # cc.EFIRSTMINUTES:cc.LEVENT,
+            # cc.ENEXTMOVES:cc.LEVENT,
+            # cc.ENEXTMINUTES:cc.LEVENT,
+            # cc.ERESTMINUTES:cc.LEVENT,
+            # cc.EALLMINUTES:cc.LEVENT,
+            # cc.ESECPERMOVE:cc.LEVENT,
+            # cc.EADJUDICATED:cc.LEVENT,
+            # cc.EGRANDPRIX:cc.LEVENT,
+            # cc.EFIDE:cc.LEVENT,
+            # cc.ECHESSMOVES:cc.LEVENT,
+            # cc.EEAST:cc.LEVENT,
+            # cc.EMIDLAND:cc.LEVENT,
+            # cc.ENORTH:cc.LEVENT,
+            # cc.ESOUTH:cc.LEVENT,
+            # cc.EWEST:cc.LEVENT,
+            # cc.ECOLOR:cc.LEVENT,
+            # cc.CCODE:{cc.LCLUB:None, cc.LTEAM:None, cc.LAFFILIATE:None},
+            # cc.CNAME:cc.LCLUB,
+            # cc.CBCF:cc.LCLUB,
+            # cc.CBCFCOUNTY:cc.LCLUB,
             cc.PCODE: {
-                cc.player: None,
-                cc.affiliate: None,
-                cc.represent: None,
+                cc.LPLAYER: None,
+                cc.LAFFILIATE: None,
+                cc.LREPRESENT: None,
             },
             cc.PNAME: {
-                cc.player: None,
-                cc.affiliate: None,
-                cc.represent: None,
+                cc.LPLAYER: None,
+                cc.LAFFILIATE: None,
+                cc.LREPRESENT: None,
             },
-            # cc.PBCF:cc.player,
-            # cc.PDOB:cc.player,
-            # cc.PGENDER:cc.player,
-            # cc.PDIRECT:cc.player,
-            # cc.PTITLE:cc.player,
-            # cc.PFIDE:cc.player,
-            cc.PLENFORENAME: cc.player,
-            cc.PLENNICKNAME: cc.player,
-            cc.MCODE: {cc.match: None, cc.game: None},
-            cc.MNAME: cc.match,
-            cc.MDATE: cc.match,
-            cc.MTYPE: cc.match,
-            cc.MCOLOR: cc.match,
-            # cc.MUSEEVENTDATE:cc.match,
-            cc.TCODE1: cc.match,
-            cc.TCODE2: cc.match,
-            cc.GROUND: cc.game,
-            cc.GBOARD: cc.game,
-            cc.GCODE: cc.game,
-            cc.PCODE1: cc.game,
-            cc.PCODE2: cc.game,
-            cc.GCOLOR: cc.game,
-            cc.GRESULT: cc.game,
-            cc.GDATE: cc.game,
-            # cc.GUSEMATCHDATE:cc.game,
-            cc.TCODE: {cc.team: None, cc.represent: None},
-            cc.TNAME: cc.team,
-            # cc.RPAIRING:cc.represent,
-            # cc.represent:None,
-            # cc.club:None,
-            cc.player: None,
-            cc.game: None,
-            # cc.affiliate:None,
-            cc.team: None,
-            cc.event: None,
-            cc.match: None,
+            # cc.PBCF:cc.LPLAYER,
+            # cc.PDOB:cc.LPLAYER,
+            # cc.PGENDER:cc.LPLAYER,
+            # cc.PDIRECT:cc.LPLAYER,
+            # cc.PTITLE:cc.LPLAYER,
+            # cc.PFIDE:cc.LPLAYER,
+            cc.PLENFORENAME: cc.LPLAYER,
+            cc.PLENNICKNAME: cc.LPLAYER,
+            cc.MCODE: {cc.LMATCH: None, cc.LGAME: None},
+            cc.MNAME: cc.LMATCH,
+            cc.MDATE: cc.LMATCH,
+            cc.MTYPE: cc.LMATCH,
+            cc.MCOLOR: cc.LMATCH,
+            # cc.MUSEEVENTDATE:cc.LMATCH,
+            cc.TCODE1: cc.LMATCH,
+            cc.TCODE2: cc.LMATCH,
+            cc.GROUND: cc.LGAME,
+            cc.GBOARD: cc.LGAME,
+            cc.GCODE: cc.LGAME,
+            cc.PCODE1: cc.LGAME,
+            cc.PCODE2: cc.LGAME,
+            cc.GCOLOR: cc.LGAME,
+            cc.GRESULT: cc.LGAME,
+            cc.GDATE: cc.LGAME,
+            # cc.GUSEMATCHDATE:cc.LGAME,
+            cc.TCODE: {cc.LTEAM: None, cc.LREPRESENT: None},
+            cc.TNAME: cc.LTEAM,
+            # cc.RPAIRING:cc.LREPRESENT,
+            # cc.LREPRESENT:None,
+            # cc.LCLUB:None,
+            cc.LPLAYER: None,
+            cc.LGAME: None,
+            # cc.LAFFILIATE:None,
+            cc.LTEAM: None,
+            cc.LEVENT: None,
+            cc.LMATCH: None,
         }
 
-        extract = super(ConvertLeagueDump, self).translate_results_format(
+        extract = super()._translate_results_format(
             context=context,
             keymap=keymap,
             validmap=validmap,
@@ -1364,7 +1375,7 @@ class ConvertLeagueDump(ConvertResults):
                 del self.affiliate[(e, p)]
 
 
-class PhraseCounts(object):
+class PhraseCounts:
     """Counts of phrase usage.
 
     The number of times the phrase equals starts or ends strings is updated
@@ -1375,7 +1386,7 @@ class PhraseCounts(object):
 
     def __init__(self, phrase):
         """Initialise counts which contribute to phrase weight."""
-        super(PhraseCounts, self).__init__()
+        super().__init__()
         self.phrase = tuple(phrase.split())
         self.chars = phrase
         self.equal = 0
@@ -1393,9 +1404,9 @@ class PhraseCounts(object):
         """Return True if defining attributea are equal."""
         if self.count != other.count:
             return False
-        elif len(self.phrase) != len(other.phrase):
+        if len(self.phrase) != len(other.phrase):
             return False
-        elif self.chars != other.chars:
+        if self.chars != other.chars:
             return False
         return True
 
@@ -1403,9 +1414,9 @@ class PhraseCounts(object):
         """Return True if any defining attribute is not equal."""
         if self.count == other.count:
             return False
-        elif len(self.phrase) == len(other.phrase):
+        if len(self.phrase) == len(other.phrase):
             return False
-        elif self.chars == other.chars:
+        if self.chars == other.chars:
             return False
         return True
 
@@ -1413,9 +1424,9 @@ class PhraseCounts(object):
         """Return True if defining attributes in order are greater or equal."""
         if self.count < other.count:
             return False
-        elif len(self.phrase) < len(other.phrase):
+        if len(self.phrase) < len(other.phrase):
             return False
-        elif self.chars < other.chars:
+        if self.chars < other.chars:
             return False
         return True
 
@@ -1423,9 +1434,9 @@ class PhraseCounts(object):
         """Return True if defining attributes in order are greater."""
         if self.count <= other.count:
             return False
-        elif len(self.phrase) <= len(other.phrase):
+        if len(self.phrase) <= len(other.phrase):
             return False
-        elif self.chars <= other.chars:
+        if self.chars <= other.chars:
             return False
         return True
 
@@ -1433,9 +1444,9 @@ class PhraseCounts(object):
         """Return True if defining attributes in order are smaller or equal."""
         if self.count > other.count:
             return False
-        elif len(self.phrase) > len(other.phrase):
+        if len(self.phrase) > len(other.phrase):
             return False
-        elif self.chars > other.chars:
+        if self.chars > other.chars:
             return False
         return True
 
@@ -1443,9 +1454,9 @@ class PhraseCounts(object):
         """Return True if defining attributes in order are smaller or equal."""
         if self.count >= other.count:
             return False
-        elif len(self.phrase) >= len(other.phrase):
+        if len(self.phrase) >= len(other.phrase):
             return False
-        elif self.chars >= other.chars:
+        if self.chars >= other.chars:
             return False
         return True
 
@@ -1463,11 +1474,11 @@ def convert_date_to_iso(data, key):
 def get_player_identifier_from_game(game, player, serial):
     """Return player identifier from game details."""
     return (
-        game[cc._startdate],
-        game[cc._enddate],
-        game[cc._event],
+        game[cc.STARTDATE],
+        game[cc.ENDDATE],
+        game[cc.EVENT],
         game[player],
-        game[cc._section],
+        game[cc.SECTION],
         game[serial],
     )
 
@@ -1483,7 +1494,7 @@ def single_splits(words=None):
     """
     if words is None:
         return set()
-    elif isinstance(words, str):
+    if isinstance(words, str):
         words = words.split()
     return [
         (" ".join(words[:i]), " ".join(words[i:]))
@@ -1496,30 +1507,30 @@ class TeamNames(list):
 
     def __init__(self, matchname, teams):
         """Extend and deduce home and away team names."""
-        super(TeamNames, self).__init__()
-        self.append({cc._hometeam: "", cc._awayteam: ""})
+        super().__init__()
+        self.append({cc.HOMETEAM: "", cc.AWAYTEAM: ""})
         self.matchname = matchname
 
         for h, a in single_splits(words=matchname):
-            f = {cc._hometeam: "", cc._awayteam: ""}
+            f = {cc.HOMETEAM: "", cc.AWAYTEAM: ""}
             for t in teams:
                 if t in a:
-                    if len(t) > len(f[cc._awayteam]):
-                        f[cc._awayteam] = t
+                    if len(t) > len(f[cc.AWAYTEAM]):
+                        f[cc.AWAYTEAM] = t
                 if t in h:
-                    if len(t) > len(f[cc._hometeam]):
-                        f[cc._hometeam] = t
-            if not f[cc._awayteam]:
+                    if len(t) > len(f[cc.HOMETEAM]):
+                        f[cc.HOMETEAM] = t
+            if not f[cc.AWAYTEAM]:
                 break
-            if f[cc._hometeam]:
+            if f[cc.HOMETEAM]:
                 self.append(f)
 
         if len(self) == 1:
             s = matchname.split()
             self[:] = [
                 {
-                    cc._hometeam: " ".join(s[: (1 + len(s)) // 2]),
-                    cc._awayteam: " ".join(s[(1 + len(s)) // 2 :]),
+                    cc.HOMETEAM: " ".join(s[: (1 + len(s)) // 2]),
+                    cc.AWAYTEAM: " ".join(s[(1 + len(s)) // 2 :]),
                 }
             ]
         else:

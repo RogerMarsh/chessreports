@@ -29,12 +29,14 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
     _btn_ecf_club_download = "ecfclubcodes_ecf_club_download"
     _btn_no_club = "ecfclubcodes_no_club"
 
-    def __init__(self, parent=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, cnf={}, **kargs):
         """Extend and define the results database ECF club code panel."""
         self.newplayerclubgrid = None
         self.ecfclubcodegrid = None
 
-        super(ECFClubCodes, self).__init__(parent=parent, cnf=cnf, **kargs)
+        super().__init__(parent=parent, cnf=cnf, **kargs)
 
         self.show_panel_buttons(
             (
@@ -46,20 +48,22 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
         )
         self.create_buttons()
 
+        # pylint W0632 unbalanced-tuple-unpacking.
+        # self.make_grids returns a list with same length as argument.
         self.newplayerclubgrid, self.ecfclubcodegrid = self.make_grids(
             (
-                dict(
-                    grid=ecfplayergrids.NewPlayerClubGrid,
-                    selectlabel="Select Player:  ",
-                    gridfocuskey="<KeyPress-F7>",
-                    selectfocuskey="<KeyPress-F5>",
-                ),
-                dict(
-                    grid=ecfplayergrids.ECFClubCodeGrid,
-                    selectlabel="Select Club Reference:  ",
-                    gridfocuskey="<KeyPress-F8>",
-                    selectfocuskey="<KeyPress-F6>",
-                ),
+                {
+                    "grid": ecfplayergrids.NewPlayerClubGrid,
+                    "selectlabel": "Select Player:  ",
+                    "gridfocuskey": "<KeyPress-F7>",
+                    "selectfocuskey": "<KeyPress-F5>",
+                },
+                {
+                    "grid": ecfplayergrids.ECFClubCodeGrid,
+                    "selectlabel": "Select Club Reference:  ",
+                    "gridfocuskey": "<KeyPress-F8>",
+                    "selectfocuskey": "<KeyPress-F6>",
+                },
             )
         )
 
@@ -142,6 +146,8 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
             wrap=tkinter.WORD,
             tabstyle="tabular",
         )
+        # Method is defined by setattr in a superclass.
+        # pylint: disable-next=no-member
         if not dlg.ok_pressed():
             return
 
@@ -152,7 +158,7 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
             mr = ecfmaprecord.get_player(db, p[-1])
             if mr is None:
                 pr = ecfmaprecord.ECFmapDBrecordClub()
-                pr.load_record(self.newpersongrid.objects[p])
+                pr.load_record(self.newplayerclubgrid.objects[p])
                 deleted_players.append(
                     resultsrecord.get_player_name_text(
                         db, pr.value.get_unpacked_playername()
@@ -284,6 +290,8 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
             wrap=tkinter.WORD,
             tabstyle="tabular",
         )
+        # Method is defined by setattr in a superclass.
+        # pylint: disable-next=no-member
         if not dlg.ok_pressed():
             return
 
@@ -292,7 +300,7 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
             mr = ecfmaprecord.get_player(db, p[-1])
             if mr is None:
                 pr = ecfmaprecord.ECFmapDBrecordClub()
-                pr.load_record(self.newpersongrid.objects[p])
+                pr.load_record(self.newplayerclubgrid.objects[p])
                 dlg = tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message="".join(
@@ -335,7 +343,6 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
         Used, at least, as callback from AppSysFrame container.
 
         """
-        pass
 
     def describe_buttons(self):
         """Define all action buttons that may appear on ECF club codes page."""
@@ -439,8 +446,6 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
 
     def download_new_club_ecf_detail(self):
         """Show dialogue to download club's ECF club code and do update."""
-        msgtitle = "Download Club Code"
-
         db = self.get_appsys().get_results_database()
         dlg = ecfdetail.ECFDownloadClubCodeDialog(None, db)
         if dlg.is_yes():
@@ -448,22 +453,26 @@ class ECFClubCodes(panel.PanedPanelGridSelectorBar):
 
     def on_affiliate(self, event=None):
         """Affiliate player with club."""
+        del event
         self.affiliate_players_to_club()
         self.ecfclubcodegrid.set_select_hint_label()
         return "break"
 
     def on_ecf_club(self, event=None):
         """Edit ECF club name."""
+        del event
         self.edit_new_club_ecf_detail()
         return "break"
 
     def on_ecf_club_download(self, event=None):
         """Download ECF club code."""
+        del event
         self.download_new_club_ecf_detail()
         return "break"
 
     def on_no_club(self, event=None):
         """Affiliate player with no club."""
+        del event
         self.affiliate_players_to_no_club()
         self.ecfclubcodegrid.set_select_hint_label()
         return "break"

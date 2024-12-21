@@ -14,7 +14,7 @@ class TakeonCollation(importcollation.ImportCollation):
 
     def __init__(self, reports, fixtures, importdata):
         """Extend, allow for noting merges."""
-        self.merges = dict()
+        self.merges = {}
         super().__init__(importdata)
 
         self.reports = reports
@@ -34,14 +34,14 @@ class TakeonCollation(importcollation.ImportCollation):
         pl = []
         for player, pin, affiliation in (
             (
-                constants._homeplayer,
-                constants._homepin,
-                constants._homeaffiliation,
+                constants.HOMEPLAYER,
+                constants.HOMEPIN,
+                constants.HOMEAFFILIATION,
             ),
             (
-                constants._awayplayer,
-                constants._awaypin,
-                constants._awayaffiliation,
+                constants.AWAYPLAYER,
+                constants.AWAYPIN,
+                constants.AWAYAFFILIATION,
             ),
         ):
             pk = get_player_identifier_from_game(game, player, pin)
@@ -49,17 +49,17 @@ class TakeonCollation(importcollation.ImportCollation):
             if p is None:
                 p = gameobjects.Player(
                     name=game[player],
-                    event=game[constants._event],
-                    startdate=game[constants._startdate],
-                    enddate=game[constants._enddate],
-                    section=game[constants._section],
+                    event=game[constants.EVENT],
+                    startdate=game[constants.STARTDATE],
+                    enddate=game[constants.ENDDATE],
+                    section=game[constants.SECTION],
                     pin=game[pin],
                     reported_codes=frozenset(),
                 )
-                if constants._board in game:
+                if constants.BOARD_LOWER in game:
                     p.affiliation = game[affiliation]
                 self.players[pk] = p
             pl.append(p)
-            merge = self.merges.setdefault(game[pin], dict())
+            merge = self.merges.setdefault(game[pin], {})
             merge[pk] = merge.setdefault(pk, 0) + 1
         return pl

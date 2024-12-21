@@ -19,33 +19,32 @@ from solentware_grid.gui.datarow import (
 )
 
 
-class dBaseDataHeader(DataHeader):
+class DBaseDataHeader(DataHeader):
     """Provide methods to create a new header and configure its widgets."""
 
     @staticmethod
     def make_header_specification(fieldnames=None):
         """Return dbase file header specification."""
         if fieldnames is None:
-            return dBaseDataRow.header_specification
-        else:
-            hs = []
-            for col, fn in enumerate(fieldnames):
-                hs.append(dBaseDataRow.header_specification[0].copy())
-                hs[-1][GRID_CONFIGURE] = dict(column=col, sticky=tkinter.EW)
-                hs[-1][WIDGET_CONFIGURE] = dict(text=fn)
-            return hs
+            return DBaseDataRow.header_specification
+        hs = []
+        for col, fn in enumerate(fieldnames):
+            hs.append(DBaseDataRow.header_specification[0].copy())
+            hs[-1][GRID_CONFIGURE] = {"column": col, "sticky": tkinter.EW}
+            hs[-1][WIDGET_CONFIGURE] = {"text": fn}
+        return hs
 
 
-class dBaseDataRow(RecorddBaseIII, DataRow):
+class DBaseDataRow(RecorddBaseIII, DataRow):
     """Provide methods to create, for display, a row from a dBaseIII file."""
 
     # The header is derived from file so define a null header here
     header_specification = (
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text=""),
-            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1),
+            WIDGET_CONFIGURE: {"text": ""},
+            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1},
             ROW: 0,
         },
     )
@@ -53,8 +52,8 @@ class dBaseDataRow(RecorddBaseIII, DataRow):
     row_specification = (
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(),
-            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+            WIDGET_CONFIGURE: {},
+            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
             ROW: 0,
         },
     )
@@ -65,28 +64,29 @@ class dBaseDataRow(RecorddBaseIII, DataRow):
         self.set_database(database)
         self.row_specification = []
 
-    def grid_row(self, **kargs):
+    def grid_row(self, textitems=(), **kargs):
         """Return tuple of instructions to create row.
 
         Create row specification from dBase file fieldnames.
-        Create textitems argument for dBaseDataRow instance.
+        Create textitems argument for DBaseDataRow instance.
+
+        textitems arguments is ignored and is present for compatibility.
 
         """
-        fn = self.database.dBasefiles[self.dbname]._dbaseobject.fieldnames
+        fn = self.database.dbasefiles[self.dbname].dbaseobject.fieldnames
         self.row_specification = self.make_row_specification(fn)
         v = self.value.__dict__
-        return super(dBaseDataRow, self).grid_row(
-            textitems=tuple([v.get(f, "") for f in fn]), **kargs
+        return super().grid_row(
+            textitems=tuple(v.get(f, "") for f in fn), **kargs
         )
 
     @staticmethod
     def make_row_specification(fieldnames=None):
         """Return dbase file row specification."""
         if fieldnames is None:
-            return dBaseDataRow.row_specification
-        else:
-            hs = []
-            for col, fn in enumerate(fieldnames):
-                hs.append(dBaseDataRow.row_specification[0].copy())
-                hs[-1][GRID_CONFIGURE] = dict(column=col, sticky=tkinter.EW)
-            return hs
+            return DBaseDataRow.row_specification
+        hs = []
+        for col in range(len(fieldnames)):
+            hs.append(DBaseDataRow.row_specification[0].copy())
+            hs[-1][GRID_CONFIGURE] = {"column": col, "sticky": tkinter.EW}
+        return hs

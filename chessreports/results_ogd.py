@@ -7,7 +7,7 @@
 if __name__ == "__main__":
     from . import APPLICATION_NAME
 
-    application_name = "".join((APPLICATION_NAME, "OGD"))
+    _APPLICATION_NAME = "".join((APPLICATION_NAME, "OGD"))
     try:
         from solentware_misc.gui.startstop import (
             start_application_exception,
@@ -27,26 +27,34 @@ if __name__ == "__main__":
                     )
                 ),
             )
-        except:
-            pass
-        raise SystemExit("Unable to import start application utilities")
+        except Exception as exc:
+            raise SystemExit(
+                "Exception while reporting problem importing start module"
+            ) from exc
+        raise SystemExit(
+            "Unable to import start application utilities"
+        ) from error
     try:
         from .gui.resultsroot import Results
         from .gui.ogd.leagues_ogd import Leagues
     except Exception as error:
         start_application_exception(
-            error, appname=application_name, action="import"
+            error, appname=_APPLICATION_NAME, action="import"
         )
-        raise SystemExit(" import ".join(("Unable to", application_name)))
+        raise SystemExit(
+            " import ".join(("Unable to", _APPLICATION_NAME))
+        ) from error
     try:
         app = Results(
-            title=application_name, gui_module=Leagues, width=400, height=200
+            title=_APPLICATION_NAME, gui_module=Leagues, width=400, height=200
         )
     except Exception as error:
         start_application_exception(
-            error, appname=application_name, action="initialise"
+            error, appname=_APPLICATION_NAME, action="initialise"
         )
-        raise SystemExit(" initialise ".join(("Unable to", application_name)))
+        raise SystemExit(
+            " initialise ".join(("Unable to", _APPLICATION_NAME))
+        ) from error
     try:
         app.root.mainloop()
     except SystemExit:
@@ -57,6 +65,6 @@ if __name__ == "__main__":
             error,
             app,
             app.root,
-            title=application_name,
-            appname=application_name,
+            title=_APPLICATION_NAME,
+            appname=_APPLICATION_NAME,
         )

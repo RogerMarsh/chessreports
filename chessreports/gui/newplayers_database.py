@@ -34,31 +34,35 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
     _btn_join = "newplayers_join"
     _btn_person_details = "newplayers_details"
 
-    def __init__(self, parent=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, cnf={}, **kargs):
         """Extend and define the results database new player panel."""
         self.newplayergrid = None
         self.playergrid = None
 
-        super(NewPlayers, self).__init__(parent=parent, cnf=cnf, **kargs)
+        super().__init__(parent=parent, cnf=cnf, **kargs)
 
         self.show_panel_buttons((self._btn_merge,))
         self.create_buttons()
 
+        # pylint W0632 unbalanced-tuple-unpacking.
+        # self.make_grids returns a list with same length as argument.
         self.newplayergrid, self.playergrid = self.make_grids(
             (
-                dict(
-                    grid=playergrids.NewGrid,
-                    selectlabel="Select New Player:  ",
-                    gridfocuskey="<KeyPress-F7>",
-                    selectfocuskey="<KeyPress-F5>",
-                    slavegrids=("<KeyPress-F8>",),
-                ),
-                dict(
-                    grid=aliaslinkgrids.AliasLinkGrid,
-                    selectlabel="Select Player Reference:  ",
-                    gridfocuskey="<KeyPress-F8>",
-                    selectfocuskey="<KeyPress-F6>",
-                ),
+                {
+                    "grid": playergrids.NewGrid,
+                    "selectlabel": "Select New Player:  ",
+                    "gridfocuskey": "<KeyPress-F7>",
+                    "selectfocuskey": "<KeyPress-F5>",
+                    "slavegrids": ("<KeyPress-F8>",),
+                },
+                {
+                    "grid": aliaslinkgrids.AliasLinkGrid,
+                    "selectlabel": "Select Player Reference:  ",
+                    "gridfocuskey": "<KeyPress-F8>",
+                    "selectfocuskey": "<KeyPress-F6>",
+                },
             )
         )
 
@@ -68,7 +72,6 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
         Used, at least, as callback from AppSysFrame container.
 
         """
-        pass
 
     def describe_buttons(self):
         """Define all action buttons that may appear on new players page."""
@@ -107,7 +110,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
         pbkm = self.playergrid.bookmarks
 
         if len(psel) == 0:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="No player selected as main entry after join.",
                 title=msgtitle,
@@ -115,7 +118,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
             return
 
         if len(pbkm) == 0:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="No players selected for join.",
                 title=msgtitle,
@@ -123,7 +126,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
             return
 
         if len(psel) > 1:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="Select one player as main entry after join.",
                 title=msgtitle,
@@ -131,7 +134,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
             return
 
         if pbkm == psel:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="No players selected for join to main entry.",
                 title=msgtitle,
@@ -145,7 +148,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
         finally:
             db.end_read_only_transaction()
         if mainentry is None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="Cannot find identified player for selection.",
                 title=msgtitle,
@@ -160,7 +163,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
             msg = []
             for k in gpfak[None]:
                 msg.append(resultsrecord.get_player_name_text_tabs(db, k[0]))
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -174,7 +177,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
         mkp = mainentry.key.pack()
         entries = [v for k, v in gpfak.items() if k != mkp]
         if not entries:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="The selected players are already joined.",
                 title=msgtitle,
@@ -186,7 +189,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
             for alias in mainrecord.value.get_alias_list():
                 aliasrecord = resultsrecord.get_alias(db, alias)
                 if aliasrecord is None:
-                    dlg = tkinter.messagebox.showinfo(
+                    tkinter.messagebox.showinfo(
                         parent=self.get_widget(),
                         message="".join(
                             (
@@ -199,7 +202,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                         ),
                         title=msgtitle,
                     )
-                    return
+                    return None
                 ra.append(
                     "".join(
                         (
@@ -213,6 +216,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
 
         h = []
         r = []
+        get_player_name_text_tabs = resultsrecord.get_player_name_text_tabs
         db.start_read_only_transaction()
         try:
             h.append(
@@ -220,7 +224,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                     (
                         "".join(
                             (
-                                resultsrecord.get_player_name_text_tabs(
+                                get_player_name_text_tabs(
                                     db, mainentry.value.identity()
                                 ),
                             )
@@ -240,11 +244,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
             for e in entries:
                 h.append(
                     "".join(
-                        (
-                            resultsrecord.get_player_name_text_tabs(
-                                db, e.value.identity()
-                            ),
-                        )
+                        (get_player_name_text_tabs(db, e.value.identity()),)
                     )
                 )
             ra = generate_report(mainentry)
@@ -257,7 +257,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                             " ".join(("The current aliases of\n",)),
                             "".join(
                                 (
-                                    resultsrecord.get_player_name_text_tabs(
+                                    get_player_name_text_tabs(
                                         db, mainentry.value.identity()
                                     ),
                                 )
@@ -273,7 +273,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                         (
                             "".join(
                                 (
-                                    resultsrecord.get_player_name_text_tabs(
+                                    get_player_name_text_tabs(
                                         db, mainentry.value.identity()
                                     ),
                                 )
@@ -293,7 +293,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                                 "\nThe entry on the existing player list\n",
                                 "".join(
                                     (
-                                        resultsrecord.get_player_name_text_tabs(
+                                        get_player_name_text_tabs(
                                             db, e.value.identity()
                                         ),
                                     )
@@ -316,7 +316,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                                 "\nThe entry on the existing player list\n",
                                 "".join(
                                     (
-                                        resultsrecord.get_player_name_text_tabs(
+                                        get_player_name_text_tabs(
                                             db, e.value.identity()
                                         ),
                                     )
@@ -347,6 +347,8 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
             tabstyle="tabular",
         )
 
+        # Method is defined by setattr in a superclass.
+        # pylint: disable-next=no-member
         if cdlg.ok_pressed():
             # After merging the main record for the player will have a list
             # of keys of merged records in value.alias and each subsidiary
@@ -393,7 +395,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
         pbkm = self.playergrid.bookmarks
 
         if len(nsel) + len(nbkm) == 0:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="No new players selected for merge.",
                 title=msgtitle,
@@ -416,7 +418,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                     )
             finally:
                 db.end_read_only_transaction()
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -441,7 +443,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
             finally:
                 db.end_read_only_transaction()
             if mainentry is None:
-                dlg = tkinter.messagebox.showinfo(
+                tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message="Cannot find new player for selection.",
                     title=msgtitle,
@@ -464,7 +466,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
             finally:
                 db.end_read_only_transaction()
             if mainentry is None:
-                dlg = tkinter.messagebox.showinfo(
+                tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message="Cannot find identified player for selection.",
                     title=msgtitle,
@@ -477,7 +479,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                 finally:
                     db.end_read_only_transaction()
                 if r is None:
-                    dlg = tkinter.messagebox.showinfo(
+                    tkinter.messagebox.showinfo(
                         parent=self.get_widget(),
                         message="Cannot find new player for selection.",
                         title=msgtitle,
@@ -488,7 +490,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
                     gnpfak[rkp] = r
 
         else:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (
@@ -566,6 +568,8 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
             tabstyle="tabular",
         )
 
+        # Method is defined by setattr in a superclass.
+        # pylint: disable-next=no-member
         if cdlg.ok_pressed():
             # After merging the main record for the player will have a list
             # of keys of merged records in value.alias and each subsidiary
@@ -604,18 +608,21 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
 
     def on_join(self, event=None):
         """Join two or more players into one."""
+        del event
         self.join_merged_players()
         self.newplayergrid.set_select_hint_label()
         return "break"
 
     def on_merge(self, event=None):
         """Merge one or more new player names into a new or existing player."""
+        del event
         self.merge_new_players()
         self.newplayergrid.set_select_hint_label()
         return "break"
 
     def on_person_details(self, event=None):
         """Display player details."""
+        del event
         self.display_player_details()
         return "break"
 
@@ -631,7 +638,7 @@ class NewPlayers(panel.PanedPanelGridSelectorBar):
         psel = self.playergrid.selection
         pbkm = self.playergrid.bookmarks
         if len(psel) + len(pbkm) == 0:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (

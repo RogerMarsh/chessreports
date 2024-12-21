@@ -9,13 +9,11 @@ import io
 from os.path import split
 
 from solentware_base.core.record import KeyText, ValueText, RecordText
+from solentware_base.core.constants import FILE, FIELDS
 
 from ...minorbases.textapi import (
     Textapi,
     TextapiRoot,
-    FILE,
-    FOLDER,
-    FIELDS,
 )
 
 PLAYERS = "ogdplayers"
@@ -49,15 +47,20 @@ class ECFOGDRoot(TextapiRoot):
     """Provide record access to an Online Grading Database file in bsddb style.
 
     The CSV file containing the online grading database is displayed as a text
-    file.  When updating the database it is processed as a CSV file.  This class
-    deals with the special status of the first line of text, which contains the
-    field names.
-
+    file.  When updating the database it is processed as a CSV file.  This
+    class deals with the special status of the first line of text, which
+    contains the field names.
     """
+
+    def __init__(self, *args):
+        """Define database structure."""
+        super().__init__(*args)
+        self.headerline = None
+        self.fieldnames = None
 
     def open_root(self):
         """Delegate then note CSV file fieldnames and row count."""
-        super(ECFOGDRoot, self).open_root()
+        super().open_root()
         self.headerline = self.textlines.pop(0)
         self.record_count = len(self.textlines)
         if isinstance(self.headerline, bytes):
@@ -73,13 +76,9 @@ class ECFOGDRoot(TextapiRoot):
 class ECFOGDkey(KeyText):
     """OGD player key."""
 
-    pass
-
 
 class ECFOGDvalue(ValueText):
     """OGD player data."""
-
-    pass
 
 
 class ECFOGDrecord(RecordText):
@@ -87,4 +86,4 @@ class ECFOGDrecord(RecordText):
 
     def __init__(self, keyclass=ECFOGDkey, valueclass=ECFOGDvalue):
         """Customise RecordText with ECFOGDkey and ECFOGDvalue."""
-        super(ECFOGDrecord, self).__init__(keyclass, valueclass)
+        super().__init__(keyclass, valueclass)

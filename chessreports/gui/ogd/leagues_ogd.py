@@ -4,7 +4,6 @@
 
 """Results database Leagues frame class."""
 
-import os
 import importlib
 
 from . import control_ogd
@@ -36,7 +35,8 @@ class Leagues(leagues_database.Leagues):
 
     def __init__(self, master=None, cnf=None, **kargs):
         """Extend and define the results database results frame."""
-        super(Leagues, self).__init__(master=master, cnf=cnf, **kargs)
+        super().__init__(master=master, cnf=cnf, **kargs)
+        self.__ecfogddataimport_module = None
 
     def define_tabs(self):
         """Define the application tabs."""
@@ -49,7 +49,7 @@ class Leagues(leagues_database.Leagues):
             tabclass=lambda **k: ogdgradingcodes.ECFGradingCodes(
                 gridhorizontal=False, **k
             ),
-            destroy_actions=(control_ogd.Control._btn_closedatabase,),
+            destroy_actions=(control_ogd.Control.btn_closedatabase,),
         )
         self.define_tab(
             self._tab_importecfogd_grading,
@@ -58,8 +58,8 @@ class Leagues(leagues_database.Leagues):
             underline=-1,
             tabclass=lambda **k: importecfogd.ImportECFOGD(**k),
             destroy_actions=(
-                importecfogd.ImportECFOGD._btn_closeecfogdimport,
-                control_ogd.Control._btn_closedatabase,
+                importecfogd.ImportECFOGD.btn_closeecfogdimport,
+                control_ogd.Control.btn_closedatabase,
             ),
         )
         self.define_tab(
@@ -69,8 +69,8 @@ class Leagues(leagues_database.Leagues):
             underline=-1,
             tabclass=lambda **k: importecfogd.ImportECFOGD(**k),
             destroy_actions=(
-                importecfogd.ImportECFOGD._btn_closeecfogdimport,
-                control_ogd.Control._btn_closedatabase,
+                importecfogd.ImportECFOGD.btn_closeecfogdimport,
+                control_ogd.Control.btn_closedatabase,
             ),
         )
 
@@ -104,33 +104,33 @@ class Leagues(leagues_database.Leagues):
             {
                 (
                     self._state_dbopen,
-                    control_ogd.Control._btn_copyecfogdgradingfile,
+                    control_ogd.Control.btn_copyecfogdgradingfile,
                 ): [
                     self._state_importecfogd_grading,
                     self._tab_importecfogd_grading,
                 ],
                 (
                     self._state_importecfogd_grading,
-                    importecfogd.ImportECFOGD._btn_closeecfogdimport,
+                    importecfogd.ImportECFOGD.btn_closeecfogdimport,
                 ): [self._state_dbopen, self._tab_control],
                 (
                     self._state_importecfogd_grading,
-                    control_ogd.Control._btn_closedatabase,
+                    control_ogd.Control.btn_closedatabase,
                 ): [self._state_dbclosed, None],
                 (
                     self._state_dbopen,
-                    control_ogd.Control._btn_copyecfogdratingfile,
+                    control_ogd.Control.btn_copyecfogdratingfile,
                 ): [
                     self._state_importecfogd_rating,
                     self._tab_importecfogd_rating,
                 ],
                 (
                     self._state_importecfogd_rating,
-                    importecfogd.ImportECFOGD._btn_closeecfogdimport,
+                    importecfogd.ImportECFOGD.btn_closeecfogdimport,
                 ): [self._state_dbopen, self._tab_control],
                 (
                     self._state_importecfogd_rating,
-                    control_ogd.Control._btn_closedatabase,
+                    control_ogd.Control.btn_closedatabase,
                 ): [self._state_dbclosed, None],
             }
         )
@@ -138,9 +138,13 @@ class Leagues(leagues_database.Leagues):
 
     def set_ecfogddataimport_module(self, enginename):
         """Import the ECF reference data import module."""
-        self._ecfogddataimport_module = importlib.import_module(
+        self.__ecfogddataimport_module = importlib.import_module(
             ECF_OGD_DATA_IMPORT_MODULE[enginename], "chessreports.gui"
         )
+
+    def get_ecfogddataimport_module(self):
+        """Return the ECF Online Grading Database import module."""
+        return self.__ecfogddataimport_module
 
     def results_control(self, **kargs):
         """Return control_ogd.Control class instance."""

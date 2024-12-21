@@ -5,10 +5,6 @@
 """Results database using Berkeley DB database via bsddb3."""
 
 from bsddb3.db import (
-    DB_BTREE,
-    DB_HASH,
-    DB_RECNO,
-    DB_DUPSORT,
     DB_CREATE,
     DB_RECOVER,
     DB_INIT_MPOOL,
@@ -62,14 +58,16 @@ class ResultsDatabase(database.Database, bsddb3_database.Database):
             **kargs,
         )
 
-    def delete_database(self):
-        """Close and delete the open chess results database."""
-        return super().delete_database(
-            (self.database_file, self.dbenv.get_lg_dir().decode())
+    def _delete_database_names(self):
+        """Override and return tuple of filenames to delete."""
+        return (
+            self.database_file,
+            self.dbenv.get_lg_dir().decode(),
+            self.database_file + "-lock",
         )
 
-    # Not clear why _keyify is necessary or just returns value for Berkeley DB.
-    def _keyify(self, value):
+    # Not clear why keyify is necessary or just returns value for Berkeley DB.
+    def keyify(self, value):
         """Tranform a value from an ECF DbaseIII file for database key search.
 
         Overrides the default in database.Database which decodes value.
@@ -77,9 +75,9 @@ class ResultsDatabase(database.Database, bsddb3_database.Database):
         """
         return value
 
-    # Not clear why _keybyteify is necessary except it is same as for _keyify.
+    # Not clear why keybyteify is necessary except it is same as for keyify.
     # See version in db.resultsdatabase.
-    def _keybyteify(self, value):
+    def keybyteify(self, value):
         """Tranform a value from an ECF json download for database key search.
 
         Overrides the default in database.Database which returns value.

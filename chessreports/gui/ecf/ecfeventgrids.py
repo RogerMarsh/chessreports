@@ -4,8 +4,6 @@
 
 """Results database datagrid classes for event's ECF detail and submission."""
 
-import tkinter
-
 from solentware_grid.core.dataclient import DataSource
 
 from .. import eventgrids

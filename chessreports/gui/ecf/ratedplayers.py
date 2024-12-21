@@ -7,7 +7,7 @@
 Display the 'players_ratings' download and offer the option to update the open
 database.
 
-Player's names, ecf_codes, and club_codes, are taken from the download. 
+Player's names, ecf_codes, and club_codes, are taken from the download.
 
 Assume that all clubs referenced in the download are in the 'active_clubs'
 download, and any club not referenced in the download is absent from the
@@ -17,16 +17,11 @@ download, and any club not referenced in the download is absent from the
 
 import tkinter
 import tkinter.messagebox
-import datetime
 
 from solentware_misc.gui import logpanel
 from solentware_misc.gui import textreadonly
-from solentware_misc.gui import tasklog
 
-from ...core.ecf import ecfmaprecord
-from ...core.ecf import ecfrecord
 from ...core.ecf import ecfdataimport
-from ...core import resultsrecord
 from ...core import filespec
 from ...core import constants
 
@@ -39,16 +34,18 @@ _REFRESH_FILE_FIELD = {
 class RatedPlayers(logpanel.WidgetAndLogPanel):
     """The 'players_ratings' panel for a Results database."""
 
-    _btn_closeratedplayers = "ratedplayers_close"
+    btn_closeratedplayers = "ratedplayers_close"
     _btn_applyratedplayers = "ratedplayers_apply"
 
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
     def __init__(
         self,
         parent=None,
         datafile=None,
         closecontexts=(),
         starttaskmsg=None,
-        cnf=dict(),
+        cnf={},
         **kargs
     ):
         """Extend and define the 'players_ratings' database update panel."""
@@ -65,26 +62,26 @@ class RatedPlayers(logpanel.WidgetAndLogPanel):
             ),
             maketaskwidget=self._create_rated_players_download_widget,
             taskbuttons={
-                self._btn_closeratedplayers: dict(
-                    text="Cancel Apply Rated Players",
-                    tooltip="Cancel the rated players update.",
-                    underline=0,
-                    switchpanel=True,
-                    command=self.on_cancel_apply_downloaded_rated_players,
-                ),
-                self._btn_applyratedplayers: dict(
-                    text="Apply Rated Players",
-                    tooltip="Apply rated players updates to database.",
-                    underline=0,
-                    command=self.on_apply_downloaded_rated_players,
-                ),
+                self.btn_closeratedplayers: {
+                    "text": "Cancel Apply Rated Players",
+                    "tooltip": "Cancel the rated players update.",
+                    "underline": 0,
+                    "switchpanel": True,
+                    "command": self.on_cancel_apply_downloaded_rated_players,
+                },
+                self._btn_applyratedplayers: {
+                    "text": "Apply Rated Players",
+                    "tooltip": "Apply rated players updates to database.",
+                    "underline": 0,
+                    "command": self.on_apply_downloaded_rated_players,
+                },
             },
             starttaskbuttons=(
-                self._btn_closeratedplayers,
+                self.btn_closeratedplayers,
                 self._btn_applyratedplayers,
             ),
             runmethod=False,
-            runmethodargs=dict(),
+            runmethodargs={},
             cnf=cnf,
             **kargs
         )
@@ -111,8 +108,7 @@ class RatedPlayers(logpanel.WidgetAndLogPanel):
         to a WidgetAndLogPanel(...) call.
 
         """
-        self.resultsdbfolder = tkinter.Label(master=self.get_widget(), text="")
-        self.resultsdbfolder.pack(side=tkinter.TOP, fill=tkinter.X)
+        del master
         tf = tkinter.Frame(master=self.get_widget())
         header = tkinter.Text(
             master=tf,
@@ -234,7 +230,6 @@ class RatedPlayers(logpanel.WidgetAndLogPanel):
         Used, at least, as callback from AppSysFrame container.
 
         """
-        pass
 
     def apply_downloaded_rated_players(self, *args, **kargs):
         """Apply new, and update existing, ecf_codes from download.
@@ -243,6 +238,7 @@ class RatedPlayers(logpanel.WidgetAndLogPanel):
         when running this method.
 
         """
+        del args, kargs
         ecfdataimport.copy_ecf_players_post_2020_rules(
             self,
             logwidget=self.tasklog,
@@ -255,6 +251,7 @@ class RatedPlayers(logpanel.WidgetAndLogPanel):
 
         Re-open the files that were closed on creating this widget.
         """
+        del event
         self.get_appsys().get_results_database().allocate_and_open_contexts(
             files=self._closecontexts
         )
@@ -274,6 +271,7 @@ class RatedPlayers(logpanel.WidgetAndLogPanel):
 
     def on_apply_downloaded_rated_players(self, event=None):
         """Run apply_downloaded_rated_players in separate thread."""
+        del event
         dlg = tkinter.messagebox.askquestion(
             parent=self.get_widget(),
             title="Apply Rated Players",
@@ -291,11 +289,11 @@ class RatedPlayers(logpanel.WidgetAndLogPanel):
     def show_buttons_for_cancel_import(self):
         """Show buttons for actions allowed at start of import process."""
         self.hide_panel_buttons()
-        self.show_panel_buttons((self._btn_closeratedplayers,))
+        self.show_panel_buttons((self.btn_closeratedplayers,))
 
     def show_buttons_for_start_import(self):
         """Show buttons for actions allowed at start of import process."""
         self.hide_panel_buttons()
         self.show_panel_buttons(
-            (self._btn_closeratedplayers, self._btn_applyratedplayers)
+            (self.btn_closeratedplayers, self._btn_applyratedplayers)
         )

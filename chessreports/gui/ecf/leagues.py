@@ -25,7 +25,6 @@ from . import activeclubs
 from . import ratedplayers
 from . import newevent
 from .. import leagues_database
-from .. import players
 from .. import configuredialog_hack
 from ... import ECF_DATA_IMPORT_MODULE
 from ...core import constants
@@ -35,7 +34,7 @@ from ...core import configuration
 class Leagues(leagues_database.Leagues):
     """The Results frame for a Results database."""
 
-    _tab_ecfeventdetail = "leagues_tab_ecfeventdetail"
+    tab_ecfeventdetail = "leagues_tab_ecfeventdetail"
     _tab_ecfgradingcodes = "leagues_tab_ecfgradingcodes"
     _tab_ecfclubcodes = "leagues_tab_ecfclubcodes"
     _tab_ecfevents = "leagues_tab_ecfevents"
@@ -60,7 +59,8 @@ class Leagues(leagues_database.Leagues):
 
     def __init__(self, master=None, cnf=None, **kargs):
         """Extend and define the results database results frame."""
-        super(Leagues, self).__init__(master=master, cnf=cnf, **kargs)
+        super().__init__(master=master, cnf=cnf, **kargs)
+        self.__ecfdataimport_module = None
 
     def define_tabs(self):
         """Define the application tabs."""
@@ -73,7 +73,7 @@ class Leagues(leagues_database.Leagues):
             tabclass=lambda **k: ecfgradingcodes.ECFGradingCodes(
                 gridhorizontal=False, **k
             ),
-            destroy_actions=(control.Control._btn_closedatabase,),
+            destroy_actions=(control.Control.btn_closedatabase,),
         )
         self.define_tab(
             self._tab_ecfclubcodes,
@@ -83,7 +83,7 @@ class Leagues(leagues_database.Leagues):
             tabclass=lambda **k: ecfclubcodes.ECFClubCodes(
                 gridhorizontal=False, **k
             ),
-            destroy_actions=(control.Control._btn_closedatabase,),
+            destroy_actions=(control.Control.btn_closedatabase,),
         )
         self.define_tab(
             self._tab_ecfevents,
@@ -93,26 +93,30 @@ class Leagues(leagues_database.Leagues):
             tabclass=lambda **k: ecfevents.ECFEvents(
                 gridhorizontal=False, **k
             ),
-            destroy_actions=(control.Control._btn_closedatabase,),
+            destroy_actions=(control.Control.btn_closedatabase,),
         )
         self.define_tab(
-            self._tab_ecfeventdetail,
+            self.tab_ecfeventdetail,
             text="ECF Event Detail",
             tooltip="Update details of event for submission to ECF.",
+            # pylint W0108 unnecessary-lambda.
+            # self.define_tab implementation provides **k arguments.
             tabclass=lambda **k: newevent.NewEvent(**k),
             destroy_actions=(
-                newevent.NewEvent._btn_cancel,
-                control.Control._btn_closedatabase,
+                newevent.NewEvent.btn_cancel,
+                control.Control.btn_closedatabase,
             ),
         )
         self.define_tab(
             self._tab_ecfeventcopy,
             text="Copy ECF Event Detail",
             tooltip="Select event and copy details to ECF Event Detail tab.",
+            # pylint W0108 unnecessary-lambda.
+            # self.define_tab implementation provides **k arguments.
             tabclass=lambda **k: ecfeventcopy.ECFEventCopy(**k),
             destroy_actions=(
-                newevent.NewEvent._btn_cancel,
-                control.Control._btn_closedatabase,
+                newevent.NewEvent.btn_cancel,
+                control.Control.btn_closedatabase,
             ),
         )
         self.define_tab(
@@ -123,17 +127,19 @@ class Leagues(leagues_database.Leagues):
             tabclass=lambda **k: ecfplayers.ECFPlayers(
                 gridhorizontal=False, **k
             ),
-            destroy_actions=(control.Control._btn_closedatabase,),
+            destroy_actions=(control.Control.btn_closedatabase,),
         )
         self.define_tab(
             self._tab_importecfdata,
             text="Import ECF Reference Data",
             tooltip="Import data from ECF Master and Update zipped files.",
             underline=-1,
+            # pylint W0108 unnecessary-lambda.
+            # self.define_tab implementation provides **k arguments.
             tabclass=lambda **k: importecfdata.ImportECFData(**k),
             destroy_actions=(
-                importecfdata.ImportECFData._btn_closeecfimport,
-                control.Control._btn_closedatabase,
+                importecfdata.ImportECFData.btn_closeecfimport,
+                control.Control.btn_closedatabase,
             ),
         )
         self.define_tab(
@@ -141,10 +147,12 @@ class Leagues(leagues_database.Leagues):
             text="Feedback",
             tooltip="Import data from ECF feedback text files.",
             underline=-1,
+            # pylint W0108 unnecessary-lambda.
+            # self.define_tab implementation provides **k arguments.
             tabclass=lambda **k: feedback.Feedback(**k),
             destroy_actions=(
-                feedback.Feedback._btn_closefeedback,
-                control.Control._btn_closedatabase,
+                feedback.Feedback.btn_closefeedback,
+                control.Control.btn_closedatabase,
             ),
         )
         self.define_tab(
@@ -152,10 +160,12 @@ class Leagues(leagues_database.Leagues):
             text="Feedback Monthly",
             tooltip="Import data from ECF feedback text files.",
             underline=-1,
+            # pylint W0108 unnecessary-lambda.
+            # self.define_tab implementation provides **k arguments.
             tabclass=lambda **k: feedback_monthly.FeedbackMonthly(**k),
             destroy_actions=(
-                feedback_monthly.FeedbackMonthly._btn_closefeedbackmonthly,
-                control.Control._btn_closedatabase,
+                feedback_monthly.FeedbackMonthly.btn_closefeedbackmonthly,
+                control.Control.btn_closedatabase,
             ),
         )
         self.define_tab(
@@ -163,18 +173,20 @@ class Leagues(leagues_database.Leagues):
             text="Active Clubs Download",
             tooltip="Import data from ECF feedback text files.",
             underline=-1,
+            # pylint W0108 unnecessary-lambda.
+            # self.define_tab implementation provides **k arguments.
             tabclass=lambda **k: activeclubs.ActiveClubs(**k),
-            destroy_actions=(activeclubs.ActiveClubs._btn_closeactiveclubs,),
+            destroy_actions=(activeclubs.ActiveClubs.btn_closeactiveclubs,),
         )
         self.define_tab(
             self._tab_playersdownload,
             text="Players Download",
             tooltip="Import data from ECF feedback text files.",
             underline=-1,
+            # pylint W0108 unnecessary-lambda.
+            # self.define_tab implementation provides **k arguments.
             tabclass=lambda **k: ratedplayers.RatedPlayers(**k),
-            destroy_actions=(
-                ratedplayers.RatedPlayers._btn_closeratedplayers,
-            ),
+            destroy_actions=(ratedplayers.RatedPlayers.btn_closeratedplayers,),
         )
 
     def define_tab_states(self):
@@ -192,7 +204,7 @@ class Leagues(leagues_database.Leagues):
                     self._tab_ecfplayers,
                     self._tab_ecfevents,
                 ),
-                self._state_ecfeventdetail: (self._tab_ecfeventdetail,),
+                self._state_ecfeventdetail: (self.tab_ecfeventdetail,),
                 self._state_ecfeventcopy: (self._tab_ecfeventcopy,),
                 self._state_importecfdata: (self._tab_importecfdata,),
                 self._state_importfeedback: (self._tab_importfeedback,),
@@ -215,107 +227,107 @@ class Leagues(leagues_database.Leagues):
             {
                 (
                     self._state_dbopen,
-                    ecfevents.ECFEvents._btn_ecfeventdetail,
-                ): [self._state_ecfeventdetail, self._tab_ecfeventdetail],
-                (self._state_ecfeventdetail, newevent.NewEvent._btn_copy): [
+                    ecfevents.ECFEvents.btn_ecfeventdetail,
+                ): [self._state_ecfeventdetail, self.tab_ecfeventdetail],
+                (self._state_ecfeventdetail, newevent.NewEvent.btn_copy): [
                     self._state_ecfeventcopy,
                     self._tab_ecfeventcopy,
                 ],
-                (self._state_ecfeventdetail, newevent.NewEvent._btn_cancel): [
+                (self._state_ecfeventdetail, newevent.NewEvent.btn_cancel): [
                     self._state_dbopen,
                     self._tab_ecfevents,
                 ],
                 (
                     self._state_dbopen,
-                    control.Control._btn_copyecfmasterplayer,
+                    control.Control.btn_copyecfmasterplayer,
                 ): [self._state_importecfdata, self._tab_importecfdata],
-                (self._state_dbopen, control.Control._btn_copyecfmasterclub): [
+                (self._state_dbopen, control.Control.btn_copyecfmasterclub): [
                     self._state_importecfdata,
                     self._tab_importecfdata,
                 ],
                 (
                     self._state_importecfdata,
-                    importecfdata.ImportECFData._btn_closeecfimport,
+                    importecfdata.ImportECFData.btn_closeecfimport,
                 ): [self._state_dbopen, self._tab_control],
                 (
                     self._state_dbopen,
-                    control.Control._btn_ecfresultsfeedback,
+                    control.Control.btn_ecfresultsfeedback,
                 ): [self._state_importfeedback, self._tab_importfeedback],
                 (
                     self._state_importfeedback,
-                    feedback.Feedback._btn_closefeedback,
+                    feedback.Feedback.btn_closefeedback,
                 ): [self._state_dbopen, self._tab_control],
                 (
                     self._state_dbopen,
-                    control.Control._btn_ecfresultsfeedbackmonthly,
+                    control.Control.btn_ecfresultsfeedbackmonthly,
                 ): [
                     self._state_importfeedbackmonthly,
                     self._tab_importfeedbackmonthly,
                 ],
                 (
                     self._state_dbopen,
-                    ecfevents.ECFEvents._btn_ecf_feedback_monthly,
+                    ecfevents.ECFEvents.btn_ecf_feedback_monthly,
                 ): [
                     self._state_responsefeedbackmonthly,
                     self._tab_importfeedbackmonthly,
                 ],
                 (
                     self._state_importfeedbackmonthly,
-                    feedback_monthly.FeedbackMonthly._btn_closefeedbackmonthly,
+                    feedback_monthly.FeedbackMonthly.btn_closefeedbackmonthly,
                 ): [self._state_dbopen, self._tab_control],
                 (
                     self._state_responsefeedbackmonthly,
-                    feedback_monthly.FeedbackMonthly._btn_closefeedbackmonthly,
+                    feedback_monthly.FeedbackMonthly.btn_closefeedbackmonthly,
                 ): [self._state_dbopen, self._tab_ecfevents],
-                (self._state_dbopen, control.Control._btn_clubsdownload): [
+                (self._state_dbopen, control.Control.btn_clubsdownload): [
                     self._state_clubsdownload,
                     self._tab_clubsdownload,
                 ],
                 (
                     self._state_clubsdownload,
-                    activeclubs.ActiveClubs._btn_closeactiveclubs,
+                    activeclubs.ActiveClubs.btn_closeactiveclubs,
                 ): [self._state_dbopen, self._tab_control],
-                (self._state_dbopen, control.Control._btn_playersdownload): [
+                (self._state_dbopen, control.Control.btn_playersdownload): [
                     self._state_playersdownload,
                     self._tab_playersdownload,
                 ],
                 (
                     self._state_playersdownload,
-                    ratedplayers.RatedPlayers._btn_closeratedplayers,
+                    ratedplayers.RatedPlayers.btn_closeratedplayers,
                 ): [self._state_dbopen, self._tab_control],
                 (
                     self._state_ecfeventdetail,
-                    control.Control._btn_closedatabase,
+                    control.Control.btn_closedatabase,
                 ): [self._state_dbclosed, None],
                 (
                     self._state_importecfdata,
-                    control.Control._btn_closedatabase,
+                    control.Control.btn_closedatabase,
                 ): [self._state_dbclosed, None],
                 (
                     self._state_importfeedback,
-                    control.Control._btn_closedatabase,
+                    control.Control.btn_closedatabase,
                 ): [self._state_dbclosed, None],
                 (
                     self._state_importfeedbackmonthly,
-                    control.Control._btn_closedatabase,
+                    control.Control.btn_closedatabase,
                 ): [self._state_dbclosed, None],
                 (
                     self._state_responsefeedbackmonthly,
-                    control.Control._btn_closedatabase,
+                    control.Control.btn_closedatabase,
                 ): [self._state_dbclosed, None],
                 (
                     self._state_ecfeventcopy,
-                    ecfeventcopy.ECFEventCopy._btn_ecfeventcopy,
+                    ecfeventcopy.ECFEventCopy.btn_ecfeventcopy,
                 ): [
                     self._state_ecfeventdetail,
-                    self._tab_ecfeventdetail,
+                    self.tab_ecfeventdetail,
                 ],
                 (
                     self._state_ecfeventcopy,
-                    ecfeventcopy.ECFEventCopy._btn_ecfeventback,
+                    ecfeventcopy.ECFEventCopy.btn_ecfeventback,
                 ): [
                     self._state_ecfeventdetail,
-                    self._tab_ecfeventdetail,
+                    self.tab_ecfeventdetail,
                 ],
             }
         )
@@ -327,9 +339,13 @@ class Leagues(leagues_database.Leagues):
 
     def set_ecfdataimport_module(self, enginename):
         """Import the ECF reference data import module."""
-        self._ecfdataimport_module = importlib.import_module(
+        self.__ecfdataimport_module = importlib.import_module(
             ECF_DATA_IMPORT_MODULE[enginename], "chessreports.gui"
         )
+
+    def get_ecfdataimport_module(self):
+        """Return the ECF reference data import module."""
+        return self.__ecfdataimport_module
 
     def results_control(self, **kargs):
         """Return control.Control class instance."""
@@ -354,26 +370,26 @@ class Leagues(leagues_database.Leagues):
 
         if not os.path.exists(default):
             urls = "\n".join([" ".join(u) for u in constants.DEFAULT_URLS])
-            of = open(default, "w")
-            try:
-                of.write(urls)
-                of.write("\n")
-            except Exception as exc:
-                tkinter.messagebox.showinfo(
-                    parent=self.get_widget(),
-                    message="".join(
-                        (
-                            "Unable to write URL defaults to ",
-                            default,
-                        )
-                    ),
-                    title="Open Database",
-                )
-                return
-            finally:
-                of.close()
+            with open(default, "w", encoding="utf8") as outf:
+                try:
+                    outf.write(urls)
+                    outf.write("\n")
+                except Exception as exc:
+                    tkinter.messagebox.showinfo(
+                        parent=self.get_widget(),
+                        message="".join(
+                            (
+                                "Unable to write URL defaults to ",
+                                default,
+                                "\n\nReported error is ",
+                                str(exc),
+                            )
+                        ),
+                        title="Open Database",
+                    )
+                    return
 
-    def _add_ecf_url_item(self, menu):
+    def add_ecf_url_item(self, menu):
         """Override to provide edit ECF URL defaults."""
         menu.insert_separator(tkinter.END)
         menu.insert_command(

@@ -8,7 +8,6 @@ import tkinter
 import tkinter.messagebox
 import json
 import urllib.request
-import os
 
 from solentware_bind.gui.exceptionhandler import ExceptionHandler, FOCUS_ERROR
 
@@ -34,11 +33,14 @@ class ECFDetailDialog(ExceptionHandler):
 
     """
 
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
     def __init__(
-        self, parent, title, header, items, edititems, cnf=dict(), **kargs
+        self, parent, title, header, items, edititems, cnf={}, **kargs
     ):
         """Create dialogue to display locally entered ECF detail for player."""
-        super(ECFDetailDialog, self).__init__()
+        del cnf, kargs
+        super().__init__()
         self.edit_ctrl = []
         self.yes = False
         self.dialog = tkinter.Toplevel(master=parent)
@@ -123,6 +125,7 @@ class ECFDetailDialog(ExceptionHandler):
 
     def on_cancel(self, event=None):
         """Show dialogue to confirm cancellation of edit."""
+        del event
         if tkinter.messagebox.askyesno(
             parent=self.dialog,
             message="Confirm cancellation of edit",
@@ -136,6 +139,7 @@ class ECFDetailDialog(ExceptionHandler):
         Subclass must override this method.
 
         """
+        del event
         if tkinter.messagebox.askyesno(
             parent=self.dialog,
             message="Confirm application of edit",
@@ -173,7 +177,9 @@ class ECFClubDialog(ECFDetailDialog):
 
     """
 
-    def __init__(self, parent, record, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent, record, cnf={}, **kargs):
         """Extend, allow update of ECF formatted player name."""
         self.record = record
         if record.value.clubecfname is None:
@@ -203,7 +209,7 @@ class ECFClubDialog(ECFDetailDialog):
             ("Edit ECF Club Code", ecfcode),
         )
 
-        super(ECFClubDialog, self).__init__(
+        super().__init__(
             parent,
             "ECF club detail Edit",
             "Edit ECF club detail for Player",
@@ -224,7 +230,8 @@ class ECFClubDialog(ECFDetailDialog):
                     message="".join(
                         (
                             "Neither club name nor club code specified.\n\n",
-                            "Confirm ECF club details for player to be deleted.",
+                            "Confirm ECF club details for player to be ",
+                            "deleted.",
                         )
                     ),
                     title="ECF club detail Edit",
@@ -288,8 +295,8 @@ class ECFClubDialog(ECFDetailDialog):
                         clubcode,
                         ") already exists on ECF club file for:\n",
                         ecfclub.value.ECFname,
-                        '\n\nUse "Affiliate" to select this club or change the ',
-                        "club code entered.",
+                        '\n\nUse "Affiliate" to select this club or ',
+                        "change the club code entered.",
                     )
                 ),
                 title="ECF club detail Edit",
@@ -326,7 +333,9 @@ class ECFClubDialog(ECFDetailDialog):
 class ECFNameDialog(ECFDetailDialog):
     """Dialogue to amend locally entered ECF formatted name for player."""
 
-    def __init__(self, parent, record, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent, record, cnf={}, **kargs):
         """Extend, allow update of ECF formatted player name."""
         self.record = record
         if record.value.playerecfname is None:
@@ -353,7 +362,7 @@ class ECFNameDialog(ECFDetailDialog):
             record.database.end_read_only_transaction()
         edititems = (("Edit ECF Name", ecfname),)
 
-        super(ECFNameDialog, self).__init__(
+        super().__init__(
             parent,
             "ECF detail Edit",
             "Edit ECF name for New Player",
@@ -376,7 +385,9 @@ class ECFNameDialog(ECFDetailDialog):
             if self.record.value.playerecfname:
                 if tkinter.messagebox.askyesno(
                     parent=self.dialog,
-                    message="Confirm ECF version of new player name to be deleted",
+                    message=(
+                        "Confirm ECF version of new player name to be deleted"
+                    ),
                     title="ECF detail Edit",
                 ):
                     newrecord = self.record.clone()
@@ -392,7 +403,7 @@ class ECFNameDialog(ECFDetailDialog):
                     self.set_yes()
                     self.dialog.destroy()
             else:
-                dlg = tkinter.messagebox.showinfo(
+                tkinter.messagebox.showinfo(
                     parent=self.dialog,
                     message="No name specified",
                     title="ECF detail Edit",
@@ -406,13 +417,12 @@ class ECFNameDialog(ECFDetailDialog):
             def charcase(t):
                 if len(t) == 1:
                     return t.upper()
-                else:
-                    return t
+                return t
 
             tokens = [charcase(t) for t in tokens]
         ecfname = " ".join(tokens)
         if len(ecfname) > 60:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 message=" ".join(
                     (ecfname, "is too long for ECF version of name (max 60)")
@@ -447,7 +457,9 @@ class ECFNameDialog(ECFDetailDialog):
 class ECFGradingCodeDialog(ECFDetailDialog):
     """Dialogue to amend locally entered ECF grading code for player."""
 
-    def __init__(self, parent, record, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent, record, cnf={}, **kargs):
         """Extend, allow update of ECF grading code for player."""
         self.record = record
         if record.value.playerecfname is None:
@@ -474,7 +486,7 @@ class ECFGradingCodeDialog(ECFDetailDialog):
             record.database.end_read_only_transaction()
         edititems = (("Edit Grading Code", ecfcode),)
 
-        super(ECFGradingCodeDialog, self).__init__(
+        super().__init__(
             parent,
             "ECF detail Edit",
             "Edit Grading Code for New Player",
@@ -492,7 +504,9 @@ class ECFGradingCodeDialog(ECFDetailDialog):
             if self.record.value.playerecfcode:
                 if tkinter.messagebox.askyesno(
                     parent=self.dialog,
-                    message="Confirm Grading Code for new player to be deleted",
+                    message=(
+                        "Confirm Grading Code for new player to be deleted"
+                    ),
                     title="ECF detail Edit",
                 ):
                     newrecord = self.record.clone()
@@ -510,7 +524,7 @@ class ECFGradingCodeDialog(ECFDetailDialog):
                 return
 
         if len(ecfcode) != 7:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 message=" ".join(
                     (
@@ -525,7 +539,7 @@ class ECFGradingCodeDialog(ECFDetailDialog):
         checkdigit = 0
         for i in range(6):
             if not tokens[i].isdigit():
-                dlg = tkinter.messagebox.showinfo(
+                tkinter.messagebox.showinfo(
                     parent=self.dialog,
                     message=" ".join(
                         (
@@ -539,7 +553,7 @@ class ECFGradingCodeDialog(ECFDetailDialog):
                 return
             checkdigit += int(tokens[5 - i]) * (i + 2)
         if tokens[-1] != "ABCDEFGHJKL"[checkdigit % 11]:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 message=" ".join(
                     (
@@ -573,7 +587,7 @@ class ECFGradingCodeDialog(ECFDetailDialog):
                 #    self.record.database, ecfcode
                 # )
                 if mapperson is not None:
-                    dlg = tkinter.messagebox.showinfo(
+                    tkinter.messagebox.showinfo(
                         parent=self.dialog,
                         message=" ".join(
                             (
@@ -589,8 +603,9 @@ class ECFGradingCodeDialog(ECFDetailDialog):
                                     )
                                 ),
                                 "If the Grading Code is correct for the new",
-                                "player then the existing player on the master",
-                                "list should not have this grading code or these",
+                                "player then the existing player on the",
+                                "master list should not have this grading",
+                                "code or these",
                                 "should be the same person.",
                             )
                         ),
@@ -603,7 +618,8 @@ class ECFGradingCodeDialog(ECFDetailDialog):
                             (
                                 "Confirm Grading Code of new player is",
                                 "".join((ecfcode, ".\n\n")),
-                                "This grading code is on an old master list for",
+                                "This grading code is on an old master",
+                                "list for",
                                 "".join((ecfplayer.value.ECFname, ".")),
                             )
                         ),
@@ -624,7 +640,7 @@ class ECFGradingCodeDialog(ECFDetailDialog):
                         self.set_yes()
                         self.dialog.destroy()
                 return
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 message=" ".join(
                     (
@@ -632,9 +648,10 @@ class ECFGradingCodeDialog(ECFDetailDialog):
                         "is already on the master list as the ECF Grading",
                         "Code for",
                         "".join((ecfplayer.value.ECFname, ".")),
-                        "If the Grading Code is correct for the new player then",
-                        "the existing player on the master list should not have",
-                        "this grading code or these should be the same person.",
+                        "If the Grading Code is correct for the new player",
+                        "then the existing player on the master list should",
+                        "not have this grading code or these should be the",
+                        "same person.",
                     )
                 ),
                 title="ECF detail Edit",
@@ -646,7 +663,7 @@ class ECFGradingCodeDialog(ECFDetailDialog):
         # )
         if mapperson is not None:
             if self.record.value.playername != mapperson.value.playername:
-                dlg = tkinter.messagebox.showinfo(
+                tkinter.messagebox.showinfo(
                     parent=self.dialog,
                     message=" ".join(
                         (
@@ -661,8 +678,8 @@ class ECFGradingCodeDialog(ECFDetailDialog):
                             ),
                             "If the Grading Code is correct for",
                             self.record.value.playerecfname,
-                            "then the other person should not have this grading",
-                            "code or these should be the same person.",
+                            "then the other person should not have this",
+                            "grading code or these should be the same person.",
                         )
                     ),
                     title="ECF detail Edit",
@@ -696,16 +713,19 @@ class ECFGradingCodeDialog(ECFDetailDialog):
 class ECFDownloadGradingCodeDialog(ECFDetailDialog):
     """Dialogue to download ECF grading code for player."""
 
-    def __init__(self, parent, database, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent, database, cnf={}, **kargs):
         """Extend, allow download of ECF grading code."""
         self.database = database
         items = ()
+        conf = configuration
         edititems = (
             ("Download ECF Grading Code", ""),
             (
                 "URL",
                 get_configuration_item(
-                    configuration.Configuration().get_configuration_file_name(),
+                    conf.Configuration().get_configuration_file_name(),
                     constants.PLAYER_INFO_URL,
                     constants.DEFAULT_URLS,
                 ),
@@ -730,13 +750,14 @@ class ECFDownloadGradingCodeDialog(ECFDetailDialog):
         ecfcode = "".join(self.edit_ctrl[0].get().strip().split())
         urlname = self.edit_ctrl[1].get().strip()
         if len(ecfcode) != 7:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 message="".join(
                     (
                         "'",
                         ecfcode,
-                        "' is not 7 characters so cannot be an ECF Grading Code",
+                        "' is not 7 characters so cannot be an ",
+                        "ECF Grading Code",
                     )
                 ),
                 title="ECF Grading Code Download",
@@ -746,7 +767,7 @@ class ECFDownloadGradingCodeDialog(ECFDetailDialog):
         checkdigit = 0
         for i in range(6):
             if not tokens[i].isdigit():
-                dlg = tkinter.messagebox.showinfo(
+                tkinter.messagebox.showinfo(
                     parent=self.dialog,
                     message=" ".join(
                         (
@@ -760,7 +781,7 @@ class ECFDownloadGradingCodeDialog(ECFDetailDialog):
                 return
             checkdigit += int(tokens[5 - i]) * (i + 2)
         if tokens[-1] != "ABCDEFGHJKL"[checkdigit % 11]:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 message=" ".join(
                     (
@@ -784,13 +805,13 @@ class ECFDownloadGradingCodeDialog(ECFDetailDialog):
         finally:
             self.database.end_read_only_transaction()
         if ecfplayer is not None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 message="".join(
                     (
                         ecfcode,
-                        "\n\nis already on the master list as the ECF Grading ",
-                        "Code for\n\n",
+                        "\n\nis already on the master list as the ",
+                        "ECF Grading Code for\n\n",
                         "".join((ecfplayer.value.ECFname, ".")),
                     )
                 ),
@@ -798,7 +819,7 @@ class ECFDownloadGradingCodeDialog(ECFDetailDialog):
             )
             return
         if mapplayer is not None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 message="".join(
                     (
@@ -811,32 +832,38 @@ class ECFDownloadGradingCodeDialog(ECFDetailDialog):
                                 "\n\n(a new player).  ",
                             )
                         ),
-                        "Delete the grading code from the new player, download ",
-                        "the grading code, and link it to the player.",
+                        "Delete the grading code from the new player, ",
+                        "download the grading code, and link it to the ",
+                        "player.",
                     )
                 ),
                 title="ECF Grading Code Download",
             )
             return
         try:
-            url = urllib.request.urlopen("".join((urlname, ecfcode[:6])))
+            with urllib.request.urlopen(
+                "".join((urlname, ecfcode[:6]))
+            ) as url:
+                try:
+                    urldata = url.read()
+                except Exception as exc:
+                    tkinter.messagebox.showinfo(
+                        parent=self.dialog,
+                        title="ECF Grading Code Download",
+                        message="".join(
+                            (
+                                "Exception raised trying to read URL\n\n",
+                                str(exc),
+                            )
+                        ),
+                    )
+                    return
         except Exception as exc:
             tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 title="ECF Grading Code Download",
                 message="".join(
                     ("Exception raised trying to open URL\n\n", str(exc))
-                ),
-            )
-            return
-        try:
-            urldata = url.read()
-        except Exception as exc:
-            tkinter.messagebox.showinfo(
-                parent=self.dialog,
-                title="ECF Grading Code Download",
-                message="".join(
-                    ("Exception raised trying to read URL\n\n", str(exc))
                 ),
             )
             return
@@ -865,16 +892,19 @@ class ECFDownloadGradingCodeDialog(ECFDetailDialog):
 class ECFDownloadPlayerNameDialog(ECFDetailDialog):
     """Dialogue to download ECF name for player."""
 
-    def __init__(self, parent, database, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent, database, cnf={}, **kargs):
         """Extend, allow download of ECF name for existing ECF code."""
         self.database = database
         items = ()
+        conf = configuration
         edititems = (
             ("Download ECF name for ECF code", ""),
             (
                 "URL",
                 get_configuration_item(
-                    configuration.Configuration().get_configuration_file_name(),
+                    conf.Configuration().get_configuration_file_name(),
                     constants.PLAYER_INFO_URL,
                     constants.DEFAULT_URLS,
                 ),
@@ -899,13 +929,14 @@ class ECFDownloadPlayerNameDialog(ECFDetailDialog):
         ecfcode = "".join(self.edit_ctrl[0].get().strip().split())
         urlname = self.edit_ctrl[1].get().strip()
         if len(ecfcode) != 7:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 message="".join(
                     (
                         "'",
                         ecfcode,
-                        "' is not 7 characters so cannot be an ECF Grading Code",
+                        "' is not 7 characters so cannot be an ",
+                        "ECF Grading Code",
                     )
                 ),
                 title="ECF Player Name Download",
@@ -915,7 +946,7 @@ class ECFDownloadPlayerNameDialog(ECFDetailDialog):
         checkdigit = 0
         for i in range(6):
             if not tokens[i].isdigit():
-                dlg = tkinter.messagebox.showinfo(
+                tkinter.messagebox.showinfo(
                     parent=self.dialog,
                     message=" ".join(
                         (
@@ -929,7 +960,7 @@ class ECFDownloadPlayerNameDialog(ECFDetailDialog):
                 return
             checkdigit += int(tokens[5 - i]) * (i + 2)
         if tokens[-1] != "ABCDEFGHJKL"[checkdigit % 11]:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 message=" ".join(
                     (
@@ -953,7 +984,7 @@ class ECFDownloadPlayerNameDialog(ECFDetailDialog):
         finally:
             self.database.end_read_only_transaction()
         if ecfplayer is None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 message="".join(
                     (
@@ -966,7 +997,7 @@ class ECFDownloadPlayerNameDialog(ECFDetailDialog):
             )
             return
         if mapplayer is not None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 message="".join(
                     (
@@ -979,32 +1010,38 @@ class ECFDownloadPlayerNameDialog(ECFDetailDialog):
                                 "\n\n(a new player).  ",
                             )
                         ),
-                        "Delete the grading code from the new player, download ",
-                        "the grading code, and link it to the player.",
+                        "Delete the grading code from the new player, ",
+                        "download the grading code, and link it to the ",
+                        "player.",
                     )
                 ),
                 title="ECF Player Name Download",
             )
             return
         try:
-            url = urllib.request.urlopen("".join((urlname, ecfcode[:6])))
+            with urllib.request.urlopen(
+                "".join((urlname, ecfcode[:6]))
+            ) as url:
+                try:
+                    urldata = url.read()
+                except Exception as exc:
+                    tkinter.messagebox.showinfo(
+                        parent=self.dialog,
+                        title="ECF Player Name Download",
+                        message="".join(
+                            (
+                                "Exception raised trying to read URL\n\n",
+                                str(exc),
+                            )
+                        ),
+                    )
+                    return
         except Exception as exc:
             tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 title="ECF Player Name Download",
                 message="".join(
                     ("Exception raised trying to open URL\n\n", str(exc))
-                ),
-            )
-            return
-        try:
-            urldata = url.read()
-        except Exception as exc:
-            tkinter.messagebox.showinfo(
-                parent=self.dialog,
-                title="ECF Player Name Download",
-                message="".join(
-                    ("Exception raised trying to read URL\n\n", str(exc))
                 ),
             )
             return
@@ -1033,16 +1070,19 @@ class ECFDownloadPlayerNameDialog(ECFDetailDialog):
 class ECFDownloadClubCodeDialog(ECFDetailDialog):
     """Dialogue to download ECF club code."""
 
-    def __init__(self, parent, database, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent, database, cnf={}, **kargs):
         """Extend, allow download of ECF club code."""
         self.database = database
         items = ()
+        conf = configuration
         edititems = (
             ("Download ECF Club Code", ""),
             (
                 "URL",
                 get_configuration_item(
-                    configuration.Configuration().get_configuration_file_name(),
+                    conf.Configuration().get_configuration_file_name(),
                     constants.CLUB_INFO_URL,
                     constants.DEFAULT_URLS,
                 ),
@@ -1094,24 +1134,27 @@ class ECFDownloadClubCodeDialog(ECFDetailDialog):
             )
             return
         try:
-            url = urllib.request.urlopen("".join((urlname, clubcode)))
+            with urllib.request.urlopen("".join((urlname, clubcode))) as url:
+                try:
+                    urldata = url.read()
+                except Exception as exc:
+                    tkinter.messagebox.showinfo(
+                        parent=self.dialog,
+                        title="ECF Grading Code Download",
+                        message="".join(
+                            (
+                                "Exception raised trying to read URL\n\n",
+                                str(exc),
+                            )
+                        ),
+                    )
+                    return
         except Exception as exc:
             tkinter.messagebox.showinfo(
                 parent=self.dialog,
                 title="ECF Grading Code Download",
                 message="".join(
                     ("Exception raised trying to open URL\n\n", str(exc))
-                ),
-            )
-            return
-        try:
-            urldata = url.read()
-        except Exception as exc:
-            tkinter.messagebox.showinfo(
-                parent=self.dialog,
-                title="ECF Grading Code Download",
-                message="".join(
-                    ("Exception raised trying to read URL\n\n", str(exc))
                 ),
             )
             return

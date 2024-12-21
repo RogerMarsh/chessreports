@@ -20,11 +20,12 @@ def get_new_player_for_alias_key(database, key):
     """
     r = resultsrecord.get_alias(database, key[-1])
     if r is None:
-        return
-    elif r.value.merge is None:
+        return None
+    if r.value.merge is None:
         return r
-    elif r.value.merge is True:
+    if r.value.merge is True:
         return r
+    return None
 
 
 def get_new_players_for_alias_keys(database, keys):
@@ -46,11 +47,12 @@ def get_person_for_alias_key(database, key):
     while r:
         if r.value.merge is False:
             return r
-        elif r.value.merge is True:
-            return
-        elif r.value.merge is None:
-            return
+        if r.value.merge is True:
+            return None
+        if r.value.merge is None:
+            return None
         r = _get_merge_for_alias_key(database, r.value.merge)
+    return None
 
 
 def get_persons_for_alias_keys(database, keys):
@@ -232,22 +234,22 @@ def _get_merge_for_alias_key(database, key):
     """
     r = resultsrecord.get_alias(database, key)
     if r is None:
-        return
-    elif r.value.merge is None:
+        return None
+    if r.value.merge is None:
         return r
-    elif r.value.merge is True:
+    if r.value.merge is True:
         return r
-    elif r.value.merge is False:
+    if r.value.merge is False:
         return r
     r = resultsrecord.get_alias(database, r.value.merge)
     if r is None:
-        return
+        return None
     return r
 
 
 def _get_records(database, keys, function):
     """Return records on database for keys using function."""
-    records = dict()
+    records = {}
     for k in keys:
         r = function(database, k)
         if r is None:

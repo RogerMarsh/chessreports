@@ -28,12 +28,14 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
     _btn_ecf_name_download = "ecfgradingcodes_ecf_name_download"
     _btn_cancel_edit_ecf_name = "ecfgradingcodes_cancel"
 
-    def __init__(self, parent=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, cnf={}, **kargs):
         """Extend and define the results database ECF grading code panel."""
         self.newpersongrid = None
         self.ecfpersongrid = None
 
-        super(ECFGradingCodes, self).__init__(parent=parent, cnf=cnf, **kargs)
+        super().__init__(parent=parent, cnf=cnf, **kargs)
 
         self.show_panel_buttons(
             (
@@ -47,20 +49,22 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
         )
         self.create_buttons()
 
+        # pylint W0632 unbalanced-tuple-unpacking.
+        # self.make_grids returns a list with same length as argument.
         self.newpersongrid, self.ecfpersongrid = self.make_grids(
             (
-                dict(
-                    grid=ecfplayergrids.NewPersonGrid,
-                    selectlabel="Select New Player:  ",
-                    gridfocuskey="<KeyPress-F7>",
-                    selectfocuskey="<KeyPress-F5>",
-                ),
-                dict(
-                    grid=ecfplayergrids.ECFPersonGrid,
-                    selectlabel="Select Player Reference:  ",
-                    gridfocuskey="<KeyPress-F8>",
-                    selectfocuskey="<KeyPress-F6>",
-                ),
+                {
+                    "grid": ecfplayergrids.NewPersonGrid,
+                    "selectlabel": "Select New Player:  ",
+                    "gridfocuskey": "<KeyPress-F7>",
+                    "selectfocuskey": "<KeyPress-F5>",
+                },
+                {
+                    "grid": ecfplayergrids.ECFPersonGrid,
+                    "selectlabel": "Select Player Reference:  ",
+                    "gridfocuskey": "<KeyPress-F8>",
+                    "selectfocuskey": "<KeyPress-F6>",
+                },
             )
         )
 
@@ -70,10 +74,9 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
         Used, at least, as callback from AppSysFrame container.
 
         """
-        pass
 
     def describe_buttons(self):
-        """Define all action buttons that may appear on ECF grading code page."""
+        """Define action buttons that may appear on ECF grading code page."""
         super().describe_buttons()
         self.define_button(
             self._btn_identify,
@@ -85,7 +88,12 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
         self.define_button(
             self._btn_revert,
             text="Adjust Identity",
-            tooltip="Remove player from Rating Codes tab (to adjust identification).",
+            tooltip="".join(
+                (
+                    "Remove player from Rating Codes tab ",
+                    "(to adjust identification).",
+                )
+            ),
             underline=2,
             command=self.on_revert,
         )
@@ -136,7 +144,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                     "edit is to be cancelled.",
                 )
             )
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(), message=msg, title=msgtitle
             )
             return
@@ -162,7 +170,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
         finally:
             db.end_read_only_transaction()
         if mr is None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -175,15 +183,15 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             )
             return
         if mr.value.playercode is None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
                         name_text,
-                        "\nrecord is not linked to an ECF grading code record ",
-                        "so Cancel Edit is not allowed.\n",
-                        "Use Identify to link the player to an ECF grading code ",
-                        "or Edit Name and Grading code to specify the details ",
+                        "\nrecord is not linked to an ECF grading code ",
+                        "record so Cancel Edit is not allowed.\nUse Identify ",
+                        "to link the player to an ECF grading code or Edit ",
+                        "Name and Grading code to specify the details ",
                         "for a new player.",
                     )
                 ),
@@ -222,7 +230,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
         return
 
     def edit_new_player_ecf_name(self):
-        """Show dialogue to edit ECF form of new player's name and do update."""
+        """Show edit dialogue for ECF form of new player's name."""
         msgtitle = "New Player Name"
         npsel = self.newpersongrid.selection
         if len(npsel) == 0:
@@ -233,7 +241,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                     "submission of results for the new player).",
                 )
             )
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(), message=msg, title=msgtitle
             )
             return
@@ -255,7 +263,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
         finally:
             db.end_read_only_transaction()
         if mr is None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -269,7 +277,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             return
         if mr.value.playerecfcode:
             if mr.value.playercode is None:
-                dlg = tkinter.messagebox.showinfo(
+                tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message="".join(
                         (
@@ -314,7 +322,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                     "of feedback file from ECF).",
                 )
             )
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(), message=msg, title=msgtitle
             )
             return
@@ -338,7 +346,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
         if mr is None:
             pr = ecfmaprecord.ECFmapDBrecordPlayer()
             pr.load_record(self.newpersongrid.objects[npsel[0]])
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -351,7 +359,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             )
             return
         if not mr.value.playerecfname:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -364,7 +372,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             )
             return
         if mr.value.playercode:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -389,8 +397,6 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
 
     def download_new_player_grading_code(self):
         """Show dialogue to download player's ECF code and do update."""
-        msgtitle = "Download Player's Grading Code"
-
         db = self.get_appsys().get_results_database()
 
         dlg = ecfdetail.ECFDownloadGradingCodeDialog(None, db)
@@ -399,8 +405,6 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
 
     def download_ecf_name_for_ecf_code(self):
         """Show dialogue to download player's ECF name and do update."""
-        msgtitle = "Download Player's ECF name"
-
         db = self.get_appsys().get_results_database()
 
         dlg = ecfdetail.ECFDownloadPlayerNameDialog(None, db)
@@ -409,37 +413,44 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
 
     def on_identify(self, event=None):
         """Link a player name with a grading code record."""
+        del event
         self.select_grading_code()
         self.ecfpersongrid.set_select_hint_label()
         return "break"
 
     def on_revert(self, event=None):
         """Break link between player name and grading code record."""
+        del event
         self.return_person_for_identification()
         return "break"
 
     def on_ecf_name(self, event=None):
         """Edit the locally entered player name in ECF name format."""
+        del event
         self.edit_new_player_ecf_name()
         return "break"
 
     def on_cancel_edit_ecf_name(self, event=None):
         """Cancel editing of locally entered player name in ECF name format."""
+        del event
         self.cancel_edit_player_ecf_name()
         return "break"
 
     def on_grading_code(self, event=None):
         """Edit the locally entered ECF code."""
+        del event
         self.edit_new_player_grading_code()
         return "break"
 
     def on_grading_code_download(self, event=None):
         """Download the locally entered ECF code."""
+        del event
         self.download_new_player_grading_code()
         return "break"
 
     def on_ecf_name_download(self, event=None):
         """Download the ECF name for the locally entered ECF code."""
+        del event
         self.download_ecf_name_for_ecf_code()
         return "break"
 
@@ -459,7 +470,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                     "for adjustment of identification.",
                 )
             )
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(), message=msg, title=msgtitle
             )
             return
@@ -481,7 +492,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
         finally:
             db.end_read_only_transaction()
         if mr is None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -494,15 +505,15 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             )
             return
         if mr.value.playercode:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
                         name_text,
                         "\nrecord is linked to an ECF grading code record ",
                         mr.value.playercode,
-                        " so releasing player for adjustment on Player tabs is ",
-                        "not allowed.\n",
+                        " so releasing player for adjustment on Player tabs ",
+                        "is not allowed.\n",
                         "Use ECF Name to edit the name or Cancel Edit ",
                         "to remove player from this grid.",
                     )
@@ -556,7 +567,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                     )
                 )
 
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(), message=msg, title=msgtitle
             )
             return
@@ -596,7 +607,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
         finally:
             db.end_read_only_transaction()
         if cpc is not None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -604,8 +615,8 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                         ecfrec.value.ECFcode,
                         " is already linked to\n",
                         name_text,
-                        ".\nIf the new link is correct you will need either to ",
-                        "return the new player to the New Player tab and ",
+                        ".\nIf the new link is correct you will need either ",
+                        "to return the new player to the New Player tab and ",
                         "merge with the player who has the grading code ",
                         "(correctly) or to break the existing link and ",
                         "assign grading codes for both players.",
@@ -615,7 +626,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             )
             return
         if mr is None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -628,7 +639,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             )
             return
         if mr.value.playercode:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (

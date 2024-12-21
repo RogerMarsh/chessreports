@@ -16,7 +16,7 @@ player identification.
 """
 
 
-class MatchTeams(object):
+class MatchTeams:
     """List of all pairs of non-empty contiguous subsets of words in a string.
 
     The string 'a b c d e f' produces 70 pairs.  Samples are (a, b) (b c, e f)
@@ -42,8 +42,8 @@ class MatchTeams(object):
         if split and string:
             self.string = " ".join(string.split())
             self.sentence = sentence = self.string.split()
-            self.phrases = phrases = dict()
-            self.position = position = dict()
+            self.phrases = phrases = {}
+            self.position = position = {}
             clauses = []
             for i in range(len(sentence)):
                 for j in range(i + 1, len(sentence) + 1):

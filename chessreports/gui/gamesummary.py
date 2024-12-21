@@ -5,7 +5,6 @@
 """Display game summary for selected events."""
 
 import tkinter
-import os
 
 from solentware_bind.gui.exceptionhandler import ExceptionHandler
 
@@ -14,6 +13,7 @@ from solentware_misc.core.utilities import AppSysPersonName
 from chessvalidate.core.gameresults import (
     displayresult as DISPLAYRESULT,
 )
+import chessvalidate.core.constants
 
 from . import reports
 from ..core import resultsrecord
@@ -21,9 +21,9 @@ from ..core import filespec
 from ..core import constants
 
 INVERT_RESULT = {
-    constants.HWIN: constants.AWIN,
-    constants.DRAW: constants.DRAW,
-    constants.AWIN: constants.HWIN,
+    chessvalidate.core.constants.HWIN: chessvalidate.core.constants.AWIN,
+    chessvalidate.core.constants.DRAW: chessvalidate.core.constants.DRAW,
+    chessvalidate.core.constants.AWIN: chessvalidate.core.constants.HWIN,
 }
 
 
@@ -38,7 +38,7 @@ class GameSummary(ExceptionHandler):
 
     def __init__(self, parent, database, event):
         """Create widget to display game summary for event."""
-        super(GameSummary, self).__init__()
+        super().__init__()
         self.event = event
         rv = resultsrecord.get_event_from_record_value(
             database.get_primary_record(filespec.EVENT_FILE_DEF, event[-1])
@@ -99,9 +99,7 @@ class GameSummary(ExceptionHandler):
             "".join(
                 (
                     "\n\n",
-                    str(
-                        len(set([p.key.recno for p in eventplayers.values()]))
-                    ),
+                    str(len(set(p.key.recno for p in eventplayers.values()))),
                     " players with games for grading.",
                 )
             )
@@ -126,9 +124,9 @@ class GameSummary(ExceptionHandler):
                 "".join(
                     (
                         "\n\nSome players are still on the NewPlayers tab ",
-                        "waiting to be merged.  Games are not listed under the ",
-                        "names of these players, but may be listed under the ",
-                        "names of their opponents.\n",
+                        "waiting to be merged.  Games are not listed under ",
+                        "the names of these players, but may be listed under ",
+                        "the names of their opponents.\n",
                     )
                 )
             )

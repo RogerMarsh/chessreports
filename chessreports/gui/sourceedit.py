@@ -6,16 +6,10 @@
 
 import tkinter
 import tkinter.messagebox
-import os
-import csv
+
+from solentware_misc.gui import dialogue
 
 from chessvalidate.gui import sourceedit
-from chessvalidate.core.gameobjects import (
-    get_game_rows_for_csv_format,
-    split_codes_from_name,
-)
-
-from chessvalidate.core.gameresults import resultmapecf
 
 from ..core.resultsrecord import (
     get_events_matching_event_name,
@@ -49,8 +43,8 @@ class SourceEdit(sourceedit.SourceEdit):
             text="Show Original",
             tooltip=" ".join(
                 (
-                    "Display original and edited results data but not generated",
-                    "data.",
+                    "Display original and edited results data but not ",
+                    "generated data.",
                 )
             ),
             underline=5,
@@ -61,8 +55,8 @@ class SourceEdit(sourceedit.SourceEdit):
             text="Hide Original",
             tooltip=" ".join(
                 (
-                    "Display edited source and generated data but not original",
-                    "source.",
+                    "Display edited source and generated data but not ",
+                    "original source.",
                 )
             ),
             underline=5,
@@ -102,6 +96,7 @@ class SourceEdit(sourceedit.SourceEdit):
 
     def on_update(self, event=None):
         """Update database from validated source document."""
+        del event
         if self.update_event_results():
             db = self.get_appsys().get_results_database()
             self.refresh_controls(
@@ -165,8 +160,8 @@ class SourceEdit(sourceedit.SourceEdit):
                 (
                     "".join(
                         (
-                            "This report was generated without a database open ",
-                            "to look up grading codes.",
+                            "This report was generated without a database ",
+                            "open to look up grading codes.",
                         )
                     ),
                     None,
@@ -176,8 +171,8 @@ class SourceEdit(sourceedit.SourceEdit):
                 (
                     "".join(
                         (
-                            "Any reported codes, usually grading codes, follow ",
-                            "the player name.\n",
+                            "Any reported codes, usually grading codes, ",
+                            "follow the player name.\n",
                         )
                     ),
                     None,
@@ -207,7 +202,7 @@ class SourceEdit(sourceedit.SourceEdit):
             evkey = e[1].key.recno
             sd = e[1].value.startdate
             ed = e[1].value.enddate
-            for k, v in get_aliases_for_event(db, e[1]).items():
+            for v in get_aliases_for_event(db, e[1]).values():
                 ns = v.value.name, get_name(db, v.value.section).value.name
                 nsd = sd, ed, evkey, v.key.recno, v.value.merge
                 a.setdefault(ns, []).append(nsd)
@@ -217,8 +212,6 @@ class SourceEdit(sourceedit.SourceEdit):
         populate_aliases(event, aliases)
         for e in events:
             populate_aliases(e, aliases)
-        startdate = event[1].value.startdate
-        enddate = event[1].value.enddate
         genres.append(("Players by club\n", None))
         genres.append(
             (
@@ -246,8 +239,9 @@ class SourceEdit(sourceedit.SourceEdit):
             (
                 "".join(
                     (
-                        "If neither is given please give the player's grading ",
-                        "code or confirm the player\ndoes not have one.",
+                        "If neither is given please give the player's ",
+                        "grading code or confirm the player\ndoes not ",
+                        "have one.",
                     )
                 ),
                 None,
@@ -257,9 +251,10 @@ class SourceEdit(sourceedit.SourceEdit):
             (
                 "".join(
                     (
-                        "The '!', '!!', '?', and '*', prefixes are asking for ",
-                        "confirmation or correction\nof the grading code. ",
-                        "Their absence means only corrections are needed.",
+                        "The '!', '!!', '?', and '*', prefixes are asking ",
+                        "for confirmation or correction\nof the grading ",
+                        "code. Their absence means only corrections are ",
+                        "needed.",
                     )
                 ),
                 None,
@@ -291,8 +286,9 @@ class SourceEdit(sourceedit.SourceEdit):
             (
                 "".join(
                     (
-                        "'*' means it was not possible to decide which of '!', ",
-                        "'!!' is appropriate\n(because of a date error).\n",
+                        "'*' means it was not possible to decide which of ",
+                        "'!', '!!' is appropriate\n(because of a date ",
+                        "error).\n",
                     )
                 ),
                 None,
@@ -302,9 +298,9 @@ class SourceEdit(sourceedit.SourceEdit):
             (
                 "".join(
                     (
-                        "A grading code in brackets immediately following the ",
-                        "name is the code shown\non the ECF Grading Database ",
-                        "rather than the one before the name.\n",
+                        "A grading code in brackets immediately following ",
+                        "the name is the code shown\non the ECF Grading ",
+                        "Database  rather than the one before the name.\n",
                     )
                 ),
                 None,
@@ -363,7 +359,7 @@ class SourceEdit(sourceedit.SourceEdit):
                             players.append(r[4])
                     if len(set(players)) > 1:
                         peopletag = "?"
-                    if len(players):
+                    if players:
                         grading_code = get_grading_code_for_person(
                             db, get_alias(db, players[0])
                         )
@@ -381,8 +377,12 @@ class SourceEdit(sourceedit.SourceEdit):
                             nogcode[person] = len(nogcode) + 1
                         if merge is not None:
                             grading_code = nogcode[person]
+                # pylint C0209 consider-using-f-string.
+                # Not used at Python 3.10 due to Idle colouring.
+                # See github.com/python/cpython/issues/73473.
                 tag = "{:>3}".format(peopletag + recenttag)
                 grading_code = "{:>7}".format(grading_code)
+
                 if merged_grading_code:
                     pnrc = "\t\t\t\t\t".join(
                         (
@@ -433,7 +433,7 @@ class SourceEdit(sourceedit.SourceEdit):
             return False
         db = self.get_appsys().get_results_database()
         if not db:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -468,7 +468,7 @@ class SourceEdit(sourceedit.SourceEdit):
             ).append("\n\n".join(u))
         else:
             db.commit()
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(("Results database updated")),
                 title="Update",

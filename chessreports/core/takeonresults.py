@@ -24,12 +24,12 @@ import collections
 from . import constants as cc
 
 
-class TakeonResults(object):
+class TakeonResults:
     """Class for importing results data."""
 
     def __init__(self, folder):
         """Initialise data structures for results import."""
-        super(TakeonResults, self).__init__()
+        super().__init__()
         self.folder = folder
         self.files = set()
         self.converterror = None
@@ -42,16 +42,16 @@ class TakeonResults(object):
         self.textlines[:] = []
         return False
 
-    def translate_results_format(self, keymap=None, tidyup=None):
+    def _translate_results_format(self, keymap=None, tidyup=None):
         """Extract results into a common format.
 
         Provide rules in context and keymap arguments.
 
         """
         if keymap is None:
-            keymap = dict()
+            keymap = {}
 
-        data = dict()
+        data = {}
         for t in self.get_lines():
             ts = t.split("=", 1)
             key, value = ts[0], ts[-1]
@@ -85,14 +85,13 @@ class TakeonResults(object):
         self.get_folder_contents(self.folder)
         text = []
         for f in sorted(self.files):
-            ofile = open(f, "r")
-            text.extend([t.rstrip() for t in ofile.readlines()])
-            ofile.close()
+            with open(f, "r", encoding="utf8") as ofile:
+                text.extend([t.rstrip() for t in ofile.readlines()])
         return text
 
     def get_lines_for_difference_file(self):
         """Return lines of text formatted for results difference file."""
-        return [t for t in self.textlines]
+        return list(self.textlines)
 
 
 class TakeonSubmissionFile(TakeonResults):
@@ -121,13 +120,11 @@ class TakeonSubmissionFile(TakeonResults):
         table = False
         text = []
 
-        for t in "".join(super(TakeonSubmissionFile, self).get_lines()).split(
-            "#"
-        ):
+        for t in "".join(super().get_lines()).split("#"):
             ts = t.split("=", 1)
             key, value = ts[0], ts[-1]
             if key == cc.TABLE_END:
-                if len(row):
+                if row:
                     text.append(key)
                 table = False
                 columns = []
@@ -153,6 +150,7 @@ class TakeonSubmissionFile(TakeonResults):
         """Translate the imported data into internal format."""
 
         def set_match(data, key, value):
+            del data
             field = "_".join(
                 (
                     cc.TAKEON_MATCH,
@@ -166,9 +164,7 @@ class TakeonSubmissionFile(TakeonResults):
             cc.MATCH_RESULTS: set_match,
         }
 
-        extract = super(TakeonSubmissionFile, self).translate_results_format(
-            keymap=keymap, tidyup=None
-        )
+        extract = super()._translate_results_format(keymap=keymap, tidyup=None)
 
         if not extract:
             return False
@@ -230,6 +226,7 @@ class TakeonLeagueDumpFile(TakeonResults):
             data[key] = value
 
         def set_match(data, key, value):
+            del value
             tidyup(data)
             self.textlines.append(key)
 
@@ -264,16 +261,16 @@ class TakeonLeagueDumpFile(TakeonResults):
             data.clear()
 
         keymap = {
-            cc.player: set_match,
-            cc.game: set_match,
-            cc.team: set_match,
-            cc.event: set_match,
-            cc.match: set_match,
+            cc.LPLAYER: set_match,
+            cc.LGAME: set_match,
+            cc.LTEAM: set_match,
+            cc.LEVENT: set_match,
+            cc.LMATCH: set_match,
             cc.MNAME: get_match,
             cc.MTYPE: get_match,
         }
 
-        extract = super(TakeonLeagueDumpFile, self).translate_results_format(
+        extract = super()._translate_results_format(
             keymap=keymap, tidyup=tidyup
         )
 

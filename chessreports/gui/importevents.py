@@ -21,7 +21,7 @@ from ..core import importcollation
 class ImportEvents(logpanel.TextAndLogPanel):
     """The panel for importing events from another Results database."""
 
-    _btn_closeimport = "importevents_close"
+    btn_closeimport = "importevents_close"
     _btn_startimport = "importevents_start"
     _btn_previewimport = "importevents_preview"
     _btn_renameimporteventsreport = "importevents_rename"
@@ -35,10 +35,13 @@ class ImportEvents(logpanel.TextAndLogPanel):
         starttaskmsg=None,
         tabtitle=None,
         copymethod=None,
-        cnf=dict(),
+        # pylint W0102 dangerous-default-value.
+        # cnf used as tkinter.Frame argument, which defaults to {}.
+        cnf={},
         **kargs
     ):
         """Extend and define the results database import event tab."""
+        del starttaskmsg, tabtitle
         # See comment in function _do_ecf_reference_data_import of relative
         # module ..core.ecfdataimport for explanation of this change.
         # Binding the instance attribute is not delegated to the superclass,
@@ -47,58 +50,58 @@ class ImportEvents(logpanel.TextAndLogPanel):
         # self.datafilename, importtext = datafile
         self.datafilename, self.importtext = datafile
 
-        super(ImportEvents, self).__init__(
+        super().__init__(
             parent=parent,
             taskheader=self.datafilename,
             # taskdata=importtext,
             taskdata=self.importtext,  # See preceding comment.
             taskbuttons={
-                self._btn_closeimport: dict(
-                    text="Cancel Import",
-                    tooltip="Cancel the Events import.",
-                    underline=0,
-                    switchpanel=True,
-                    command=self.on_cancel_import_events,
-                ),
-                self._btn_startimport: dict(
-                    text="Start Import",
-                    tooltip="Start the Events import.",
-                    underline=6,
-                    command=self.on_start_import_events,
-                ),
-                self._btn_previewimport: dict(
-                    text="Preview Import",
-                    tooltip="Show what the import will do and needs.",
-                    underline=0,
-                    command=self.on_preview_import_events,
-                ),
-                self._btn_renameimporteventsreport: dict(
-                    text="Rename Import Report",
-                    tooltip="".join(
+                self.btn_closeimport: {
+                    "text": "Cancel Import",
+                    "tooltip": "Cancel the Events import.",
+                    "underline": 0,
+                    "switchpanel": True,
+                    "command": self.on_cancel_import_events,
+                },
+                self._btn_startimport: {
+                    "text": "Start Import",
+                    "tooltip": "Start the Events import.",
+                    "underline": 6,
+                    "command": self.on_start_import_events,
+                },
+                self._btn_previewimport: {
+                    "text": "Preview Import",
+                    "tooltip": "Show what the import will do and needs.",
+                    "underline": 0,
+                    "command": self.on_preview_import_events,
+                },
+                self._btn_renameimporteventsreport: {
+                    "text": "Rename Import Report",
+                    "tooltip": "".join(
                         (
-                            "The report is used in the Identify application to ",
-                            "resolve player identities",
+                            "The report is used in the Identify application ",
+                            "to resolve player identities",
                         )
                     ),
-                    underline=2,
-                    command=self.on_rename_import_event_report,
-                ),
-                self._btn_pickreportforvalidation: dict(
-                    text="Pick Validation Report",
-                    tooltip="Validate against original Import.",
-                    underline=5,
-                    command=self.on_pick_report_for_validation,
-                ),
+                    "underline": 2,
+                    "command": self.on_rename_import_event_report,
+                },
+                self._btn_pickreportforvalidation: {
+                    "text": "Pick Validation Report",
+                    "tooltip": "Validate against original Import.",
+                    "underline": 5,
+                    "command": self.on_pick_report_for_validation,
+                },
             },
             starttaskbuttons=(
-                self._btn_closeimport,
+                self.btn_closeimport,
                 self._btn_previewimport,
                 self._btn_pickreportforvalidation,
                 self._btn_renameimporteventsreport,
                 self._btn_startimport,
             ),
             runmethod=False,
-            runmethodargs=dict(),
+            runmethodargs={},
             cnf=cnf,
             **kargs
         )
@@ -128,20 +131,24 @@ class ImportEvents(logpanel.TextAndLogPanel):
 
         Re-open the files that were closed on creating this widget.
         """
+        del event
         self.get_appsys().get_results_database().allocate_and_open_contexts(
             files=self._closecontexts
         )
 
     def on_start_import_events(self, event=None):
         """Run import_event in separate thread."""
+        del event
         self.tasklog.run_method(method=self.import_events)
 
     def on_preview_import_events(self, event=None):
         """Run list_events_in_import_file in separate thread."""
+        del event
         self.tasklog.run_method(method=self.list_events_in_import_file)
 
     def on_rename_import_event_report(self, event=None):
         """Run save_import_event_report in separate thread."""
+        del event
         dlg = tkinter.filedialog.asksaveasfilename(
             parent=self.get_widget(),
             title="Import Report Name",
@@ -170,7 +177,8 @@ class ImportEvents(logpanel.TextAndLogPanel):
                         (
                             "The next import report will be saved in file\n\n",
                             self._importevent_report,
-                            "\n\nrather than one named from the (system) time.",
+                            "\n\nrather than one named from the (system) ",
+                            "time.",
                         )
                     ),
                     title="Import Report Name",
@@ -201,6 +209,7 @@ class ImportEvents(logpanel.TextAndLogPanel):
 
     def on_pick_report_for_validation(self, event=None):
         """Specify the import report to be used for validation."""
+        del event
         title = "Validate against Report for previous Import"
         dlg = tkinter.filedialog.askopenfilename(
             parent=self.get_widget(),
@@ -248,6 +257,7 @@ class ImportEvents(logpanel.TextAndLogPanel):
 
     def get_event_data_to_be_imported(self, logwidget=None):
         """Import data from file in results export format."""
+        del logwidget
         tasklog = self.tasklog
 
         # See comment in function _do_ecf_reference_data_import of relative
@@ -264,22 +274,21 @@ class ImportEvents(logpanel.TextAndLogPanel):
             tasklog.append_text("Unable to extract events from import file.")
             tasklog.append_text_only("")
             return False
+        ien = importdata.get_event_names()
+        if len(ien) == 0:
+            if tasklog:
+                tasklog.append_text("No events in input file.")
+                tasklog.append_text_only("")
+                return False
+        elif len(ien) == 1:
+            tasklog.append_text("Event to be imported:")
         else:
-            ien = importdata.get_event_names()
-            if len(ien) == 0:
-                if tasklog:
-                    tasklog.append_text("No events in input file.")
-                    tasklog.append_text_only("")
-                    return False
-            elif len(ien) == 1:
-                tasklog.append_text("Event to be imported:")
-            else:
-                tasklog.append_text("Events to be imported:")
-            for en in ien:
-                tasklog.append_text_only("  ".join((en[1], en[2], en[0])))
-            tasklog.append_text_only("")
-            self._importdata = importdata
-            return True
+            tasklog.append_text("Events to be imported:")
+        for en in ien:
+            tasklog.append_text_only("  ".join((en[1], en[2], en[0])))
+        tasklog.append_text_only("")
+        self._importdata = importdata
+        return True
 
     def import_events(self, logwidget=None):
         """Import data from file in results export format."""
@@ -308,42 +317,44 @@ class ImportEvents(logpanel.TextAndLogPanel):
                 # input contains new players that have not been matched
                 # with known players or not declared new.
                 # remoteplayer is empty for the initial submission
-                message = " ".join(
+                message = "".join(
                     (
                         "Some exported players are not identified on the ",
-                        "importing database.  Use the Identify application to ",
-                        "decide the missing identifications.\n\nThe owner of ",
-                        "the exporting database is probably able to do this ",
-                        "best.",
+                        "importing database.  Use the Identify application ",
+                        "to decide the missing identifications.\n\nThe owner ",
+                        "of the exporting database is probably able to do ",
+                        "this best.",
                     )
                 )
                 tasklog.append_text(
                     "".join(
                         (
-                            "Import Events abandoned.  Identification decisions ",
-                            "are missing for some unmatched players.",
+                            "Import Events abandoned.  Identification ",
+                            "decisions are missing for some unmatched ",
+                            "players.",
                         )
                     )
                 )
                 tasklog.append_text_only("")
                 tasklog.append_text_only(message)
-                return
+                return None
             if not self._validation_report:
                 tasklog.append_text("Validation Report file not set.")
                 tasklog.append_text_only("")
                 tasklog.append_text_only(
                     "".join(
                         (
-                            "The import file contains identification decisions for ",
-                            "all players in the events being imported.  Before ",
-                            "importing the events, this import file must be ",
-                            "validated against the report file produced for the ",
-                            "original import file.",
+                            "The import file contains identification ",
+                            "decisions for all players in the events being ",
+                            "imported.  Before importing the events, this ",
+                            "import file must be validated against the ",
+                            "report file produced for the original ",
+                            "import file.",
                         )
                     )
                 )
                 tasklog.append_text_only("")
-                return
+                return None
 
             # if import file is response to request for player identifications
             # there should be request file consistent with import file being
@@ -377,8 +388,8 @@ class ImportEvents(logpanel.TextAndLogPanel):
                 tasklog.append_text_only(
                     "".join(
                         (
-                            "Must not validate import file against a file which ",
-                            "contains the data.",
+                            "Must not validate import file against a file ",
+                            "which contains the data.",
                         )
                     )
                 )
@@ -398,9 +409,10 @@ class ImportEvents(logpanel.TextAndLogPanel):
                 tasklog.append_text_only(
                     "".join(
                         (
-                            "Cannot proceed with import becuse the import file is ",
-                            "not consistent with the selected report file.  Perhaps ",
-                            "the wrong report file was selected.",
+                            "Cannot proceed with import becuse the import ",
+                            "file is not consistent with the selected report ",
+                            "file.  Perhaps the wrong report file was ",
+                            "selected.",
                         )
                     )
                 )
@@ -411,12 +423,13 @@ class ImportEvents(logpanel.TextAndLogPanel):
             self.get_appsys().get_results_database().do_database_task(
                 self.validate_and_do_updates,
                 tasklog,
-                dict(importdata=importdata),
+                {"importdata": importdata},
             )
         else:
             self.get_appsys().get_results_database().do_database_task(
                 self.do_updates, tasklog
             )
+        return None
 
     def list_events_in_import_file(self, logwidget=None):
         """List events found in file in results export format."""
@@ -447,41 +460,43 @@ class ImportEvents(logpanel.TextAndLogPanel):
                 # remoteplayer is empty for the initial submission
                 message = " ".join(
                     (
-                        "Some exported players are not identified on the ",
-                        "importing database.  Use the Identify application to ",
-                        "decide the missing identifications.\n\nThe owner of ",
-                        "the exporting database is probably able to do this ",
-                        "best.",
+                        "Some exported players are not identified on the",
+                        "importing database.  Use the Identify application",
+                        "to decide the missing identifications.\n\nThe owner",
+                        "of the exporting database is probably able to do",
+                        "this best.",
                     )
                 )
                 tasklog.append_text(
                     "".join(
                         (
-                            "List Events abandoned.  Identification decisions ",
-                            "are missing for some unmatched players.",
+                            "List Events abandoned.  Identification ",
+                            "decisions are missing for some unmatched ",
+                            "players.",
                         )
                     )
                 )
                 tasklog.append_text_only("")
                 tasklog.append_text_only(message)
-                return
+                return None
             tasklog.append_text(
                 "".join(
                     (
-                        "The import file contains identification decisions for ",
-                        "all players in the events being imported.  Before ",
-                        "importing the events, this import file must be ",
-                        "validated against the report file produced for the ",
-                        "original import file.",
+                        "The import file contains identification decisions ",
+                        "for all players in the events being imported.  ",
+                        "Before importing the events, this import file must ",
+                        "be validated against the report file produced for ",
+                        "the original import file.",
                     )
                 )
             )
             tasklog.append_text_only("")
-            return
+            return None
 
         self.get_appsys().get_results_database().do_database_task(
             self.list_events, tasklog
         )
+        return None
 
     def list_events(self, database, tasklog):
         """List the events in the file if the import file is ok."""
@@ -501,19 +516,19 @@ class ImportEvents(logpanel.TextAndLogPanel):
             tasklog.append_text(
                 "".join(
                     (
-                        "Check that player identifications are consistent between ",
-                        "import file and database.",
+                        "Check that player identifications are consistent ",
+                        "between import file and database.",
                     )
                 )
             )
             inconsistent = collatedb.is_player_identification_inconsistent()
-            if len(inconsistent):
+            if inconsistent:
                 tasklog.append_text(
                     "".join(
                         (
-                            "The import would not be attempted because player ",
-                            "identifications on import are not consistent with ",
-                            "player records on database.",
+                            "The import would not be attempted because ",
+                            "player identifications on import are not ",
+                            "consistent with player records on database.",
                         )
                     )
                 )
@@ -550,8 +565,8 @@ class ImportEvents(logpanel.TextAndLogPanel):
             tasklog.append_text(
                 "".join(
                     (
-                        "Check that player identifications are consistent between ",
-                        "import file and database.",
+                        "Check that player identifications are consistent ",
+                        "between import file and database.",
                     )
                 )
             )
@@ -562,13 +577,13 @@ class ImportEvents(logpanel.TextAndLogPanel):
                 )
             finally:
                 database.end_read_only_transaction()
-            if len(inconsistent):
+            if inconsistent:
                 tasklog.append_text(
                     "".join(
                         (
                             "Cannot proceed with import because player ",
-                            "identifications on import are not consistent with ",
-                            "player records on database.",
+                            "identifications on import are not consistent ",
+                            "with player records on database.",
                         )
                     )
                 )
@@ -632,8 +647,9 @@ class ImportEvents(logpanel.TextAndLogPanel):
             "".join(
                 (
                     "The Import Events Report enables use of the Identify ",
-                    "application to record decisions identifying players on the ",
-                    "exporting database as players on the importing database.",
+                    "application to record decisions identifying players on ",
+                    "the exporting database as players on the importing ",
+                    "database.",
                 )
             )
         )
@@ -653,9 +669,9 @@ class ImportEvents(logpanel.TextAndLogPanel):
                 tasklog.append_text(
                     "".join(
                         (
-                            "Cannot proceed with import because new players are ",
-                            "not consistent with database.  Perhaps validation ",
-                            "done against wrong request.",
+                            "Cannot proceed with import because new players ",
+                            "are not consistent with database.  Perhaps ",
+                            "validation done against wrong request.",
                         )
                     )
                 )

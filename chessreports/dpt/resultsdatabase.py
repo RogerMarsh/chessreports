@@ -5,7 +5,6 @@
 """Results database using DPT database via dptdb.dptapi."""
 
 import os
-import shutil
 
 from solentware_base import dpt_database
 
@@ -48,12 +47,12 @@ class ResultsDatabase(database.Database, dpt_database.Database):
             **kargs,
         )
 
-    def delete_database(self):
-        """Close and delete the open chess results database."""
+    def _delete_database_names(self):
+        """Override and return tuple of filenames to delete."""
         names = [self.sysfolder]
-        for k, v in self.table.items():
-            names.append(v.file)
-        return super().delete_database(names)
+        for value in self.table.values():
+            names.append(value.file)
+        return tuple(names)
 
     def open_database(self, files=None):
         """Return "" if all files are opened normally, or an error message.
@@ -63,7 +62,7 @@ class ResultsDatabase(database.Database, dpt_database.Database):
         The file remains closed if an error message is given.
         """
         super().open_database(files=files)
-        fistat = dict()
+        fistat = {}
         for dbo in self.table.values():
             fistat[dbo] = dbo.get_file_parameters(self.dbenv)["FISTAT"]
         for dbo in self.table.values():

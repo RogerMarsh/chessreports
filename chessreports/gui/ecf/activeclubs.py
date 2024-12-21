@@ -20,13 +20,9 @@ import tkinter.messagebox
 
 from solentware_misc.gui import logpanel
 from solentware_misc.gui import textreadonly
-from solentware_misc.gui import tasklog
 
-from ...core import resultsrecord
 from ...core import filespec
 from ...core import constants
-from ...core.ecf import ecfmaprecord
-from ...core.ecf import ecfrecord
 from ...core.ecf import ecfdataimport
 
 _REFRESH_FILE_FIELD = {
@@ -38,7 +34,7 @@ _REFRESH_FILE_FIELD = {
 class ActiveClubs(logpanel.WidgetAndLogPanel):
     """The 'active_clubs' panel for a Results database."""
 
-    _btn_closeactiveclubs = "activeclubs_close"
+    btn_closeactiveclubs = "activeclubs_close"
     _btn_applyactiveclubs = "activeclubs_apply"
 
     def __init__(
@@ -47,7 +43,9 @@ class ActiveClubs(logpanel.WidgetAndLogPanel):
         datafile=None,
         closecontexts=(),
         starttaskmsg=None,
-        cnf=dict(),
+        # pylint W0102 dangerous-default-value.
+        # cnf used as tkinter.Frame argument, which defaults to {}.
+        cnf={},
         **kargs
     ):
         """Extend and define the 'active_clubs' database update panel."""
@@ -64,26 +62,26 @@ class ActiveClubs(logpanel.WidgetAndLogPanel):
             ),
             maketaskwidget=self._create_club_download_widget,
             taskbuttons={
-                self._btn_closeactiveclubs: dict(
-                    text="Cancel Apply Active Clubs",
-                    tooltip="Cancel the active clubs update.",
-                    underline=0,
-                    switchpanel=True,
-                    command=self.on_cancel_apply_downloaded_active_clubs,
-                ),
-                self._btn_applyactiveclubs: dict(
-                    text="Apply Active Clubs",
-                    tooltip="Apply active clubs updates to database.",
-                    underline=0,
-                    command=self.on_apply_downloaded_active_clubs,
-                ),
+                self.btn_closeactiveclubs: {
+                    "text": "Cancel Apply Active Clubs",
+                    "tooltip": "Cancel the active clubs update.",
+                    "underline": 0,
+                    "switchpanel": True,
+                    "command": self.on_cancel_apply_downloaded_active_clubs,
+                },
+                self._btn_applyactiveclubs: {
+                    "text": "Apply Active Clubs",
+                    "tooltip": "Apply active clubs updates to database.",
+                    "underline": 0,
+                    "command": self.on_apply_downloaded_active_clubs,
+                },
             },
             starttaskbuttons=(
-                self._btn_closeactiveclubs,
+                self.btn_closeactiveclubs,
                 self._btn_applyactiveclubs,
             ),
             runmethod=False,
-            runmethodargs=dict(),
+            runmethodargs={},
             cnf=cnf,
             **kargs
         )
@@ -110,8 +108,7 @@ class ActiveClubs(logpanel.WidgetAndLogPanel):
         to a WidgetAndLogPanel(...) call.
 
         """
-        self.resultsdbfolder = tkinter.Label(master=self.get_widget(), text="")
-        self.resultsdbfolder.pack(side=tkinter.TOP, fill=tkinter.X)
+        del master
         tf = tkinter.Frame(master=self.get_widget())
         header = tkinter.Text(
             master=tf,
@@ -183,7 +180,6 @@ class ActiveClubs(logpanel.WidgetAndLogPanel):
         Used, at least, as callback from AppSysFrame container.
 
         """
-        pass
 
     def apply_downloaded_active_clubs(self, *args, **kargs):
         """Apply new, and update existing, club_codes from download.
@@ -192,6 +188,7 @@ class ActiveClubs(logpanel.WidgetAndLogPanel):
         when running this method.
 
         """
+        del args, kargs
         ecfdataimport.copy_ecf_clubs_post_2020_rules(
             self,
             logwidget=self.tasklog,
@@ -204,6 +201,7 @@ class ActiveClubs(logpanel.WidgetAndLogPanel):
 
         Re-open the files that were closed on creating this widget.
         """
+        del event
         self.get_appsys().get_results_database().allocate_and_open_contexts(
             files=self._closecontexts
         )
@@ -223,6 +221,7 @@ class ActiveClubs(logpanel.WidgetAndLogPanel):
 
     def on_apply_downloaded_active_clubs(self, event=None):
         """Run apply_downloaded_active_clubs in separate thread."""
+        del event
         dlg = tkinter.messagebox.askquestion(
             parent=self.get_widget(),
             title="Apply Active Clubs",
@@ -240,11 +239,11 @@ class ActiveClubs(logpanel.WidgetAndLogPanel):
     def show_buttons_for_cancel_import(self):
         """Show buttons for actions allowed at start of import process."""
         self.hide_panel_buttons()
-        self.show_panel_buttons((self._btn_closeactiveclubs,))
+        self.show_panel_buttons((self.btn_closeactiveclubs,))
 
     def show_buttons_for_start_import(self):
         """Show buttons for actions allowed at start of import process."""
         self.hide_panel_buttons()
         self.show_panel_buttons(
-            (self._btn_closeactiveclubs, self._btn_applyactiveclubs)
+            (self.btn_closeactiveclubs, self._btn_applyactiveclubs)
         )

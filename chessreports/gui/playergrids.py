@@ -4,13 +4,9 @@
 
 """Results database datagrid classes for identifying players."""
 
-import tkinter
-
 from solentware_grid.datagrid import DataGridReadOnly
 from solentware_grid.core import dataclient
 from solentware_grid.gui import gridbindings
-
-from solentware_misc.core.utilities import AppSysPersonNameParts
 
 from . import resultsrow
 from ..core import filespec
@@ -86,14 +82,18 @@ class NewGrid(PlayerGrid):
         self.set_data_source(ds)
         dr.register_in(self, self.on_data_change)
 
-    def bookmark_down(self):
-        """Extend to adjust Identified grid."""
-        super().bookmark_down()
-        # not implemented
-        # self.appsyspanel.playergrid.display_identified_players_for_selection()
+    # Commented to avoid pylint W0246 'useless ... delegation' while action
+    # not implemented.
+    # def bookmark_down(self):
+    #     """Extend to adjust Identified grid."""
+    #     super().bookmark_down()
+    # not implemented
+    # self.appsyspanel.playergrid.display_identified_players_for_selection()
 
-    def bookmark_up(self):
-        """Extend to adjust Identified grid."""
-        super().bookmark_up()
-        # not implemented
-        # self.appsyspanel.playergrid.display_identified_players_for_selection()
+    # Commented to avoid pylint W0246 'useless ... delegation' while action
+    # not implemented.
+    # def bookmark_up(self):
+    #     """Extend to adjust Identified grid."""
+    #     super().bookmark_up()
+    # not implemented
+    # self.appsyspanel.playergrid.display_identified_players_for_selection()

@@ -29,59 +29,61 @@ class ECFrefDBrowECFClub(ecfrecord.ECFrefDBrecordECFclub, DataRow):
     header_specification = [
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Status", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="cactive"),
+            WIDGET_CONFIGURE: {"text": "Status", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "cactive"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Club code", anchor=tkinter.CENTER),
-            GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=0, uniform="ccode"),
+            WIDGET_CONFIGURE: {"text": "Club code", "anchor": tkinter.CENTER},
+            GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 0, "uniform": "ccode"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Name", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="cname"),
+            WIDGET_CONFIGURE: {"text": "Name", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "cname"},
             ROW: 0,
         },
     ]
 
     def __init__(self, database=None):
         """Extend, link ECF club record from master file to database."""
-        super(ECFrefDBrowECFClub, self).__init__()
+        super().__init__()
         self.set_database(database)
         self.row_specification = [
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
                 ROW: 0,
             },
         ]
 
-    def grid_row(self, **kargs):
+    def grid_row(self, textitems=(), **kargs):
         """Return tuple of instructions to create row.
 
         Create textitems argument for ECFrefDBrowECFClub instance.
 
+        textitems arguments is ignored and is present for compatibility.
+
         """
-        return super(ECFrefDBrowECFClub, self).grid_row(
+        return super().grid_row(
             textitems=(
                 "Inactive" if not self.value.ECFactive else "",
                 self.value.ECFcode,
@@ -101,72 +103,82 @@ class ECFrefDBrowECFPlayer(ecfrecord.ECFrefDBrecordECFplayer, DataRow):
     header_specification = [
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Merge status", anchor=tkinter.CENTER),
-            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=0, uniform="pmerge"),
+            WIDGET_CONFIGURE: {
+                "text": "Merge status",
+                "anchor": tkinter.CENTER,
+            },
+            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 0, "uniform": "pmerge"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Grading code", anchor=tkinter.CENTER),
-            GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=0, uniform="pcode"),
+            WIDGET_CONFIGURE: {
+                "text": "Grading code",
+                "anchor": tkinter.CENTER,
+            },
+            GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 0, "uniform": "pcode"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Name (ECF)", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="pname"),
+            WIDGET_CONFIGURE: {"text": "Name (ECF)", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "pname"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(
-                text="Clubs (if grading code listed in 'Player ECF Detail')",
-                anchor=tkinter.W,
-            ),
-            GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="pclubs"),
+            WIDGET_CONFIGURE: {
+                "text": (
+                    "Clubs (if grading code listed in 'Player ECF Detail')"
+                ),
+                "anchor": tkinter.W,
+            },
+            GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "pclubs"},
             ROW: 0,
         },
     ]
 
     def __init__(self, database=None):
         """Extend, link ECF player record from master file to database."""
-        super(ECFrefDBrowECFPlayer, self).__init__()
+        super().__init__()
         self.set_database(database)
         self.row_specification = [
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
                 ROW: 0,
             },
         ]
 
-    def grid_row(self, **kargs):
+    def grid_row(self, textitems=(), **kargs):
         """Return tuple of instructions to create row.
 
         Create textitems argument for ECFrefDBrowECFPlayer instance.
+
+        textitems arguments is ignored and is present for compatibility.
 
         """
         if self.value.ECFactive:
@@ -192,7 +204,7 @@ class ECFrefDBrowECFPlayer(ecfrecord.ECFrefDBrecordECFplayer, DataRow):
         else:
             merged_into = "Inactive"
             clubs = ""
-        return super(ECFrefDBrowECFPlayer, self).grid_row(
+        return super().grid_row(
             textitems=(
                 merged_into,
                 self.value.ECFcode,

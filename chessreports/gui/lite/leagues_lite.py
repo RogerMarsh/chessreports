@@ -18,15 +18,15 @@ class Leagues(leagues_database.Leagues):
         switch_table = super().define_state_switch_table()
         switch_table.update(
             {
-                (self._state_dbopen, events_lite.Events._btn_performance): [
+                (self._state_dbopen, events_lite.Events.btn_performance): [
                     self._state_dbopen_report_event,
                     self._tab_reportevent,
                 ],
-                (self._state_dbopen, events_lite.Events._btn_prediction): [
+                (self._state_dbopen, events_lite.Events.btn_prediction): [
                     self._state_dbopen_report_event,
                     self._tab_reportevent,
                 ],
-                (self._state_dbopen, events_lite.Events._btn_population): [
+                (self._state_dbopen, events_lite.Events.btn_population): [
                     self._state_dbopen_report_event,
                     self._tab_reportevent,
                 ],

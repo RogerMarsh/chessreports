@@ -27,82 +27,84 @@ class ECFmapOGDrowPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
     header_specification = [
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="ECF code", anchor=tkinter.CENTER),
-            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="pecfcode"),
+            WIDGET_CONFIGURE: {"text": "ECF code", "anchor": tkinter.CENTER},
+            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "pecfcode"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Name", anchor=tkinter.CENTER),
-            GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="pname"),
+            WIDGET_CONFIGURE: {"text": "Name", "anchor": tkinter.CENTER},
+            GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "pname"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Event details", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="pevent"),
+            WIDGET_CONFIGURE: {"text": "Event details", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "pevent"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="psection"),
+            WIDGET_CONFIGURE: {"text": "", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "psection"},
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: dict(text="Association", anchor=tkinter.W),
-            GRID_CONFIGURE: dict(column=4, sticky=tkinter.EW),
-            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="paff"),
+            WIDGET_CONFIGURE: {"text": "Association", "anchor": tkinter.W},
+            GRID_CONFIGURE: {"column": 4, "sticky": tkinter.EW},
+            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "paff"},
             ROW: 0,
         },
     ]
 
     def __init__(self, database=None):
         """Extend, link player record to database."""
-        super(ECFmapOGDrowPlayer, self).__init__()
+        super().__init__()
         self.set_database(database)
         self.row_specification = [
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
-                GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
+                GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
-                GRID_CONFIGURE: dict(column=4, sticky=tkinter.EW),
+                WIDGET_CONFIGURE: {"anchor": tkinter.W},
+                GRID_CONFIGURE: {"column": 4, "sticky": tkinter.EW},
                 ROW: 0,
             },
         ]
 
-    def grid_row(self, **kargs):
+    def grid_row(self, textitems=(), **kargs):
         """Return tuple of instructions to create row.
 
         Create textitems argument for ECFmapOGDrowPlayer instance.
+
+        textitems arguments is ignored and is present for compatibility.
 
         """
         mapcode = ecfgcodemaprecord.get_grading_code_for_person(
@@ -119,7 +121,7 @@ class ECFmapOGDrowPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
                 mapcode = "*"
         else:
             mapcode = ""
-        return super(ECFmapOGDrowPlayer, self).grid_row(
+        return super().grid_row(
             textitems=(
                 mapcode,
                 self.value.name,

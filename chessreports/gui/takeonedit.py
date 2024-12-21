@@ -55,7 +55,9 @@ class TakeonEdit(panel.PlainPanel):
     _btn_update = "takeonedit_update"
     _btn_report = "takeonedit_report"
 
-    def __init__(self, parent=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, cnf={}, **kargs):
         """Extend and define data input panel for a results database."""
         super().__init__(parent=parent, cnf=cnf, **kargs)
         self.generated_schedule = []
@@ -98,9 +100,7 @@ class TakeonEdit(panel.PlainPanel):
         self.get_schedule(data)
         self._report_fixtures(data)
         self.get_results(data)
-        if not len(data.collation.error) and not len(
-            data.fixture_schedule.error
-        ):
+        if not data.collation.error and not data.fixture_schedule.error:
             report = data.collation.reports.report_games()
             for w, r in zip(
                 (self.generated_schedule, self.generated_results), report
@@ -115,7 +115,7 @@ class TakeonEdit(panel.PlainPanel):
         )
         self.resultsctrl.delete("1.0", tkinter.END)
         self.resultsctrl.insert(tkinter.END, "\n".join(self.generated_results))
-        return not len(data.collation.error)
+        return not data.collation.error
 
     def _report_fixtures(self, data):
         """Append fixtures to event schedule report."""
@@ -147,7 +147,7 @@ class TakeonEdit(panel.PlainPanel):
             return False
         db = self.get_appsys().get_results_database()
         if not db:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -181,7 +181,7 @@ class TakeonEdit(panel.PlainPanel):
         else:
             collatedb.merge_players()
             db.commit()
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(("Results database updated")),
                 title="Update",
@@ -205,15 +205,15 @@ class TakeonEdit(panel.PlainPanel):
                 opaqueresize=tkinter.FALSE,
                 orient=tkinter.VERTICAL,
             )
-        if self.editschedctrl == None:
+        if self.editschedctrl is None:
             self.editschedctrl = texttab.make_text_tab(master=self.editpane)
-        if self.editresctrl == None:
+        if self.editresctrl is None:
             self.editresctrl = texttab.make_text_tab(master=self.editpane)
-        if self.schedulectrl == None:
+        if self.schedulectrl is None:
             self.schedulectrl = textreadonly.make_text_readonly(
                 master=self.generatedpane
             )
-        if self.resultsctrl == None:
+        if self.resultsctrl is None:
             self.resultsctrl = textreadonly.make_text_readonly(
                 master=self.generatedpane
             )
@@ -265,15 +265,15 @@ class TakeonEdit(panel.PlainPanel):
                 opaqueresize=tkinter.FALSE,
                 orient=tkinter.VERTICAL,
             )
-        if self.editschedctrl == None:
+        if self.editschedctrl is None:
             self.editschedctrl = texttab.make_text_tab(master=self.editpane)
-        if self.editresctrl == None:
+        if self.editresctrl is None:
             self.editresctrl = texttab.make_text_tab(master=self.editpane)
-        if self.origschedctrl == None:
+        if self.origschedctrl is None:
             self.origschedctrl = textreadonly.make_text_readonly(
                 master=self.originalpane
             )
-        if self.origresctrl == None:
+        if self.origresctrl is None:
             self.origresctrl = textreadonly.make_text_readonly(
                 master=self.originalpane
             )
@@ -361,8 +361,8 @@ class TakeonEdit(panel.PlainPanel):
                 ),
                 title="Save",
             ):
-                return
-        if msg == None:
+                return None
+        if msg is None:
             msg = " ".join(
                 (
                     "Save",
@@ -396,14 +396,19 @@ class TakeonEdit(panel.PlainPanel):
             self.editschedctrl.edit_modified(False)
             self.editresctrl.edit_modified(False)
             return True
+        return None
 
     def is_report_modified(self):
         """Return Text.edit_modified(). Work around see Python issue 961805."""
         # return self.editresctrl.edit_modified()
+        # pylint C0209 consider-using-f-string.  Not used at Python 3.10 due
+        # to Idle colouring.  See github.com/python/cpython/issues/73473.
         if self.editschedctrl.winfo_toplevel().tk.call(
             "eval", "%s edit modified" % self.editschedctrl
         ):
             return True
+        # pylint C0209 consider-using-f-string.  Not used at Python 3.10 due
+        # to Idle colouring.  See github.com/python/cpython/issues/73473.
         return self.editresctrl.winfo_toplevel().tk.call(
             "eval", "%s edit modified" % self.editresctrl
         )
@@ -435,8 +440,8 @@ class TakeonEdit(panel.PlainPanel):
             text="Show Original",
             tooltip=" ".join(
                 (
-                    "Display original and edited results data but not generated",
-                    "data.",
+                    "Display original and edited results data but not",
+                    "generated data.",
                 )
             ),
             underline=5,
@@ -447,8 +452,8 @@ class TakeonEdit(panel.PlainPanel):
             text="Hide Original",
             tooltip=" ".join(
                 (
-                    "Display edited source and generated data but not original",
-                    "source.",
+                    "Display edited source and generated data but not",
+                    "original source.",
                 )
             ),
             underline=5,
@@ -488,37 +493,44 @@ class TakeonEdit(panel.PlainPanel):
 
     def on_close_data(self, event=None):
         """Close source document."""
+        del event
         self.close_data_folder()
         self.inhibit_context_switch(self.btn_closedata)
 
     def on_generate(self, event=None):
         """Validate source document."""
+        del event
         if self._generate_event_report():
             self.show_buttons_for_update()
             self.create_buttons()
 
     def on_report(self, event=None):
         """Save validation report."""
+        del event
         self._save_reports()
 
     def on_save(self, event=None):
         """Save source document."""
+        del event
         self.save_data_folder()
 
     def on_toggle_compare(self, event=None):
-        """Display original source document alongside edited source document."""
+        """Display original source document beside edited source document."""
+        del event
         self._show_buttons_for_compare()
         self.create_buttons()
         self._show_originals_and_edits()
 
     def on_toggle_generate(self, event=None):
-        """Display edited source document alongside validation report widgets."""
+        """Display edited source document beside validation report widgets."""
+        del event
         self.show_buttons_for_generate()
         self.create_buttons()
         self._show_edits_and_generated()
 
     def on_update(self, event=None):
         """Update database from validated source document."""
+        del event
         if self.update_event_results():
             db = self.get_appsys().get_results_database()
             self.refresh_controls(
@@ -586,7 +598,7 @@ class TakeonEdit(panel.PlainPanel):
             try:
                 os.mkdir(reports)
             except:
-                dlg = tkinter.messagebox.showinfo(
+                tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message="".join(
                         (
@@ -597,7 +609,7 @@ class TakeonEdit(panel.PlainPanel):
                     ),
                     title="Save Reports",
                 )
-                return
+                return None
         dt = datetime.datetime.today().isoformat()
         for control, filename in (
             (self.schedulectrl, "rep_schedule"),
@@ -606,16 +618,14 @@ class TakeonEdit(panel.PlainPanel):
             (self.editresctrl, "src_results"),
         ):
             report_file = os.path.join(reports, "_".join((dt, filename)))
-            f = open(report_file, "w", encoding="utf8")
-            try:
-                f.write(control.get("1.0", tkinter.END))
-            finally:
-                f.close()
-        dlg = tkinter.messagebox.showinfo(
+            with open(report_file, "w", encoding="utf8") as outf:
+                outf.write(control.get("1.0", tkinter.END))
+        tkinter.messagebox.showinfo(
             parent=self.get_widget(),
             message="".join(("Reports saved in folder\n\n", reports)),
             title="Save Reports",
         )
+        return None
 
     def get_context(self):
         """Return the data input page."""
@@ -643,4 +653,3 @@ class TakeonEdit(panel.PlainPanel):
         Used, at least, as callback from AppSysFrame container.
 
         """
-        pass

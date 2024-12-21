@@ -15,26 +15,30 @@ from . import ecfeventgrids
 class ECFEventCopy(panel.PanelGridSelector):
     """The Copy Event Detail panel for a Results database."""
 
-    _btn_ecfeventcopy = "ecfeventcopy_copy"
-    _btn_ecfeventback = "ecfeventcopy_back"
+    btn_ecfeventcopy = "ecfeventcopy_copy"
+    btn_ecfeventback = "ecfeventcopy_back"
 
-    def __init__(self, parent=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, cnf={}, **kargs):
         """Extend and define the results database ECF events panel."""
         self.eventgrid = None
         super().__init__(parent=parent, cnf=cnf, **kargs)
         self.show_panel_buttons(
             (
-                self._btn_ecfeventcopy,
-                self._btn_ecfeventback,
+                self.btn_ecfeventcopy,
+                self.btn_ecfeventback,
             )
         )
         self.create_buttons()
+        # pylint W0632 unbalanced-tuple-unpacking.
+        # self.make_grids returns a list with same length as argument.
         (self.eventgrid,) = self.make_grids(
             (
-                dict(
-                    grid=ecfeventgrids.ECFEventGrid,
-                    gridfocuskey="<KeyPress-F7>",
-                ),
+                {
+                    "grid": ecfeventgrids.ECFEventGrid,
+                    "gridfocuskey": "<KeyPress-F7>",
+                },
             )
         )
 
@@ -44,13 +48,12 @@ class ECFEventCopy(panel.PanelGridSelector):
         Used, at least, as callback from AppSysFrame container.
 
         """
-        pass
 
     def describe_buttons(self):
         """Define all action buttons that may appear on ECF events page."""
         super().describe_buttons()
         self.define_button(
-            self._btn_ecfeventcopy,
+            self.btn_ecfeventcopy,
             text="Copy to Event Detail",
             tooltip="Copy data to, and return to, edit Event Details.",
             switchpanel=True,
@@ -58,7 +61,7 @@ class ECFEventCopy(panel.PanelGridSelector):
             command=self.on_copy_to_ecf_event_detail,
         )
         self.define_button(
-            self._btn_ecfeventback,
+            self.btn_ecfeventback,
             text="Back to Event Detail",
             tooltip="Return to edit Event Details without copying data.",
             switchpanel=True,
@@ -87,7 +90,7 @@ class ECFEventCopy(panel.PanelGridSelector):
         if not self.is_event_selected():
             return "break"
         app = self.get_appsys()
-        if app.get_tab_data(app._tab_ecfeventdetail).copy_event_detail(
+        if app.get_tab_data(app.tab_ecfeventdetail).copy_event_detail(
             self.eventgrid.selection
         ):
             return None

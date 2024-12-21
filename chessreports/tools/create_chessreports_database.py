@@ -52,8 +52,8 @@ class CreateChessReportsDatabase(create_database.CreateDatabase):
 
     _START_TEXT = "".join(
         (
-            "ChessReports would create a new database with the top-left engine, ",
-            "and segment size 4000.",
+            "ChessReports would create a new database with the top-left ",
+            "engine, and segment size 4000.",
         )
     )
 
@@ -61,17 +61,17 @@ class CreateChessReportsDatabase(create_database.CreateDatabase):
         """Build the user interface."""
         engines = {}
         if chessunqlite:
-            engines[
-                chessunqlite.unqlite_database.unqlite
-            ] = chessunqlite.ResultsDatabase
+            engines[chessunqlite.unqlite_database.unqlite] = (
+                chessunqlite.ResultsDatabase
+            )
         if chessvedis:
-            engines[
-                chessvedis.vedis_database.vedis
-            ] = chessvedis.ResultsDatabase
+            engines[chessvedis.vedis_database.vedis] = (
+                chessvedis.ResultsDatabase
+            )
         if chesssqlite3:
-            engines[
-                chesssqlite3.sqlite3_database.sqlite3
-            ] = chesssqlite3.ResultsDatabase
+            engines[chesssqlite3.sqlite3_database.sqlite3] = (
+                chesssqlite3.ResultsDatabase
+            )
         if chessapsw:
             engines[chessapsw.apsw_database.apsw] = chessapsw.ResultsDatabase
         if chessdb:
@@ -79,17 +79,17 @@ class CreateChessReportsDatabase(create_database.CreateDatabase):
         if chesslmdb:
             engines[chesslmdb.lmdb_database.lmdb] = chesslmdb.ResultsDatabase
         if chessberkeleydb:
-            engines[
-                chessberkeleydb.berkeleydb_database.berkeleydb
-            ] = chessberkeleydb.ResultsDatabase
+            engines[chessberkeleydb.berkeleydb_database.berkeleydb] = (
+                chessberkeleydb.ResultsDatabase
+            )
         if chessdbtkinter:
-            engines[
-                chessdbtkinter.db_tkinter_database.db_tcl
-            ] = chessdbtkinter.ResultsDatabase
+            engines[chessdbtkinter.db_tkinter_database.db_tcl] = (
+                chessdbtkinter.ResultsDatabase
+            )
         if chessdpt:
-            engines[
-                chessdpt.dpt_database._dpt.dptapi
-            ] = chessdpt.ResultsDatabase
+            engines[chessdpt.dpt_database._dpt.dptapi] = (
+                chessdpt.ResultsDatabase
+            )
         super().__init__(title="Create ChessReports Database", engines=engines)
 
 

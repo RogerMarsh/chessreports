@@ -4,8 +4,6 @@
 
 """Results database datagrid classes for events."""
 
-import tkinter
-
 from solentware_grid.datagrid import DataGridReadOnly
 from solentware_grid.core.dataclient import DataSource
 from solentware_grid.gui import gridbindings

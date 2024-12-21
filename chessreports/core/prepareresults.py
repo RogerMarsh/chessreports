@@ -9,11 +9,11 @@ input into a Berkeley DB or DPT results database.  The ECF submission file
 format is used to transfer the data because it is the only output generated
 by any grading program in a known and fit for purpose format.
 
-The assumption necessary is that a PIN value refers to the same player
+The assumption necessary is that a PIN value refers to the same LPLAYER
 across submission files.
 
 A restriction is that use of a PIN that looks like an ECF grading code is
-sufficient to prevent this module making the assumption for the player.
+sufficient to prevent this module making the assumption for the LPLAYER.
 (The League program does not use the grading code as PIN.)
 
 BCF CODE; CLUB NAME; CLUB (non-standard for CLUB NAME); CLUB CODE;
@@ -32,24 +32,24 @@ import collections
 from . import constants as cc
 
 
-class PrepareResults(object):
+class PrepareResults:
     """Class for importing results data."""
 
     def __init__(self, container):
         """Initialise data structures for import from files in container."""
-        super(PrepareResults, self).__init__()
+        super().__init__()
         self.container = container
         self.pinprefix = os.path.splitext(os.path.basename(container))[0]
         self.files = set()
-        self.keeppinvaluemap = dict()
-        self.filenewtextmap = dict()
+        self.keeppinvaluemap = {}
+        self.filenewtextmap = {}
         self.error = []
 
     def empty_extract(self):
         """Return False."""
         return False
 
-    def translate_results_format(
+    def _translate_results_format(
         self,
         context=None,
         keymap=None,
@@ -67,15 +67,18 @@ class PrepareResults(object):
         """
 
         def null(lines, text):
-            pass
+            """Do nothing."""  # Avoid pylint W0613 if 'pass' instead.
+            del lines, text
 
         def null_extend(lines, text, data):
-            pass
+            """Do nothing."""  # Avoid pylint W0613 if 'pass' instead.
+            del lines, text, data
 
         def copy_text(lines, text):
             lines.append(text)
 
         def copy_text_extend(lines, text, data):
+            del data
             lines.extend(text)
 
         if copy_lines:
@@ -84,7 +87,7 @@ class PrepareResults(object):
             process = null
 
         if context is None:
-            context = dict()
+            context = {}
         for c in context:
             if not isinstance(context[c], collections.abc.Callable):
                 if context[c] is True:
@@ -92,9 +95,9 @@ class PrepareResults(object):
                 else:
                     context[c] = null_extend
         if keymap is None:
-            keymap = dict()
+            keymap = {}
         if validmap is None:
-            validmap = dict()
+            validmap = {}
         if pinreadmap is None:
             pinreadmap = set()
         if pinmap is None:
@@ -104,7 +107,7 @@ class PrepareResults(object):
         if discardmap is None:
             discardmap = set()
 
-        pinvaluemap = dict()
+        pinvaluemap = {}
         keeppins = pinreadmap - pinmap
         cc_gccc = cc.GRADING_CODE_CHECK_CHARACTERS  # avoid long line later
         extract = []
@@ -114,7 +117,7 @@ class PrepareResults(object):
             filesprocessed.append(f)
             lines = []
             record = []
-            data = dict()
+            data = {}
             for t in text:
                 ts = t.split("=", 1)
                 key, value = ts[0], ts[-1]
@@ -173,7 +176,7 @@ class PrepareResults(object):
                         fault = True
                         break
                 if key in context:
-                    if len(record):
+                    if record:
                         context[contextkey](lines, record, data)
                     contextkey = key
                     data.clear()
@@ -221,17 +224,17 @@ class PrepareResults(object):
                         process(record, t)
                         data[keymap[key]] = value
                 elif key in gradingcodemap:
-                    if cc._pcode in data:
+                    if cc.LPCODE in data:
                         if len(value) == cc.GRADING_CODE_LENGTH:
-                            if value[:-1] in data[cc._pcode]:
+                            if value[:-1] in data[cc.LPCODE]:
                                 self.error.append(
                                     (
                                         filesprocessed[-2:],
                                         (
                                             "Grading code ",
                                             value,
-                                            " is included in player pin ",
-                                            data[cc._pcode],
+                                            " is included in LPLAYER pin ",
+                                            data[cc.LPCODE],
                                         ),
                                     )
                                 )
@@ -241,7 +244,7 @@ class PrepareResults(object):
                     process(record, t)
             if fault:
                 continue
-            if len(record):
+            if record:
                 context[contextkey](lines, record, data)
             extract.append((f, lines))
 
@@ -266,15 +269,16 @@ class PrepareResults(object):
         self.get_folder_contents(self.container)
         filetext = []
         for f in self.files:
-            ofile = open(f, "r")  # 'rb'?
-            filetext.append((f, [t.rstrip() for t in ofile.readlines()]))
-            ofile.close()
+            with open(f, "r", encoding="utf8") as ofile:  # 'rb'?
+                filetext.append((f, [t.rstrip() for t in ofile.readlines()]))
         return filetext
 
     def extract_data_from_import_files(self, importfiles=None):
         """Return list containing processed import file contents."""
         if importfiles is None:
             importfiles = [("No files to display", [])]
+        # Subclasses provide the report_file method.
+        # pylint: disable-next=no-member.
         return [self.report_file(f, t) for f, t in importfiles]
 
 
@@ -298,40 +302,38 @@ class PrepareSubmissionFile(PrepareResults):
 
         # keymap copied from merges.py unchanged but it could be a set here
         keymap = {
-            cc.EVENT_CODE: cc._ecode,
-            cc.EVENT_NAME: cc._ename,
-            cc.EVENT_DATE: cc._edate,
-            cc.FINAL_RESULT_DATE: cc._efinaldate,
-            cc.PIN: cc._pcode,
-            cc.NAME: cc._pname,
-            cc.OTHER_RESULTS: cc._mname,
-            cc.MATCH_RESULTS: cc._mname,
-            cc.SECTION_RESULTS: cc._mname,
-            cc.RESULTS_DATE: cc._mdate,
-            cc.PIN1: cc._pcode1,
-            cc.PIN2: cc._pcode2,
-            cc.ROUND: cc._ground,
-            cc.BOARD: cc._gboard,
-            cc.COLOUR: cc._gcolor,
-            cc.SCORE: cc._gresult,
-            cc.GAME_DATE: cc._gdate,
-            cc.WHITE_ON: cc._mcolor,
-            # cc.CLUB:cc._cname, #League program for CLUB NAME
-            # cc.CLUB_NAME:cc._cname,
-            cc.SURNAME: cc._surname,
-            cc.INITIALS: cc._initials,
-            cc.FORENAME: cc._forename,
+            cc.EVENT_CODE: cc.LECODE,
+            cc.EVENT_NAME: cc.LENAME,
+            cc.EVENT_DATE: cc.LEDATE,
+            cc.FINAL_RESULT_DATE: cc.LEFINALDATE,
+            cc.PIN: cc.LPCODE,
+            cc.NAME: cc.LPNAME,
+            cc.OTHER_RESULTS: cc.LMNAME,
+            cc.MATCH_RESULTS: cc.LMNAME,
+            cc.SECTION_RESULTS: cc.LMNAME,
+            cc.RESULTS_DATE: cc.LMDATE,
+            cc.PIN1: cc.LPCODE1,
+            cc.PIN2: cc.LPCODE2,
+            cc.ROUND: cc.LGROUND,
+            cc.BOARD: cc.LGBOARD,
+            cc.COLOUR: cc.LGCOLOR,
+            cc.SCORE: cc.LGRESULT,
+            cc.GAME_DATE: cc.LGDATE,
+            cc.WHITE_ON: cc.LMCOLOR,
+            # cc.CLUB:cc.LCNAME, #League program for CLUB NAME
+            # cc.CLUB_NAME:cc.LCNAME,
+            cc.SURNAME: cc.E_SURNAME,
+            cc.INITIALS: cc.E_INITIALS,
+            cc.FORENAME: cc.E_FORENAME,
         }
 
         # validmap copied from merges.py unchanged but it could be a set here
-        """
-        validmap accepts a few field sequences that are not accepted by the
-        ECF Checker program to simplify spotting field group boundaries and
-        presence of invalid fields.
-        COLUMN; TABLE END; and TABLE START expanded in get_lines so removed
-        from validmap. Appearance in return value indicates a table format
-        error.
-        """
+        # validmap accepts a few field sequences that are not accepted by the
+        # ECF Checker program to simplify spotting field group boundaries and
+        # presence of invalid fields.
+        # COLUMN; TABLE END; and TABLE START expanded in get_lines so removed
+        # from validmap. Appearance in return value indicates a table format
+        # error.
         validmap = {
             cc.ADJUDICATED: cc.EVENT_DETAILS,
             cc.BCF_CODE: cc.PIN,
@@ -433,7 +435,7 @@ class PrepareSubmissionFile(PrepareResults):
             },
         }
 
-        return super(PrepareSubmissionFile, self).translate_results_format(
+        return super()._translate_results_format(
             context=context,
             keymap=keymap,
             validmap=validmap,
@@ -458,7 +460,7 @@ class PrepareSubmissionFile(PrepareResults):
         """Delimiter is # optionally preceded by newline sequence."""
         filetext = []
 
-        for f, ft in super(PrepareSubmissionFile, self).get_lines():
+        for f, ft in super().get_lines():
             columns = []
             row = []
             table = False
@@ -467,7 +469,7 @@ class PrepareSubmissionFile(PrepareResults):
                 ts = t.split("=", 1)
                 key, value = ts[0], ts[-1]
                 if key == cc.TABLE_END:
-                    if len(row):
+                    if row:
                         text.append(key)
                     table = False
                     columns = []
@@ -534,21 +536,24 @@ class PrepareSubmissionFile(PrepareResults):
 
     def write_file(self, inpath, outpath, folder):
         """Write text derived from inpath file to outpath file in folder."""
-        d, f = os.path.split(outpath[0])
+        d = os.path.split(outpath[0])[0]
         nd = os.path.join(folder, d)
         if not os.path.exists(nd):
             os.makedirs(nd)
-        nf = open(outpath[0], "w")  # 'wb'?
-        try:
-            nf.write(self.filenewtextmap[inpath])
-            cf = open(os.path.join(nd, cc.TAKEON_ECF_FORMAT), "w")  # 'wb'?
-            cf.close()
-        finally:
-            nf.close()
+        with open(outpath[0], "w", encoding="utf8") as outnf:  # 'wb'?
+            outnf.write(self.filenewtextmap[inpath])
+            with open(
+                os.path.join(nd, cc.TAKEON_ECF_FORMAT),
+                "w",  # 'wb'?
+                encoding="utf8",
+            ) as outcf:
+                del outcf
 
     @staticmethod
     def generate_file_name(inpath, infolder, outfolder):
         """Return file name in outfolder derived from inpath and infolder."""
+        # pycodestyle E203 whitespace before ':'.
+        # black formatting insists on the space.
         m = os.path.split(inpath[len(infolder) + 1 :])
         d = os.path.splitext(m[-1])
         return os.path.join(outfolder, m[0], d[0], m[-1])
@@ -556,14 +561,6 @@ class PrepareSubmissionFile(PrepareResults):
 
 class PrepareLeagueDump(PrepareResults):
     """Import data from dump of League program database."""
-
-    def __init__(self, container):
-        """Delegate."""
-        super(PrepareLeagueDump, self).__init__(container)
-
-    def empty_extract(self):
-        """Delegate to superclass method and return it's response."""
-        return super(PrepareLeagueDump, self).empty_extract()
 
     def translate_results_format(self):
         """Translate results to internal format."""
@@ -576,144 +573,144 @@ class PrepareLeagueDump(PrepareResults):
         # context copied from merges.py and value part of key:value
         # changed as necessary
         context = {
-            cc.represent: None,
-            cc.club: None,
-            cc.player: copy_player_filter,
-            cc.game: True,
-            cc.affiliate: None,
-            cc.team: True,
-            cc.event: True,
-            cc.match: True,
+            cc.LREPRESENT: None,
+            cc.LCLUB: None,
+            cc.LPLAYER: copy_player_filter,
+            cc.LGAME: True,
+            cc.LAFFILIATE: None,
+            cc.LTEAM: True,
+            cc.LEVENT: True,
+            cc.LMATCH: True,
         }
 
         # keymap copied from merges.py unchanged but it could be a set here
         keymap = {
-            cc.ECODE: cc._ecode,
-            cc.ENAME: cc._ename,
-            cc.EDATE: cc._edate,
-            cc.EFINALDATE: cc._efinaldate,
-            cc.PCODE: cc._pcode,
-            cc.PNAME: cc._pname,
-            cc.MCODE: cc._mcode,
-            cc.MNAME: cc._mname,
-            cc.MDATE: cc._mdate,
-            cc.PCODE1: cc._pcode1,
-            cc.PCODE2: cc._pcode2,
-            cc.GCODE: cc._gcode,
-            cc.GROUND: cc._ground,
-            cc.GBOARD: cc._gboard,
-            cc.GCOLOR: cc._gcolor,
-            cc.GRESULT: cc._gresult,
-            cc.GDATE: cc._gdate,
-            cc.MCOLOR: cc._mcolor,
-            cc.MTYPE: cc._mtype,
-            # cc.CCODE:cc._ccode,
-            # cc.CNAME:cc._cname,
-            cc.TCODE: cc._tcode,
-            cc.TNAME: cc._tname,
-            # cc.RPAIRING:cc._rpairing,
-            cc.TCODE1: cc._tcode1,
-            cc.TCODE2: cc._tcode2,
-            cc.PLENFORENAME: cc._plenforename,
-            cc.PLENNICKNAME: cc._plennickname,
+            cc.ECODE: cc.LECODE,
+            cc.ENAME: cc.LENAME,
+            cc.EDATE: cc.LEDATE,
+            cc.EFINALDATE: cc.LEFINALDATE,
+            cc.PCODE: cc.LPCODE,
+            cc.PNAME: cc.LPNAME,
+            cc.MCODE: cc.LMCODE,
+            cc.MNAME: cc.LMNAME,
+            cc.MDATE: cc.LMDATE,
+            cc.PCODE1: cc.LPCODE1,
+            cc.PCODE2: cc.LPCODE2,
+            cc.GCODE: cc.LGCODE,
+            cc.GROUND: cc.LGROUND,
+            cc.GBOARD: cc.LGBOARD,
+            cc.GCOLOR: cc.LGCOLOR,
+            cc.GRESULT: cc.LGRESULT,
+            cc.GDATE: cc.LGDATE,
+            cc.MCOLOR: cc.LMCOLOR,
+            cc.MTYPE: cc.LMTYPE,
+            # cc.CCODE:cc.LCCODE,
+            # cc.CNAME:cc.LCNAME,
+            cc.TCODE: cc.LTCODE,
+            cc.TNAME: cc.LTNAME,
+            # cc.RPAIRING:cc.LRPAIRING,
+            cc.TCODE1: cc.LTCODE1,
+            cc.TCODE2: cc.LTCODE2,
+            cc.PLENFORENAME: cc.LPLENFORENAME,
+            cc.PLENNICKNAME: cc.LPLENNICKNAME,
         }
 
         # validmap copied from merges.py unchanged but it could be a set here
         validmap = {
-            cc.ECODE: {cc.event: None, cc.match: None, cc.affiliate: None},
-            cc.ENAME: cc.event,
-            cc.EBCF: cc.event,
-            cc.EDATE: {cc.event: None, cc.affiliate: None},
-            cc.EFINALDATE: cc.event,
-            cc.ESUBMISSION: cc.event,
-            cc.ETREASURER: cc.event,
-            cc.EADDRESS1: cc.event,
-            cc.EADDRESS2: cc.event,
-            cc.EADDRESS3: cc.event,
-            cc.EADDRESS4: cc.event,
-            cc.EPOSTCODE: cc.event,
-            cc.EGRADER: cc.event,
-            cc.EGADDRESS1: cc.event,
-            cc.EGADDRESS2: cc.event,
-            cc.EGADDRESS3: cc.event,
-            cc.EGADDRESS4: cc.event,
-            cc.EGPOSTCODE: cc.event,
-            cc.EFIRSTMOVES: cc.event,
-            cc.EFIRSTMINUTES: cc.event,
-            cc.ENEXTMOVES: cc.event,
-            cc.ENEXTMINUTES: cc.event,
-            cc.ERESTMINUTES: cc.event,
-            cc.EALLMINUTES: cc.event,
-            cc.ESECPERMOVE: cc.event,
-            cc.EADJUDICATED: cc.event,
-            cc.EGRANDPRIX: cc.event,
-            cc.EFIDE: cc.event,
-            cc.ECHESSMOVES: cc.event,
-            cc.EEAST: cc.event,
-            cc.EMIDLAND: cc.event,
-            cc.ENORTH: cc.event,
-            cc.ESOUTH: cc.event,
-            cc.EWEST: cc.event,
-            cc.ECOLOR: cc.event,
-            cc.CCODE: {cc.club: None, cc.team: None, cc.affiliate: None},
-            cc.CNAME: cc.club,
-            cc.CBCF: cc.club,
-            cc.CBCFCOUNTY: cc.club,
+            cc.ECODE: {cc.LEVENT: None, cc.LMATCH: None, cc.LAFFILIATE: None},
+            cc.ENAME: cc.LEVENT,
+            cc.EBCF: cc.LEVENT,
+            cc.EDATE: {cc.LEVENT: None, cc.LAFFILIATE: None},
+            cc.EFINALDATE: cc.LEVENT,
+            cc.ESUBMISSION: cc.LEVENT,
+            cc.ETREASURER: cc.LEVENT,
+            cc.EADDRESS1: cc.LEVENT,
+            cc.EADDRESS2: cc.LEVENT,
+            cc.EADDRESS3: cc.LEVENT,
+            cc.EADDRESS4: cc.LEVENT,
+            cc.EPOSTCODE: cc.LEVENT,
+            cc.EGRADER: cc.LEVENT,
+            cc.EGADDRESS1: cc.LEVENT,
+            cc.EGADDRESS2: cc.LEVENT,
+            cc.EGADDRESS3: cc.LEVENT,
+            cc.EGADDRESS4: cc.LEVENT,
+            cc.EGPOSTCODE: cc.LEVENT,
+            cc.EFIRSTMOVES: cc.LEVENT,
+            cc.EFIRSTMINUTES: cc.LEVENT,
+            cc.ENEXTMOVES: cc.LEVENT,
+            cc.ENEXTMINUTES: cc.LEVENT,
+            cc.ERESTMINUTES: cc.LEVENT,
+            cc.EALLMINUTES: cc.LEVENT,
+            cc.ESECPERMOVE: cc.LEVENT,
+            cc.EADJUDICATED: cc.LEVENT,
+            cc.EGRANDPRIX: cc.LEVENT,
+            cc.EFIDE: cc.LEVENT,
+            cc.ECHESSMOVES: cc.LEVENT,
+            cc.EEAST: cc.LEVENT,
+            cc.EMIDLAND: cc.LEVENT,
+            cc.ENORTH: cc.LEVENT,
+            cc.ESOUTH: cc.LEVENT,
+            cc.EWEST: cc.LEVENT,
+            cc.ECOLOR: cc.LEVENT,
+            cc.CCODE: {cc.LCLUB: None, cc.LTEAM: None, cc.LAFFILIATE: None},
+            cc.CNAME: cc.LCLUB,
+            cc.CBCF: cc.LCLUB,
+            cc.CBCFCOUNTY: cc.LCLUB,
             cc.PCODE: {
-                cc.player: None,
-                cc.affiliate: None,
-                cc.represent: None,
+                cc.LPLAYER: None,
+                cc.LAFFILIATE: None,
+                cc.LREPRESENT: None,
             },
             cc.PNAME: {
-                cc.player: None,
-                cc.affiliate: None,
-                cc.represent: None,
+                cc.LPLAYER: None,
+                cc.LAFFILIATE: None,
+                cc.LREPRESENT: None,
             },
-            cc.PBCF: cc.player,
-            cc.PDOB: cc.player,
-            cc.PGENDER: cc.player,
-            cc.PDIRECT: cc.player,
-            cc.PTITLE: cc.player,
-            cc.PFIDE: cc.player,
-            cc.PLENFORENAME: cc.player,
-            cc.PLENNICKNAME: cc.player,
-            cc.MCODE: {cc.match: None, cc.game: None},
-            cc.MNAME: cc.match,
-            cc.MDATE: cc.match,
-            cc.MTYPE: cc.match,
-            cc.MCOLOR: cc.match,
-            cc.MUSEEVENTDATE: cc.match,
-            cc.TCODE1: cc.match,
-            cc.TCODE2: cc.match,
-            cc.GROUND: cc.game,
-            cc.GBOARD: cc.game,
-            cc.GCODE: cc.game,
-            cc.PCODE1: cc.game,
-            cc.PCODE2: cc.game,
-            cc.GCOLOR: cc.game,
-            cc.GRESULT: cc.game,
-            cc.GDATE: cc.game,
-            cc.GUSEMATCHDATE: cc.game,
-            cc.TCODE: {cc.team: None, cc.represent: None},
-            cc.TNAME: cc.team,
-            cc.RPAIRING: cc.represent,
-            cc.represent: None,
-            cc.club: None,
-            cc.player: None,
-            cc.game: None,
-            cc.affiliate: None,
-            cc.team: None,
-            cc.event: None,
-            cc.match: None,
+            cc.PBCF: cc.LPLAYER,
+            cc.PDOB: cc.LPLAYER,
+            cc.PGENDER: cc.LPLAYER,
+            cc.PDIRECT: cc.LPLAYER,
+            cc.PTITLE: cc.LPLAYER,
+            cc.PFIDE: cc.LPLAYER,
+            cc.PLENFORENAME: cc.LPLAYER,
+            cc.PLENNICKNAME: cc.LPLAYER,
+            cc.MCODE: {cc.LMATCH: None, cc.LGAME: None},
+            cc.MNAME: cc.LMATCH,
+            cc.MDATE: cc.LMATCH,
+            cc.MTYPE: cc.LMATCH,
+            cc.MCOLOR: cc.LMATCH,
+            cc.MUSEEVENTDATE: cc.LMATCH,
+            cc.TCODE1: cc.LMATCH,
+            cc.TCODE2: cc.LMATCH,
+            cc.GROUND: cc.LGAME,
+            cc.GBOARD: cc.LGAME,
+            cc.GCODE: cc.LGAME,
+            cc.PCODE1: cc.LGAME,
+            cc.PCODE2: cc.LGAME,
+            cc.GCOLOR: cc.LGAME,
+            cc.GRESULT: cc.LGAME,
+            cc.GDATE: cc.LGAME,
+            cc.GUSEMATCHDATE: cc.LGAME,
+            cc.TCODE: {cc.LTEAM: None, cc.LREPRESENT: None},
+            cc.TNAME: cc.LTEAM,
+            cc.RPAIRING: cc.LREPRESENT,
+            cc.LREPRESENT: None,
+            cc.LCLUB: None,
+            cc.LPLAYER: None,
+            cc.LGAME: None,
+            cc.LAFFILIATE: None,
+            cc.LTEAM: None,
+            cc.LEVENT: None,
+            cc.LMATCH: None,
         }
 
         # there may be PCODE values not used as PCODE1 or PCODE2 values
-        # the extra translate_results_format call with the copy_lines=False
+        # the extra _translate_results_format call with the copy_lines=False
         # argument allows the excess PCODEs to be lost.
         # PCODE1 and PCODE2 appear before PCODE in dump file. Corresponding
         # fields in submission format are other way round.
         # pinmap argument is PCODE1 and PCODE2 in mergesource.py
-        super(PrepareLeagueDump, self).translate_results_format(
+        super()._translate_results_format(
             context=context,
             keymap=keymap,
             validmap=validmap,
@@ -724,7 +721,7 @@ class PrepareLeagueDump(PrepareResults):
             copy_lines=False,
         )
 
-        return super(PrepareLeagueDump, self).translate_results_format(
+        return super()._translate_results_format(
             context=context,
             keymap=keymap,
             validmap=validmap,
@@ -747,17 +744,18 @@ class PrepareLeagueDump(PrepareResults):
 
     def write_file(self, inpath, outpath, folder):
         """Write text derived from inpath file to outpath file in folder."""
-        d, f = os.path.split(outpath[0])
+        d = os.path.split(outpath[0])[0]
         nd = os.path.join(folder, d)
         if not os.path.exists(nd):
             os.makedirs(nd)
-        nf = open(outpath[0], "w")  # 'wb'?
-        try:
-            nf.write(self.filenewtextmap[inpath])
-            cf = open(os.path.join(nd, cc.TAKEON_LEAGUE_FORMAT), "w")  # 'wb'?
-            cf.close()
-        finally:
-            nf.close()
+        with open(outpath[0], "w", encoding="utf8") as outnf:  # 'wb'?
+            outnf.write(self.filenewtextmap[inpath])
+            with open(
+                os.path.join(nd, cc.TAKEON_LEAGUE_FORMAT),
+                "w",  # 'wb'?
+                encoding="utf8",
+            ) as outcf:
+                del outcf
 
     @staticmethod
     def generate_file_name(inpath, infolder, outfolder):
@@ -766,6 +764,7 @@ class PrepareLeagueDump(PrepareResults):
         infolder is present for compatibility with PrepareSubmissionFile.
 
         """
+        del infolder
         return os.path.join(
             outfolder,
             os.path.splitext(os.path.split(inpath)[-1])[0],

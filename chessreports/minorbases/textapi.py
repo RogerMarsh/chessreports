@@ -20,13 +20,11 @@ import threading
 # from ..core.database import DatabaseError, Database
 # from ..core import cursor
 # from ..core.constants import FILE, FOLDER, FIELDS
-from solentware_base.core.constants import FILE, FOLDER, FIELDS
+from solentware_base.core.constants import FILE, FOLDER
 
 
 class TextapiError(Exception):  # DatabaseError):
     """Exception class for textapi module."""
-
-    pass
 
 
 class Textapi:  # (Database):
@@ -52,30 +50,30 @@ class Textapi:  # (Database):
                 }, ...
             }
 
-        dBasefolder = folder for files unless overridden in textdb
+        dbasefolder = folder for files unless overridden in textdb
 
         """
-        # The database definition from dBasefiles after validation
+        # The database definition from dbasefiles after validation
         self.textdbfiles = None
 
-        # The folder from dBasefolder after validation
+        # The folder from dbasefolder after validation
         self.textdbfolder = None
 
         # TextapiRoot objects for all textdb names.
         # {name:TextapiRoot instance, ...}
-        self.main = dict()
+        self.main = {}
 
-        files = dict()
-        pathnames = dict()
+        files = {}
+        pathnames = {}
 
         if textdbfolder is not False:
             try:
                 textdbfolder = os.path.abspath(textdbfolder)
-            except:
+            except Exception as exc:
                 msg = " ".join(
                     ["Main folder name", str(textdbfolder), "is not valid"]
                 )
-                raise TextapiError(msg)
+                raise TextapiError(msg) from exc
 
         for dd in textdbfiles:
             if len(dd) == 0:
@@ -83,7 +81,7 @@ class Textapi:  # (Database):
 
             try:
                 folder = textdbfiles[dd].get(FOLDER, None)
-            except:
+            except Exception as exc:
                 msg = " ".join(
                     [
                         "textdb file definition for",
@@ -91,9 +89,9 @@ class Textapi:  # (Database):
                         "must be a dictionary",
                     ]
                 )
-                raise TextapiError(msg)
+                raise TextapiError(msg) from exc
 
-            if folder == None:
+            if folder is None:
                 folder = textdbfolder
             if textdbfolder is not False:
                 try:
@@ -101,9 +99,9 @@ class Textapi:  # (Database):
                     fname = os.path.join(
                         folder, textdbfiles[dd].get(FILE, None)
                     )
-                except:
+                except Exception as exc:
                     msg = " ".join(["File name for", dd, "is invalid"])
-                    raise TextapiError(msg)
+                    raise TextapiError(msg) from exc
             else:
                 fname = textdbfiles[dd].get(FILE, None)
 
@@ -132,8 +130,8 @@ class Textapi:  # (Database):
 
     def close_context(self):
         """Close files."""
-        for n in self.main:
-            self.main[n].close()
+        for value in self.main.values():
+            value.close()
 
     def exists(self, dbname, dummy):
         """Return True if dbname is one of the defined files.
@@ -141,6 +139,7 @@ class Textapi:  # (Database):
         dummy is ignored.  It is present for compatibility with bsddb.
 
         """
+        del dummy
         return dbname in self.main
 
     def database_cursor(self, dbname, dummy, keyrange=None, recordset=None):
@@ -151,8 +150,10 @@ class Textapi:  # (Database):
         recordset is ignored.  It is present for compatibility with others.
 
         """
-        if self.main[dbname]._table_link != None:
+        del dummy, keyrange, recordset
+        if self.main[dbname].table_link is not None:
             return self.main[dbname].make_cursor()
+        return None
 
     def get_database(self, dbname, dummy):
         """Return file for dbname.
@@ -160,7 +161,8 @@ class Textapi:  # (Database):
         dummy is ignored.  It is present for compatibility with bsddb.
 
         """
-        return self.main[dbname]._table_link
+        del dummy
+        return self.main[dbname].table_link
 
     def get_primary_record(self, dbname, record):
         """Return record.
@@ -168,6 +170,7 @@ class Textapi:  # (Database):
         dbname is ignored.  It is present for compatibility with bsddb.
 
         """
+        del dbname
         return record
 
     def is_primary(self, dbname, dummy):
@@ -177,6 +180,7 @@ class Textapi:  # (Database):
         with bsddb.
 
         """
+        del dbname, dummy
         return True
 
     def is_primary_recno(self, dbname):
@@ -185,6 +189,7 @@ class Textapi:  # (Database):
         dbname is ignored.  It is present for compatibility with bsddb.
 
         """
+        del dbname
         return True
 
     def is_recno(self, dbname, dummy):
@@ -194,17 +199,17 @@ class Textapi:  # (Database):
         with bsddb.
 
         """
+        del dbname, dummy
         return True
 
     def open_context(self):
         """Open all files."""
-        for n in self.main:
-            self.main[n].open_root()
-            if self.main[n]._table_link == None:
-                for m in self.main:
-                    self.main[n].close()
-                msg = " ".join(["Open file", repr(n)])
-                raise TextapiError(msg)
+        for key, value in self.main.items():
+            value.open_root()
+            if value.table_link is None:
+                for cvalue in self.main.values():
+                    cvalue.close()
+                raise TextapiError(" ".join(["Open file", repr(key)]))
 
     def decode_as_primary_key(self, dbname, srkey):
         """Return srkey.
@@ -212,6 +217,7 @@ class Textapi:  # (Database):
         dbname is ignored.  It is present for compatibility with bsddb.
 
         """
+        del dbname
         return srkey
 
     def make_root(self, filename):
@@ -233,22 +239,32 @@ class TextapiRoot:
         """Initialise for text file "filename" in closed state."""
         self._localdata = threading.local()
         self._lock_text = threading.Lock()
-        self._lock_text.acquire()
-        try:
+        with self._lock_text:
             self.filename = filename
-            self._clientcursors = dict()
-            self._set_closed_state()
-        finally:
-            self._lock_text.release()
+            self._clientcursors = {}
+            # Avoid a host of pylint W0201 attribute-defined-outside-init
+            # reports by not calling _set_closed_state to do this
+            # initialization.
+            # self._set_closed_state()
+            self._table_link = None
+            self.textlines = None
+            self.record_count = None
+            self._localdata.record_number = None
+            self._localdata.record_select = None
+            # self._clientcursors.clear()
 
     def __del__(self):
         """Close text file when instance destroyed."""
         self.close()
 
+    @property
+    def table_link(self):
+        """Reurn the file or IO bytes object."""
+        return self._table_link
+
     def close(self):
         """Close text file."""
-        self._lock_text.acquire()
-        try:
+        with self._lock_text:
             try:
                 try:
                     self._table_link.close()
@@ -256,25 +272,24 @@ class TextapiRoot:
                     pass
             finally:
                 self._set_closed_state()
-        finally:
-            self._lock_text.release()
 
     def make_cursor(self):
         """Create and return a record (line) cursor on the text file."""
-        self._lock_text.acquire()
-        try:
-            if self._table_link == None:
-                return
+        with self._lock_text:
+            if self._table_link is None:
+                return None
             c = Cursor(self)
             self._clientcursors[c] = True
             return c
-        finally:
-            self._lock_text.release()
+
+    def close_cursor(self, cursor):
+        """Close a cursor in clientcursors."""
+        if cursor in self._clientcursors:
+            del self._clientcursors[cursor]
 
     def open_root(self):
         """Open text file and extract lines as records."""
-        self._lock_text.acquire()
-        try:
+        with self._lock_text:
             try:
                 if isinstance(self.filename, io.BytesIO):
                     self._table_link = self.filename
@@ -286,20 +301,20 @@ class TextapiRoot:
                 self._localdata.record_select = None
             except:
                 self._table_link = None
-        finally:
-            self._lock_text.release()
 
     def first(self):
         """Return first record."""
         value = self._first_record()
         if value is not None:
             return (self._localdata.record_select, value)
+        return None
 
     def last(self):
         """Return last record."""
         value = self._last_record()
         if value is not None:
             return (self._localdata.record_select, value)
+        return None
 
     def nearest(self, current):
         """Return nearest record."""
@@ -307,6 +322,7 @@ class TextapiRoot:
         value = self._get_record()
         if value is not None:
             return (self._localdata.record_select, value)
+        return None
 
     def next(self, current):
         """Return next record."""
@@ -314,6 +330,7 @@ class TextapiRoot:
         value = self._next_record()
         if value is not None:
             return (self._localdata.record_select, value)
+        return None
 
     def prior(self, current):
         """Return prior record."""
@@ -321,6 +338,7 @@ class TextapiRoot:
         value = self._prior_record()
         if value is not None:
             return (self._localdata.record_select, value)
+        return None
 
     def setat(self, current):
         """Return current record."""
@@ -328,6 +346,7 @@ class TextapiRoot:
         value = self._get_record()
         if value is not None:
             return (self._localdata.record_select, value)
+        return None
 
     def _set_closed_state(self):
         self._table_link = None
@@ -344,20 +363,17 @@ class TextapiRoot:
 
     def _get_record(self):
         """Return selected line of text."""
-        self._lock_text.acquire()
-        try:
-            if self._table_link == None:
+        with self._lock_text:
+            if self._table_link is None:
                 return None
             if self._localdata.record_select < 0:
                 self._localdata.record_select = -1
                 return None
-            elif self._localdata.record_select >= self.record_count:
+            if self._localdata.record_select >= self.record_count:
                 self._localdata.record_select = self.record_count
                 return None
             self._localdata.record_number = self._localdata.record_select
             return self.textlines[self._localdata.record_number]
-        finally:
-            self._lock_text.release()
 
     def _last_record(self):
         """Position at and return last line of text."""
@@ -416,6 +432,7 @@ class Cursor:  # (cursor.Cursor):
         kargs - absorb argunents relevant to other database engines.
 
         """
+        del kargs
         super().__init__()  # dbobject)
         self._cursor = _CursorText(dbobject)
 
@@ -441,7 +458,6 @@ class Cursor:  # (cursor.Cursor):
         The _partial_key attribute is ignored.
 
         """
-        pass
 
     def _get_record(self, record):
         """Return record if key matches partial key (if any)."""
@@ -461,8 +477,7 @@ class Cursor:  # (cursor.Cursor):
 
     def setat(self, record):
         """Position cursor at record taking partial key into account."""
-        key, value = record
-        return self._get_record(self._cursor.set(key))
+        return self._get_record(self._cursor.set(record[0]))
 
     def count_records(self):
         """Return record count or None if cursor is not usable."""
@@ -470,7 +485,7 @@ class Cursor:  # (cursor.Cursor):
         if self._cursor is None:
             return None
         # return self.cursor_count()
-        return self._cursor._dbobject.record_count
+        return self._cursor.record_count
 
     def get_position_of_record(self, record=None):
         """Return position of record in file or 0 (zero)."""
@@ -478,7 +493,6 @@ class Cursor:  # (cursor.Cursor):
             return 0
         start = self.first
         step = self.next
-        keycount = self.count_records()
         position = 0
         k = record[0]
         r = start()
@@ -500,7 +514,6 @@ class Cursor:  # (cursor.Cursor):
         else:
             start = self.first
             step = self.next
-        keycount = self.count_records()
         count = 0
         r = start()
         while r:
@@ -510,6 +523,7 @@ class Cursor:  # (cursor.Cursor):
             r = step()
         if r is not None:
             return r
+        return None
 
 
 class _CursorText:
@@ -528,13 +542,15 @@ class _CursorText:
     def __del__(self):
         self.close()
 
+    @property
+    def record_count(self):
+        """Return record count of self._dboject."""
+        return self._dbobject.record_count
+
     def close(self):
         """Close cursor."""
         try:
-            try:
-                del self._dbobject._clientcursors[self]
-            except:
-                pass
+            self._dbobject.close_cursor(self)
         finally:
             self._set_closed_state()
 
@@ -544,6 +560,7 @@ class _CursorText:
         if r:
             self._current = r[0]
             return r
+        return None
 
     def first(self):
         """Read first record."""
@@ -551,6 +568,7 @@ class _CursorText:
         if r:
             self._current = r[0]
             return r
+        return None
 
     def last(self):
         """Read last record."""
@@ -558,6 +576,7 @@ class _CursorText:
         if r:
             self._current = r[0]
             return r
+        return None
 
     def next(self):
         """Read next record."""
@@ -565,6 +584,7 @@ class _CursorText:
         if r:
             self._current = r[0]
             return r
+        return None
 
     def prev(self):
         """Read prior record."""
@@ -572,6 +592,7 @@ class _CursorText:
         if r:
             self._current = r[0]
             return r
+        return None
 
     def set(self, key):
         """Read current record."""
@@ -579,6 +600,7 @@ class _CursorText:
         if r:
             self._current = r[0]
             return r
+        return None
 
     def set_range(self, key):
         """Read nearest record."""
@@ -586,13 +608,16 @@ class _CursorText:
         if r:
             self._current = r[0]
             return r
+        return None
 
     def set_both(self, key, value):
         """Read nearest record."""
+        del value
         r = self._dbobject.nearest(key)
         if r:
             self._current = r[0]
             return r
+        return None
 
     def _set_closed_state(self):
         self._dbobject = None

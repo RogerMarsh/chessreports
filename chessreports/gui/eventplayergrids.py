@@ -4,10 +4,6 @@
 
 """Results database datagrid classes for new players in an event."""
 
-import tkinter
-
-from solentware_grid.core import dataclient
-
 from . import eventgrids
 from . import resultsrow
 from ..core import filespec

@@ -17,7 +17,6 @@ versions it customised newplayers_lite.
 import tkinter
 import tkinter.messagebox
 import re
-import os
 import urllib.request
 import json
 
@@ -41,12 +40,15 @@ class NewPlayers(newplayers_database.NewPlayers):
 
     _btn_download_ecf_codes = "newplayers_ecf_codes"
 
-    def __init__(self, parent=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, cnf={}, **kargs):
         """Extend and define the results database new player panel."""
-        super(NewPlayers, self).__init__(parent=parent, cnf=cnf, **kargs)
+        super().__init__(parent=parent, cnf=cnf, **kargs)
 
     def on_download_ecf_codes(self, event=None):
         """Do processing for on_download_ecf_codes button."""
+        del event
         self.download_ecf_codes()
         return "break"
 
@@ -83,6 +85,7 @@ class NewPlayers(newplayers_database.NewPlayers):
         aliaskeys = {n[-1] for n in nsel + nbkm}
         reportedcodes = set()
         for name, key in nsel + nbkm:
+            del name
             if key not in aliaskeys:
                 continue
             aliaskeys.remove(key)
@@ -297,13 +300,35 @@ class NewPlayers(newplayers_database.NewPlayers):
         self, aliasrecord, db, title, reported_code, url_name, request_value
     ):
         """Attempt to download ECF data for reported code."""
+        del db
         urlname = get_configuration_item(
             configuration.Configuration().get_configuration_file_name(),
             url_name,
             constants.DEFAULT_URLS,
         )
         try:
-            url = urllib.request.urlopen("".join((urlname, request_value)))
+            with urllib.request.urlopen(
+                "".join((urlname, request_value))
+            ) as url:
+                try:
+                    urldata = url.read()
+                except Exception as exc:
+                    tkinter.messagebox.showinfo(
+                        parent=self.get_widget(),
+                        title=title,
+                        message="".join(
+                            (
+                                "Exception raised trying to read data ",
+                                "from URL for\n",
+                                reported_code,
+                                " for\n",
+                                aliasrecord.value.name,
+                                "\n\n",
+                                str(exc),
+                            )
+                        ),
+                    )
+                    return None
         except Exception as exc:
             tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
@@ -316,25 +341,6 @@ class NewPlayers(newplayers_database.NewPlayers):
                         " for\n",
                         aliasrecord.value.name,
                         ".\n\n",
-                        str(exc),
-                    )
-                ),
-            )
-            return None
-        try:
-            urldata = url.read()
-        except Exception as exc:
-            tkinter.messagebox.showinfo(
-                parent=self.get_widget(),
-                title=title,
-                message="".join(
-                    (
-                        "Exception raised trying to read data ",
-                        "from URL for\n",
-                        reported_code,
-                        " for\n",
-                        aliasrecord.value.name,
-                        "\n\n",
                         str(exc),
                     )
                 ),
@@ -364,6 +370,7 @@ class NewPlayers(newplayers_database.NewPlayers):
         self, aliasrecord, db, title, ecfdata, reportedcode
     ):
         """Confirm ECF data for membership number is stored on database."""
+        del db
         if not tkinter.messagebox.askyesno(
             parent=self.get_widget(),
             message="".join(
@@ -389,6 +396,7 @@ class NewPlayers(newplayers_database.NewPlayers):
         self, aliasrecord, db, title, ecfdata, reportedcode
     ):
         """Confirm ECF data for ECF code is stored on database."""
+        del db
         if not tkinter.messagebox.askyesno(
             parent=self.get_widget(),
             message="".join(
@@ -421,8 +429,6 @@ class NewPlayers(newplayers_database.NewPlayers):
                     (
                         "Exception raised trying to save data ",
                         "returned from URL for\n",
-                        reported_code,
-                        " for\n",
                         aliasrecord.value.name,
                         "\non database.\n\n",
                         str(exc),

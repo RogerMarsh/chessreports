@@ -28,7 +28,7 @@ from .resultsrecord import get_games_for_event, get_affiliation_details
 from . import filespec
 
 
-class CollationDB(object):
+class CollationDB:
     """Update results database from games in a Collation instance."""
 
     def __init__(self, games, database):
@@ -47,23 +47,23 @@ class CollationDB(object):
         Caller is responsible for commit or backout action.
 
         """
-        eventsections = dict()  # {name : {section name : srkey, ...}, ...}
-        eventsamend = dict()
-        eventskey = dict()  # {srkey : name, ...}
-        eventsmap = dict()  # {name : srkey, ...}
+        eventsections = {}  # {name : {section name : srkey, ...}, ...}
+        eventsamend = {}
+        eventskey = {}  # {srkey : name, ...}
+        eventsmap = {}  # {name : srkey, ...}
         namemanager = NameManager(self._database)
-        players = dict()  # {srkey: ResultsDBrecordPlayer instance, ...}
-        playersamend = dict()
-        playersgames = dict()
-        playerskey = dict()
-        playersmap = dict()
-        new_players = dict()
+        players = {}  # {srkey: ResultsDBrecordPlayer instance, ...}
+        playersamend = {}
+        playersgames = {}
+        playerskey = {}
+        playersmap = {}
+        new_players = {}
         newgames = []  # [ResultsDBrecordGame instance, ...]
-        newgamesmap = dict()  # [instance attributes tuple : count, ...}
+        newgamesmap = {}  # [instance attributes tuple : count, ...}
         dbgames = []  # [ResultsDBrecordGame instance, ...]
-        dbgamesmap = dict()  # [instance attributes tuple : [key, ...], ...}
-        merges = dict()  # {key: ResultsDBrecordPlayer instance, ...}
-        mergesamend = dict()
+        dbgamesmap = {}  # [instance attributes tuple : [key, ...], ...}
+        merges = {}  # {key: ResultsDBrecordPlayer instance, ...}
+        mergesamend = {}
 
         def get_players_blocking_update(buplayers):
             """Return players with merges or ECF codes blocking update."""
@@ -151,9 +151,9 @@ class CollationDB(object):
                     if pid not in playersamend:
                         playersamend[pid] = players[pid].clone()
                         if change_affiliation:
-                            playersamend[
-                                pid
-                            ].value.affiliation = new_affiliation
+                            playersamend[pid].value.affiliation = (
+                                new_affiliation
+                            )
                         if change_reported_codes:
                             playersamend[pid].value.reported_codes = list(
                                 player.reported_codes
@@ -185,7 +185,7 @@ class CollationDB(object):
                 players[pid] = pr
                 playersgames[pid] = False
 
-        """Get new events"""
+        # Get new events.
         for ugkey in self._games:
             competition = self._games[ugkey].competition
             for game in self._games[ugkey].games:
@@ -196,33 +196,35 @@ class CollationDB(object):
                         or game.result not in ecfresult
                     ):
                         continue
-                    elif game.gradegame != True:  # to be only test eventually
+                    if game.gradegame is not True:  # only test eventually.
                         continue
                 else:
                     continue
                 hp = game.homeplayer
                 event_id = (hp.event, hp.startdate, hp.enddate)
                 if event_id not in eventsections:
-                    eventsections[event_id] = dict()
+                    eventsections[event_id] = {}
                 if competition not in eventsections[event_id]:
                     eventsections[event_id][competition] = None
 
-        """Get existing events and match with new events if possible.
-        Note that the database may contain several event records for
-        each key in events. Any of these that intersect the new events
-        using competition will be replaced by a single record.
-        Pick one of the existing event records for each event to become
-        the event record used for the replacement results. Arbitrary choice
-        now but possibly the event with most games is better."""
+        # Get existing events and match with new events if possible.
+        # Note that the database may contain several event records for
+        # each key in events. Any of these that intersect the new events
+        # using competition will be replaced by a single record.
+        # Pick one of the existing event records for each event to become
+        # the event record used for the replacement results. Arbitrary choice
+        # now but possibly the event with most games is better.
         delete_events = []
         use_events = []
-        for e in eventsections:
-            sections = list(eventsections[e].keys())
-            dbevents = get_events_matching_event_identity(self._database, e)
+        for eskey, esvalue in eventsections.items():
+            sections = list(esvalue.keys())
+            dbevents = get_events_matching_event_identity(
+                self._database, eskey
+            )
             replace_events = []
-            for dbe in dbevents:
-                dbsections = dict()
-                for s in dbevents[dbe].value.sections:
+            for key, value in dbevents.items():
+                dbsections = {}
+                for s in value.value.sections:
                     dbsections[
                         get_name_from_record_value(
                             self._database.get_primary_record(
@@ -232,25 +234,26 @@ class CollationDB(object):
                     ] = None
                 for s in sections:
                     if s in dbsections:
-                        replace_events.append((dbe, e, dbevents[dbe]))
-                        srdbe = dbevents[dbe].key.recno
-                        eventsmap[e] = srdbe
-                        eventskey[srdbe] = dbevents[dbe]
-                        eventsamend[srdbe] = dbevents[dbe].clone()
+                        replace_events.append((key, eskey, value))
+                        srdbe = value.key.recno
+                        eventsmap[eskey] = srdbe
+                        eventskey[srdbe] = value
+                        eventsamend[srdbe] = value.clone()
                         for es in sections:
-                            eventsections[e][es] = srdbe
+                            esvalue[es] = srdbe
                         break
-            if len(replace_events):
+            if replace_events:
                 use_events.append(replace_events.pop())
             delete_events.extend(replace_events)
             del replace_events
 
-        """Get names used by existing events and decrement reference counts
-        Get players involved in existing games and decrement reference
-        counts for names used by these games and players. Invert the
-        value dictionary for comparison with new games"""
+        # Get names used by existing events and decrement reference counts
+        # Get players involved in existing games and decrement reference
+        # counts for names used by these games and players. Invert the
+        # value dictionary for comparison with new games.
         for dbevents in (delete_events, use_events):
-            for dbe, e, record in dbevents:
+            for item in dbevents:
+                record = item[2]
                 for s in record.value.sections:
                     namemanager.unset_name(s)
                 for g in get_games_for_event(self._database, record):
@@ -265,6 +268,8 @@ class CollationDB(object):
                         unset_player(p)
                     ig = []
                     d = g.value.__dict__
+                    # Replace with 'ig = literal_eval(g.value.pack_value())'
+                    # pylint: disable-next=protected-access
                     for a in g.value._attribute_order:
                         ig.append(d[a])
                     igt = tuple(ig)
@@ -274,15 +279,15 @@ class CollationDB(object):
                         dbgamesmap[igt] = [g]
         del use_events
 
-        """Go through new games to find players that already exist on database.
-        If any missing from new games have aliases that are not being deleted
-        the update cannot proceed.
-        (Check if aliases are in dbplayers as well.)"""
-        dbplayers = dict()
-        dbplayerskey = dict()
-        for pid in players:
-            dbplayers[pid] = None
-            dbplayerskey[players[pid].key.recno] = pid
+        # Go through new games to find players that already exist on database.
+        # If any missing from new games have aliases that are not being deleted
+        # the update cannot proceed.
+        # (Check if aliases are in dbplayers as well.)
+        dbplayers = {}
+        dbplayerskey = {}
+        for key, value in players.items():
+            dbplayers[key] = None
+            dbplayerskey[value.key.recno] = key
         for ugkey in self._games:
             collation = self._games[ugkey]
             competition = collation.competition
@@ -294,7 +299,7 @@ class CollationDB(object):
                         or game.result not in ecfresult
                     ):
                         continue
-                    elif game.gradegame != True:  # to be only test eventually
+                    if game.gradegame is not True:  # only test eventually.
                         continue
                 else:
                     continue
@@ -303,7 +308,7 @@ class CollationDB(object):
                     if pid in dbplayers:
                         del dbplayers[pid]
                         del dbplayerskey[players[pid].key.recno]
-        dbplayersdict = dict()
+        dbplayersdict = {}
         for pid in dbplayers:
             for a in players[pid].value.get_alias_list():
                 if a not in dbplayerskey:
@@ -323,26 +328,24 @@ class CollationDB(object):
         del dbplayers
         del dbplayersdict
 
-        """Put new events (no existing event records) in event map. Use an
-        existing event record if one is available."""
-        for n in eventsections:
-            if n not in eventsmap:
+        # Put new events (no existing event records) in event map. Use an
+        # existing event record if one is available.
+        for key, value in eventsections.items():
+            if key not in eventsmap:
                 er = ResultsDBrecordEvent()
-                er.value.name, er.value.startdate, er.value.enddate = n
-                er.value.sections = set_name_list(
-                    list(eventsections[n].keys())
-                )
+                er.value.name, er.value.startdate, er.value.enddate = key
+                er.value.sections = set_name_list(list(value.keys()))
                 er.key.recno = None
                 er.put_record(self._database, filespec.EVENT_FILE_DEF)
-                eventsmap[n] = er.key.recno
-                for s in eventsections[n]:
-                    eventsections[n][s] = er.key.recno
+                eventsmap[key] = er.key.recno
+                for s in value:
+                    value[s] = er.key.recno
             else:
-                snl = set_name_list(list(eventsections[n].keys()))
-                if eventsmap[n] in eventsamend:
-                    eventsamend[eventsmap[n]].value.sections[:] = snl
+                snl = set_name_list(list(value.keys()))
+                if eventsmap[key] in eventsamend:
+                    eventsamend[eventsmap[key]].value.sections[:] = snl
 
-        """Create new name and player records for new games."""
+        # Create new name and player records for new games.
         for ugkey in self._games:
             collation = self._games[ugkey]
             competition = collation.competition
@@ -355,7 +358,7 @@ class CollationDB(object):
                         or game.result not in ecfresult
                     ):
                         continue
-                    elif game.gradegame != True:  # to be only test eventually
+                    if game.gradegame is not True:  # only test eventually.
                         continue
                 else:
                     continue
@@ -367,12 +370,12 @@ class CollationDB(object):
                         if team is not None:
                             namemanager.set_name(team)
 
-        """Adjust associated player records where a merged player record is
-        deleted. Use instances in players if available. Create instances in
-        merges if necessary."""
-        for p in players:
-            if not playersgames[p]:
-                m = players[p].value.merge
+        # Adjust associated player records where a merged player record is
+        # deleted. Use instances in players if available. Create instances in
+        # merges if necessary.
+        for key, value in players.items():
+            if not playersgames[key]:
+                m = value.value.merge
                 if m is False:
                     continue
                 if m is None:
@@ -389,12 +392,12 @@ class CollationDB(object):
                     mergesamend[m] = merges[m].clone()
                     adjustmerge = mergesamend[m]
                 try:
-                    adjustmerge.value.alias.remove(players[p].key.recno)
+                    adjustmerge.value.alias.remove(value.key.recno)
                 except ValueError:
                     pass
 
-        """Prepare new games and invert the value dictionary for comparison
-        with games from database."""
+        # Prepare new games and invert the value dictionary for comparison
+        # with games from database.
         for ugkey in self._games:
             collation = self._games[ugkey]
             competition_date = collation.date
@@ -407,7 +410,7 @@ class CollationDB(object):
                         or game.result not in ecfresult
                     ):
                         continue
-                    elif game.gradegame != True:  # to be only test eventually
+                    if game.gradegame is not True:  # only test eventually.
                         continue
                 else:
                     continue
@@ -452,6 +455,8 @@ class CollationDB(object):
                     gr.value.awayteam = None
                 ig = []
                 d = gr.value.__dict__
+                # Replace with 'ig = literal_eval(gr.value.pack_value())'
+                # pylint: disable-next=protected-access
                 for a in gr.value._attribute_order:
                     ig.append(d[a])
                 igt = tuple(ig)
@@ -464,47 +469,45 @@ class CollationDB(object):
                 minlen = min(len(newgamesmap[ngm]), len(newgamesmap[ngm]))
                 del newgamesmap[ngm][:minlen]
                 del dbgamesmap[ngm][:minlen]
-        for ngm in newgamesmap:
-            newgames.extend(newgamesmap[ngm])
-        for dgm in dbgamesmap:
-            dbgames.extend(dbgamesmap[dgm])
+        for ngm in newgamesmap.values():
+            newgames.extend(ngm)
+        for dgm in dbgamesmap.values():
+            dbgames.extend(dgm)
 
-        """Check that player records being deleted are not ones used to link
-        to ECF grading code records.
-        It is assumed no player deletions occur for new events, so the earlier
-        put_record for a new event will not have happened.
-        Note it may be possible to do something sensible in all cases.
-        """
+        # Check that player records being deleted are not ones used to link
+        # to ECF grading code records.
+        # It is assumed no player deletions occur for new events, so the
+        # earlier put_record for a new event will not have happened.
+        # Note it may be possible to do something sensible in all cases.
         linkers = []
-        for p in players:
-            if not playersgames[p]:
-                if players[p].value.merge is False:
-                    linkers.append(players[p].value.name)
-        if len(linkers):
+        for key, value in players.items():
+            if not playersgames[key]:
+                if value.value.merge is False:
+                    linkers.append(value.value.name)
+        if linkers:
             return (
                 "".join(
                     (
-                        "These player's records cannot be deleted because they ",
-                        "link directly to ECF grading codes and probably link ",
-                        "other records for these players to their ECF grading ",
-                        "code.",
+                        "These player's records cannot be deleted because ",
+                        "they link directly to ECF grading codes and ",
+                        "probably link other records for these players to ",
+                        "their ECF grading code.",
                     )
                 ),
                 "\n".join(linkers),
             )
 
-        """Do the updates.
-        Note that games are the only records that need creating at this
-        stage. The other records (names players and events) had to be
-        created earlier so they could be referenced. It is not possible
-        to delete event records as part of this process because the
-        document driving the update does not contain the names of sections
-        to be replaced. Some section deletions are deduced: new document
-        for EventA with sections Open and Major will cause deletion of
-        section Minor if database holds EventA with sections Open and
-        Minor because the match on Open causes an amend to happen rather
-        than an insert.
-        """
+        # Do the updates.
+        # Note that games are the only records that need creating at this
+        # stage. The other records (names players and events) had to be
+        # created earlier so they could be referenced. It is not possible
+        # to delete event records as part of this process because the
+        # document driving the update does not contain the names of sections
+        # to be replaced. Some section deletions are deduced: new document
+        # for EventA with sections Open and Major will cause deletion of
+        # section Minor if database holds EventA with sections Open and
+        # Minor because the match on Open causes an amend to happen rather
+        # than an insert.
         for og, ng in zip(dbgames, newgames):
             ng.key.recno = og.key.recno
             og.edit_record(
@@ -513,42 +516,45 @@ class CollationDB(object):
                 filespec.GAME_FIELD_DEF,
                 ng,
             )
+        # pycodestyle E203 whitespace before ':'.
+        # black formatting insists on the space.
         for og in dbgames[len(newgames) :]:
             og.delete_record(self._database, filespec.GAME_FILE_DEF)
+        # pycodestyle E203 whitespace before ':'.
+        # black formatting insists on the space.
         for ng in newgames[len(dbgames) :]:
             ng.put_record(self._database, filespec.GAME_FILE_DEF)
         namemanager.update_names()
-        for p in players:
-            if not playersgames[p]:
-                players[p].delete_record(
-                    self._database, filespec.PLAYER_FILE_DEF
-                )
-            elif p in playersamend:
-                players[p].edit_record(
+        for key, value in players.items():
+            if not playersgames[key]:
+                value.delete_record(self._database, filespec.PLAYER_FILE_DEF)
+            elif key in playersamend:
+                value.edit_record(
                     self._database,
                     filespec.PLAYER_FILE_DEF,
                     filespec.PLAYER_FIELD_DEF,
-                    playersamend[p],
+                    playersamend[key],
                 )
-        for m in merges:
-            merges[m].edit_record(
+        for key, value in merges.items():
+            value.edit_record(
                 self._database,
                 filespec.PLAYER_FILE_DEF,
                 filespec.PLAYER_FIELD_DEF,
-                mergesamend[m],
+                mergesamend[key],
             )
-        for e in eventsamend:
-            eventskey[e].edit_record(
+        for key, value in eventsamend.items():
+            eventskey[key].edit_record(
                 self._database,
                 filespec.EVENT_FILE_DEF,
                 filespec.EVENT_FIELD_DEF,
-                eventsamend[e],
+                value,
             )
-        for dbe, e, record in delete_events:
+        for item in dbevents:
+            record = item[2]
             record.delete_record(self._database, filespec.EVENT_FILE_DEF)
 
 
-class NameManager(object):
+class NameManager:
     """Manage name lookup and reference counts for a collation.
 
     Originally local attributes of update_players but merge_players needs this
@@ -559,13 +565,13 @@ class NameManager(object):
 
     def __init__(self, database):
         """Initialise name lookup data structures."""
-        super(NameManager, self).__init__()
+        super().__init__()
         self._database = database
         # These were local attributes of CollationDB.update_results originally.
-        self.names = dict()  # {name : ResultsDBrecordName instance, ...}
-        self.namesamend = dict()  # {name : names[name].clone(), ...}
-        self.nameskey = dict()  # {srkey : name, ...}
-        self.namesmap = dict()  # {name : srkey, ...}
+        self.names = {}  # {name : ResultsDBrecordName instance, ...}
+        self.namesamend = {}  # {name : names[name].clone(), ...}
+        self.nameskey = {}  # {srkey : name, ...}
+        self.namesmap = {}  # {name : srkey, ...}
 
     def set_name(self, name):
         """Create name record adjust reference count and return key."""
@@ -618,19 +624,17 @@ class NameManager(object):
 
     def update_names(self):
         """Apply the collected updates to names."""
-        for n in self.names:
-            if n in self.namesamend:
-                rc = self.namesamend[n].value.reference_count
-                if rc <= 0:
-                    self.names[n].delete_record(
-                        self._database, filespec.NAME_FILE_DEF
-                    )
-                elif self.names[n].value.reference_count != rc:
-                    self.names[n].edit_record(
+        for key, value in self.names.items():
+            if key in self.namesamend:
+                count = self.namesamend[key].value.reference_count
+                if count <= 0:
+                    value.delete_record(self._database, filespec.NAME_FILE_DEF)
+                elif value.value.reference_count != count:
+                    value.edit_record(
                         self._database,
                         filespec.NAME_FILE_DEF,
                         filespec.NAME_FIELD_DEF,
-                        self.namesamend[n],
+                        self.namesamend[key],
                     )
 
     def get_code(self, name):

@@ -10,15 +10,10 @@ from os.path import split
 from solentware_base.core.record import KeydBaseIII, Value, RecorddBaseIII
 
 from ...minorbases.dbaseapi import (
-    dBaseapi,
-    FOLDER,
+    DBaseapi,
     FIELDS,
     FILE,
     C,
-    N,
-    L,
-    D,
-    F,
     LENGTH,
     TYPE,
     START,
@@ -27,12 +22,12 @@ from ...minorbases.dbaseapi import (
 PLAYERS = "players"
 
 # The RECTYPE values on an ECF player update file and interpretation
-_addplayer = "A"  # add a new player
-_updateplayer = "U"  # update details of existing player
-_deleteplayer = "D"  # delete a player
+ADDPLAYER = "A"  # add a new player
+UPDATEPLAYER = "U"  # update details of existing player
+DELETEPLAYER = "D"  # delete a player
 
 
-class ECFplayersDB(dBaseapi):
+class ECFplayersDB(DBaseapi):
     """Access a player master file published by ECF."""
 
     def __init__(self, DBpath):
@@ -60,10 +55,10 @@ class ECFplayersDB(dBaseapi):
             },
         }
 
-        dBaseapi.__init__(self, dbnames, d)
+        DBaseapi.__init__(self, dbnames, d)
 
 
-class ECFplayersUpdateDB(dBaseapi):
+class ECFplayersUpdateDB(DBaseapi):
     """Access a player update file published by ECF."""
 
     def __init__(self, DBpath):
@@ -92,13 +87,11 @@ class ECFplayersUpdateDB(dBaseapi):
             },
         }
 
-        dBaseapi.__init__(self, dbnames, d)
+        DBaseapi.__init__(self, dbnames, d)
 
 
 class ECFplayersDBkey(KeydBaseIII):
     """Player key."""
-
-    pass
 
 
 class ECFplayersDBvalue(Value):
@@ -106,7 +99,7 @@ class ECFplayersDBvalue(Value):
 
     # def load(self, value):
     #    """Convert bytes values from dbaseIII record to string"""
-    #    super(ECFplayersDBvalue, self).load(value)
+    #    super().load(value)
     #    for a in self.__dict__:
     #        self.__dict__[a] = self.__dict__[a]
 
@@ -116,4 +109,4 @@ class ECFplayersDBrecord(RecorddBaseIII):
 
     def __init__(self, keyclass=ECFplayersDBkey, valueclass=ECFplayersDBvalue):
         """Customise RecorddBaseIII with ECFplayersDBkey, ECFplayersDBvalue."""
-        super(ECFplayersDBrecord, self).__init__(keyclass, valueclass)
+        super().__init__(keyclass, valueclass)

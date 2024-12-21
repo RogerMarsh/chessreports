@@ -80,7 +80,7 @@ class FeedbackHTML(HTMLParser):
 
         """
         fbd = self.feedbackdata
-        if len(fbd):
+        if fbd:
             fbds = [fbd[0]]
         else:
             fbds = [""]
@@ -118,39 +118,29 @@ class FeedbackHTML(HTMLParser):
         if tag.strip() in {"script", "style"}:
             self._ignore_data -= 1
 
-    def handle_startendtag(self, tag, attrs):
-        """Delegate to HTMLParser method."""
-        super().handle_startendtag(tag, attrs)
-
-    def handle_data(self, tag):
+    def handle_data(self, data):
         """Override HTMLParser method which does nothing."""
         if self._ignore_data:
             return
-        ts = tag.strip()
+        ts = data.strip()
         if not ts:
             return
         self.feedbackdata.append(ts)
 
-    def handle_entityref(self, tag):
+    def handle_entityref(self, name):
         """Override HTMLParser method which does nothing."""
-        pass
 
-    def handle_charref(self, tag):
+    def handle_charref(self, name):
         """Override HTMLParser method which does nothing."""
-        pass
 
-    def handle_comment(self, tag):
+    def handle_comment(self, data):
         """Override HTMLParser method which does nothing."""
-        pass
 
-    def handle_decl(self, tag):
+    def handle_decl(self, decl):
         """Override HTMLParser method which does nothing."""
-        pass
 
-    def handle_pi(self, tag):
+    def handle_pi(self, data):
         """Override HTMLParser method which does nothing."""
-        pass
 
     def handle_unknown_decl(self, tag):
         """Override HTMLParser method which does nothing."""
-        pass

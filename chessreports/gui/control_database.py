@@ -25,22 +25,21 @@ from ..core import constants
 class Control(panel.PlainPanel):
     """The Control panel for a Results database."""
 
-    _btn_opendatabase = "control_lite_open_database"  # menu button only
-    _btn_closedatabase = "control_lite_close_database"
-    _btn_importevents = "control_lite_import_events"
+    btn_opendatabase = "control_lite_open_database"  # menu button only
+    btn_closedatabase = "control_lite_close_database"
+    btn_importevents = "control_lite_import_events"
 
-    def __init__(self, parent=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, cnf={}, **kargs):
         """Extend and define the results database control panel."""
-        super(Control, self).__init__(parent=parent, cnf=cnf, **kargs)
+        super().__init__(parent=parent, cnf=cnf, **kargs)
 
         self.datafile = None
         self.datagrid = None
 
         self.show_buttons_for_closed_database()
         self.create_buttons()
-
-        self.resultsdbfolder = tkinter.Label(master=self.get_widget(), text="")
-        self.resultsdbfolder.pack(side=tkinter.TOP, fill=tkinter.X)
 
         self.datafilepath = tkinter.Label(master=self.get_widget(), text="")
         self.datafilepath.pack(side=tkinter.TOP, fill=tkinter.X)
@@ -55,10 +54,6 @@ class Control(panel.PlainPanel):
 
         # try: ... except: ... for application destroyed after Close then Quit.
         # Switch to ChessReports-4.0 introduced raising exception.
-        try:
-            self.resultsdbfolder.destroy()
-        except tkinter.TclError:
-            pass
         try:
             self.datafilepath.destroy()
         except tkinter.TclError:
@@ -82,27 +77,29 @@ class Control(panel.PlainPanel):
         ):
             self.close_resources()
             return True
+        return None
 
     def close_import_file_prompt(self, displaytype):
         """Prompt to close the open file."""
         if self.datafile is not None:
             pn = self.datafilepath.cget("text").split()
             pn[0] = os.path.split(pn[0])[-1]
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(("Close", " ".join(pn), "first")),
                 title=displaytype,
             )
             return True
+        return None
 
     def close_resources(self):
         """Close the resources opened from this tab while database open."""
         self.close_update_resources()
-        if self.datafile != None:
+        if self.datafile is not None:
             self.datafile.close_context()
             self.datafile = None
             self.datafilepath.configure(text="")
-        if self.datagrid != None:
+        if self.datagrid is not None:
             self.close_display_data_for_import()
 
     def close_update_resources(self):
@@ -112,7 +109,7 @@ class Control(panel.PlainPanel):
         """Define all action buttons that may appear on Control page."""
         super().describe_buttons()
         self.define_button(
-            self._btn_closedatabase,
+            self.btn_closedatabase,
             text="Shut Database",
             tooltip="Close the open database.",
             underline=9,
@@ -120,7 +117,7 @@ class Control(panel.PlainPanel):
             command=self.on_close_database,
         )
         self.define_button(
-            self._btn_importevents,
+            self.btn_importevents,
             text="Import Events",
             tooltip="Import event data exported by Export Events.",
             underline=0,
@@ -130,11 +127,13 @@ class Control(panel.PlainPanel):
 
     def on_close_database(self, event=None):
         """Do close database actions."""
+        del event
         if not self.get_appsys().database_close():
-            self.inhibit_context_switch(self._btn_closedatabase)
+            self.inhibit_context_switch(self.btn_closedatabase)
 
     def on_import_events(self, event=None):
         """Do import events actions."""
+        del event
         conf = configuration.Configuration()
         filepath = tkinter.filedialog.askopenfilename(
             parent=self.get_widget(),
@@ -146,7 +145,7 @@ class Control(panel.PlainPanel):
             ),
         )
         if not filepath:
-            self.inhibit_context_switch(self._btn_importevents)
+            self.inhibit_context_switch(self.btn_importevents)
             return
         conf.set_configuration_value(
             constants.RECENT_IMPORT_EVENTS,
@@ -166,9 +165,9 @@ class Control(panel.PlainPanel):
         # exceptions on Allocate so the incorrect closecontexts argument did
         # not matter.
         self.get_appsys().set_kwargs_for_next_tabclass_call(
-            dict(
-                datafile=(filepath, text),
-                closecontexts=(
+            {
+                "datafile": (filepath, text),
+                "closecontexts": (
                     filespec.GAME_FILE_DEF,
                     filespec.PLAYER_FILE_DEF,
                     filespec.EVENT_FILE_DEF,
@@ -182,7 +181,7 @@ class Control(panel.PlainPanel):
                     filespec.ECFOGDPLAYER_FILE_DEF,
                     filespec.MAPECFOGDPLAYER_FILE_DEF,
                 ),
-            )
+            }
         )
 
     def show_buttons_for_closed_database(self):
@@ -194,5 +193,5 @@ class Control(panel.PlainPanel):
         """Show buttons for actions allowed when database is open."""
         self.hide_panel_buttons()
         self.show_panel_buttons(
-            (self._btn_closedatabase, self._btn_importevents)
+            (self.btn_closedatabase, self.btn_importevents)
         )

@@ -11,7 +11,6 @@ to the database.
 """
 
 import tkinter
-import datetime
 import re
 import email
 import os
@@ -49,10 +48,12 @@ _submission_player_re = re.compile(r"#Name=([^#]*)(?:#|/Z)", flags=re.DOTALL)
 class FeedbackMonthly(panel.PlainPanel):
     """The Feedback panel for a Results database with monthly rating emails."""
 
-    _btn_closefeedbackmonthly = "feedback_monthly_close"
+    btn_closefeedbackmonthly = "feedback_monthly_close"
     _btn_applyfeedbackmonthly = "feedback_monthly_apply"
 
-    def __init__(self, parent=None, datafile=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, datafile=None, cnf={}, **kargs):
         """Extend and define the results database feedback panel."""
         super().__init__(parent=parent, cnf=cnf, **kargs)
 
@@ -60,9 +61,6 @@ class FeedbackMonthly(panel.PlainPanel):
 
         self.show_buttons_for_start_import()
         self.create_buttons()
-
-        self.resultsdbfolder = tkinter.Label(master=self.get_widget(), text="")
-        self.resultsdbfolder.pack(side=tkinter.TOP, fill=tkinter.X)
 
         self.datafilepath = tkinter.Label(
             master=self.get_widget(), text=datafilename
@@ -160,7 +158,7 @@ class FeedbackMonthly(panel.PlainPanel):
         try:
             for sp in fb.submissionplayers[1:]:
                 elements = [e.strip() for e in sp.split("\t")]
-                ed = dict()
+                ed = {}
                 for e in elements:
                     f = e.split("=")
                     if len(f) != 2:
@@ -219,8 +217,8 @@ class FeedbackMonthly(panel.PlainPanel):
         self.insert_text_feedbackctrl(
             "".join(
                 (
-                    "\n\nThe submission PINs and feedback players in display order ",
-                    "match up as follows (all dates removed):\n\n",
+                    "\n\nThe submission PINs and feedback players in display ",
+                    "order match up as follows (all dates removed):\n\n",
                 )
             )
         )
@@ -384,7 +382,6 @@ class FeedbackMonthly(panel.PlainPanel):
         Used, at least, as callback from AppSysFrame container.
 
         """
-        pass
 
     def apply_new_grading_codes(self, *args, **kargs):
         """Apply new grading codes from feedback and return report.
@@ -393,6 +390,7 @@ class FeedbackMonthly(panel.PlainPanel):
         when running this method.
 
         """
+        del args, kargs
         updateplayers = self.updateplayers
         updateclubs = self.updateclubs
         newecfcodes = self.newecfcodes
@@ -538,9 +536,9 @@ class FeedbackMonthly(panel.PlainPanel):
                         "".join(
                             (
                                 newcode,
-                                " is not consistent with code provided locally (",
-                                "try removing code for player in 'Grading Codes'",
-                                " tab)",
+                                " is not consistent with code provided ",
+                                "locally (try removing code for player in ",
+                                "'Grading Codes' tab)",
                             )
                         )
                     )
@@ -611,7 +609,6 @@ class FeedbackMonthly(panel.PlainPanel):
             self.insert_text_applyctrl("\n")
 
         database.commit()
-        self.newcodesapply = []
         self.refresh_controls(
             (
                 (
@@ -648,7 +645,7 @@ class FeedbackMonthly(panel.PlainPanel):
         """Define all action buttons that may appear on Feedback page."""
         super().describe_buttons()
         self.define_button(
-            self._btn_closefeedbackmonthly,
+            self.btn_closefeedbackmonthly,
             text="Cancel Apply Feedback",
             tooltip="Cancel the feedback update.",
             underline=0,
@@ -665,10 +662,10 @@ class FeedbackMonthly(panel.PlainPanel):
 
     def on_cancel_apply_feedback(self, event=None):
         """Do any tidy up before switching to next panel."""
-        pass
 
     def on_apply_feedback(self, event=None):
         """Run apply_new_grading_codes in separate thread."""
+        del event
         if not self.allowapplycodes:
             tkinter.messagebox.showinfo(
                 title="Apply Feedback", message="Feedback not applied"
@@ -678,13 +675,13 @@ class FeedbackMonthly(panel.PlainPanel):
     def show_buttons_for_cancel_import(self):
         """Show buttons for actions allowed at start of import process."""
         self.hide_panel_buttons()
-        self.show_panel_buttons((self._btn_closefeedbackmonthly,))
+        self.show_panel_buttons((self.btn_closefeedbackmonthly,))
 
     def show_buttons_for_start_import(self):
         """Show buttons for actions allowed at start of import process."""
         self.hide_panel_buttons()
         self.show_panel_buttons(
-            (self._btn_closefeedbackmonthly, self._btn_applyfeedbackmonthly)
+            (self.btn_closefeedbackmonthly, self._btn_applyfeedbackmonthly)
         )
 
     def _get_ecfmaprecord_for_new_person(self, database, pin):
@@ -705,6 +702,7 @@ class FeedbackMonthly(panel.PlainPanel):
                     if maprec.value.playerecfcode is None:
                         if maprec.value.playerecfname is not None:
                             return maprec
+        return None
 
 
 def show_ecf_results_feedback_monthly_tab(tab, button):
@@ -732,23 +730,20 @@ def show_ecf_results_feedback_monthly_tab(tab, button):
         conf.convert_home_directory_to_tilde(os.path.dirname(filepath)),
     )
     try:
-        feedbackfile = open(filepath, "rb")
-        try:
+        with open(filepath, "rb") as feedbackfile:
             tab.get_appsys().set_kwargs_for_next_tabclass_call(
-                dict(
-                    datafile=(
+                {
+                    "datafile": (
                         filepath,
                         _get_feedback_monthly_text(feedbackfile),
                     )
-                )
+                }
             )
-        finally:
-            feedbackfile.close()
     except:
         tkinter.messagebox.showinfo(
             parent=tab.get_widget(),
             message="".join(
-                ("File\n", os.path.split(dlg)[-1], "\ndoes not exist")
+                ("File\n", os.path.split(filepath)[-1], "\ndoes not exist")
             ),
             title=" ".join(["Open ECF feedback email or attachment"]),
         )

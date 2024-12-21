@@ -5,7 +5,7 @@
 """Prepare ECF submission files for Results input."""
 
 if __name__ == "__main__":
-    application_name = "PrepareECFFormat"
+    _APPLICATION_NAME = "PrepareECFFormat"
     try:
         from solentware_misc.gui.startstop import (
             start_application_exception,
@@ -20,29 +20,42 @@ if __name__ == "__main__":
                 title="Start Exception",
                 message=".\n\nThe reported exception is:\n\n".join(
                     (
-                        "Unable to import solentware_misc.gui.startstop module",
+                        "".join(
+                            (
+                                "Unable to import ",
+                                "solentware_misc.gui.startstop module",
+                            )
+                        ),
                         str(error),
                     )
                 ),
             )
-        except:
-            pass
-        raise SystemExit("Unable to import start application utilities")
+        except Exception as exc:
+            raise SystemExit(
+                "Exception while reporting problem importing start module"
+            ) from exc
+        raise SystemExit(
+            "Unable to import start application utilities"
+        ) from error
     try:
         from .core.prepareresults import PrepareSubmissionFile
         from .gui.prepare import PrepareECF
     except Exception as error:
         start_application_exception(
-            error, appname=application_name, action="import"
+            error, appname=_APPLICATION_NAME, action="import"
         )
-        raise SystemExit(" import ".join(("Unable to", application_name)))
+        raise SystemExit(
+            " import ".join(("Unable to", _APPLICATION_NAME))
+        ) from error
     try:
         app = PrepareECF(PrepareSubmissionFile)
     except Exception as error:
         start_application_exception(
-            error, appname=application_name, action="initialise"
+            error, appname=_APPLICATION_NAME, action="initialise"
         )
-        raise SystemExit(" initialise ".join(("Unable to", application_name)))
+        raise SystemExit(
+            " initialise ".join(("Unable to", _APPLICATION_NAME))
+        ) from error
     try:
         if app.open_submission():
             app.root.mainloop()
@@ -54,6 +67,6 @@ if __name__ == "__main__":
             error,
             app,
             app.root,
-            title=application_name,
-            appname=application_name,
+            title=_APPLICATION_NAME,
+            appname=_APPLICATION_NAME,
         )

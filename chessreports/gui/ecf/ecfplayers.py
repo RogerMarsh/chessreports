@@ -28,11 +28,13 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
     _btn_remove_code = "ecfplayers_remove_code"
     _btn_edit_ecf_name = "ecfplayers_edit_name"
 
-    def __init__(self, parent=None, cnf=dict(), **kargs):
+    # pylint W0102 dangerous-default-value.
+    # cnf used as tkinter.Frame argument, which defaults to {}.
+    def __init__(self, parent=None, cnf={}, **kargs):
         """Extend and define the results database ECF club code panel."""
         self.playerclubgrid = None
 
-        super(ECFPlayers, self).__init__(parent=parent, cnf=cnf, **kargs)
+        super().__init__(parent=parent, cnf=cnf, **kargs)
 
         self.show_panel_buttons(
             (
@@ -43,14 +45,16 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
         )
         self.create_buttons()
 
+        # pylint W0632 unbalanced-tuple-unpacking.
+        # self.make_grids returns a list with same length as argument.
         (self.playerclubgrid,) = self.make_grids(
             (
-                dict(
-                    grid=ecfplayergrids.PlayerECFDetailGrid,
-                    selectlabel="Select Player:  ",
-                    gridfocuskey="<KeyPress-F7>",
-                    selectfocuskey="<KeyPress-F6>",
-                ),
+                {
+                    "grid": ecfplayergrids.PlayerECFDetailGrid,
+                    "selectlabel": "Select Player:  ",
+                    "gridfocuskey": "<KeyPress-F7>",
+                    "selectfocuskey": "<KeyPress-F6>",
+                },
             )
         )
 
@@ -62,7 +66,7 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
         db = self.get_appsys().get_results_database()
 
         if len(psel) + len(pbkm) == 0:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="No player(s) selected for breaking affiliations.",
                 title=msgtitle,
@@ -71,7 +75,7 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
 
         affiliated = []
         nonaffiliated = []
-        lookup = dict()
+        lookup = {}
 
         def build_affiliation_lookup(key):
             mr = ecfmaprecord.get_player_for_alias(db, key)
@@ -97,7 +101,7 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
             db.end_read_only_transaction()
 
         if len(affiliated) == 0:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="None of selected players have a club affiliation.",
                 title=msgtitle,
@@ -111,7 +115,7 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
             "The players listed below have no affiliation and are ignored"
         )
         affreport = "\n".join([lookup[k][-1] for k in affiliated])
-        if len(nonaffiliated):
+        if nonaffiliated:
             nonaffreport = "\n".join([lookup[k][-1] for k in nonaffiliated])
             header = (affheader, nonaffheader)
             detail = (affreport, nonaffreport)
@@ -126,11 +130,15 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
                 "Cancel": "Cancel Remove Affiliation Details",
                 "Ok": "Remove Affiliation Details",
             },
-            # close=('Cancel', 'Cancel Remove Affiliation Details', 'Tooltip',),
+            # close=(
+            #     'Cancel', 'Cancel Remove Affiliation Details', 'Tooltip'
+            # ),
             # ok=('Ok', 'Remove Affiliation Details', 'Tooltip',),
             wrap=tkinter.WORD,
             tabstyle="tabular",
         )
+        # Method is defined by setattr in a superclass.
+        # pylint: disable-next=no-member
         if not dlg.ok_pressed():
             return
 
@@ -181,7 +189,6 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
         Used, at least, as callback from AppSysFrame container.
 
         """
-        pass
 
     def describe_buttons(self):
         """Define all action buttons that may appear on ECF club codes page."""
@@ -219,7 +226,7 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
                     "is to be modified .",
                 )
             )
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(), message=msg, title=msgtitle
             )
             return
@@ -252,7 +259,7 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
         finally:
             db.end_read_only_transaction()
         if mr is None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -278,7 +285,7 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
             )
             return
         if ecfrec is None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -336,16 +343,19 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
 
     def on_break_affiliation(self, event=None):
         """Break player's link to a club."""
+        del event
         self.break_players_affiliations()
         return "break"
 
     def on_edit_ecf_name(self, event=None):
         """Edit the locally entered version of player's name in ECF format."""
+        del event
         self.edit_player_ecf_name()
         return "break"
 
     def on_remove_code(self, event=None):
         """Break player's link to grading code."""
+        del event
         self.remove_grading_code()
         return "break"
 
@@ -360,7 +370,7 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
                     "will be removed.",
                 )
             )
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(), message=msg, title=msgtitle
             )
             return
@@ -391,7 +401,7 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
         finally:
             db.end_read_only_transaction()
         if mr is None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -404,7 +414,7 @@ class ECFPlayers(panel.PanedPanelGridSelectorBar):
             )
             return
         if mr.value.playercode is None:
-            dlg = tkinter.messagebox.showinfo(
+            tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (

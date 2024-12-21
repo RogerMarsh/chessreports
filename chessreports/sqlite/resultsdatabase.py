@@ -35,6 +35,10 @@ class ResultsDatabase(database.Database, sqlite3_database.Database):
             **kargs,
         )
 
-    def delete_database(self):
-        """Close and delete the open chess results database."""
-        return super().delete_database((self.database_file,))
+    def _delete_database_names(self):
+        """Override and return tuple of filenames to delete."""
+        return (
+            self.database_file,
+            self.database_file + "-lock",
+            self.database_file + "-journal",
+        )
