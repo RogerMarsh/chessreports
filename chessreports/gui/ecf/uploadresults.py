@@ -72,7 +72,7 @@ _OTHER_OPTIONS_TEXT = " ".join(
     )
 )
 _DEFAULT_LIVE_URL = "https://rating.englishchess.org.uk/v2/submit/"
-_DEFAULT_TEST_URL = "https://rating.englishchess.org.uk/sandbox/submit/"
+_DEFAULT_TEST_URL = "https://rating-sbox.englishchess.org.uk/v2/submit/"
 _EVENT_DETAILS = "EVENT DETAILS"
 _EVENT_CODE = "EVENT CODE"
 _SUBMISSION_INDEX = "SUBMISSION INDEX"
@@ -254,8 +254,8 @@ class _UploadResults:
         )
         self.filename.set(localfilename)
         try:
-            with open(localfilename, encoding="utf8").read() as rft:
-                if not self.is_results_file_text_sane(rft):
+            with open(localfilename, encoding="utf8") as rft:
+                if not self.is_results_file_text_sane(rft.read()):
                     message = "".join(
                         (localfilename, " cannot be a valid submission file")
                     )
@@ -351,8 +351,8 @@ class _UploadResults:
             return
         localfilename = self.filename.get()
         try:
-            with open(localfilename, encoding="utf8").read() as rft:
-                if not self.is_results_file_text_sane(rft):
+            with open(localfilename, encoding="utf8") as rft:
+                if not self.is_results_file_text_sane(rft.read()):
                     message = "".join(
                         (localfilename, " cannot be a valid submission file")
                     )
