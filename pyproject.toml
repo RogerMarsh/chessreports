@@ -10,7 +10,7 @@ line-length = 79
 
 [project]
 name = "chessreports"
-version = "7.1.9"
+version = "7.1.10.dev0"
 authors = [
   { name="Roger Marsh", email="roger.marsh@solentware.co.uk" },
 ]
@@ -29,9 +29,9 @@ license = "BSD-3-Clause"
 license-files = ["LICENCE"]
 readme = "README"
 dependencies = [
-    "chesscalc==2.0.3",
+    "chesscalc==2.0.4.dev0",
     "chessvalidate==2.0.6",
-    "solentware-base==5.2.3",
+    "solentware-base==5.3.dev0",
     "solentware-grid==3.0.2",
 ]
 
