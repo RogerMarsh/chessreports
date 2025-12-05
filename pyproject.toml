@@ -10,7 +10,7 @@ line-length = 79
 
 [project]
 name = "chessreports"
-version = "7.1.10.dev1"
+version = "7.1.10.dev2"
 authors = [
   { name="Roger Marsh", email="roger.marsh@solentware.co.uk" },
 ]
@@ -29,7 +29,6 @@ license = "BSD-3-Clause"
 license-files = ["LICENCE"]
 readme = "README"
 dependencies = [
-    "chesscalc==2.0.4.dev1",
     "chessvalidate==2.0.6",
     "solentware-base==5.3.dev0",
     "solentware-grid==3.0.2",
@@ -64,6 +63,7 @@ packages = [
     "chessreports.unqlite",
     "chessreports.vedis",
     "chessreports.tools",
+    "chessreports.chesscalc_legacy",
 ]
 
 [tool.setuptools.package-data]

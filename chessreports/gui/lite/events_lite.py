@@ -8,7 +8,7 @@ import tkinter.messagebox
 
 from solentware_misc.core.utilities import AppSysPersonName
 
-from chesscalc.legacy.gui import performance, prediction, population
+from ...chesscalc_legacy.gui import performance, prediction, population
 
 from ...core import (
     constants,
