@@ -28,6 +28,7 @@ from ...core.ecf import ecfmaprecord
 from ...core import resultsrecord
 from ...core import constants
 from ...core import configuration
+from ...core.workarounds import url_headers
 from ...basecore.ecfdataimport import copy_single_ecf_players_post_2020_rules
 
 
@@ -308,7 +309,9 @@ class NewPlayers(newplayers_database.NewPlayers):
         )
         try:
             with urllib.request.urlopen(
-                "".join((urlname, request_value))
+                urllib.request.Request(
+                    "".join((urlname, request_value)), headers=url_headers
+                )
             ) as url:
                 try:
                     urldata = url.read()

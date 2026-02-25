@@ -44,6 +44,7 @@ from ...core import configuration
 from ...core.ecf import ecfdataimport
 from ...core.ecf import ecfclubdb
 from ...core.ecf import ecfplayerdb
+from ...core.workarounds import url_headers
 
 
 class Control(control_database.Control):
@@ -246,7 +247,9 @@ class Control(control_database.Control):
                 return
             urlname = dialogue_result["URL"]
             try:
-                with urllib.request.urlopen(urlname) as url:
+                with urllib.request.urlopen(
+                    urllib.request.Request(urlname, headers=url_headers)
+                ) as url:
                     try:
                         urldata = url.read()
                     except Exception as exc:

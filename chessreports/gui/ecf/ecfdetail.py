@@ -22,6 +22,7 @@ from ...core.ecf import (
     ecfrecord,
     ecfmaprecord,
 )
+from ...core.workarounds import url_headers
 from ...basecore import ecfdataimport
 
 
@@ -842,7 +843,9 @@ class ECFDownloadGradingCodeDialog(ECFDetailDialog):
             return
         try:
             with urllib.request.urlopen(
-                "".join((urlname, ecfcode[:6]))
+                urllib.request.Request(
+                    "".join((urlname, ecfcode[:6])), headers=url_headers
+                )
             ) as url:
                 try:
                     urldata = url.read()
@@ -1020,7 +1023,9 @@ class ECFDownloadPlayerNameDialog(ECFDetailDialog):
             return
         try:
             with urllib.request.urlopen(
-                "".join((urlname, ecfcode[:6]))
+                urllib.request.Request(
+                    "".join((urlname, ecfcode[:6])), headers=url_headers
+                )
             ) as url:
                 try:
                     urldata = url.read()
@@ -1134,7 +1139,11 @@ class ECFDownloadClubCodeDialog(ECFDetailDialog):
             )
             return
         try:
-            with urllib.request.urlopen("".join((urlname, clubcode))) as url:
+            with urllib.request.urlopen(
+                urllib.request.Request(
+                    "".join((urlname, clubcode)), headers=url_headers
+                )
+            ) as url:
                 try:
                     urldata = url.read()
                 except Exception as exc:
