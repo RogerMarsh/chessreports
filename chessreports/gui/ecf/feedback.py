@@ -11,6 +11,7 @@ to the database.
 """
 
 import tkinter
+import datetime
 
 from solentware_misc.gui import panel
 from solentware_misc.gui import textreadonly
@@ -22,30 +23,31 @@ from ...core import constants
 from ...core.ecf import ecfrecord
 from ...core.ecf import ecfmaprecord
 
-_SUBLINE = "Line "
-_PIN_LINE = "New Player - Pin "
-_NEWCODE_LINE = "New code generated - "
-_USECODE_LINE = "Code to be used is "
-_MERGECODE_LINE = ": Please note that the ECF Code supplied ("
-_CLUB_LINE = ": New Club supplied ("
+subline = "Line "
+pinline = "New Player - Pin "
+newcodeline = "New code generated - "
+usecodeline = "Code to be used is "
+mergecodeline = ": Please note that the ECF Code supplied ("
+clubline = ": New Club supplied ("
 
 
 class Feedback(panel.PlainPanel):
     """The Feedback panel for a Results database."""
 
-    btn_closefeedback = "feedback_close"
+    _btn_closefeedback = "feedback_close"
     _btn_applyfeedback = "feedback_apply"
 
-    # pylint W0102 dangerous-default-value.
-    # cnf used as tkinter.Frame argument, which defaults to {}.
-    def __init__(self, parent=None, datafile=None, cnf={}, **kargs):
+    def __init__(self, parent=None, datafile=None, cnf=dict(), **kargs):
         """Extend and define the results database feedback panel."""
-        super().__init__(parent=parent, cnf=cnf, **kargs)
+        super(Feedback, self).__init__(parent=parent, cnf=cnf, **kargs)
 
         datafilename, feedbacklines = datafile
 
         self.show_buttons_for_start_import()
         self.create_buttons()
+
+        self.resultsdbfolder = tkinter.Label(master=self.get_widget(), text="")
+        self.resultsdbfolder.pack(side=tkinter.TOP, fill=tkinter.X)
 
         self.datafilepath = tkinter.Label(
             master=self.get_widget(), text=datafilename
@@ -86,7 +88,7 @@ class Feedback(panel.PlainPanel):
         self.tasklog = tasklog.TaskLog(
             # threadqueue=self.get_appsys().get_thread_queue(),
             logwidget=tasklog.LogText(
-                master=rf, cnf={"wrap": tkinter.WORD, "undo": tkinter.FALSE}
+                master=rf, cnf=dict(wrap=tkinter.WORD, undo=tkinter.FALSE)
             ),
         )
         pw.add(toppane)
@@ -106,6 +108,7 @@ class Feedback(panel.PlainPanel):
         Used, at least, as callback from AppSysFrame container.
 
         """
+        pass
 
     def apply_new_grading_codes(self, *args, **kargs):
         """Apply new grading codes from feedback and return report.
@@ -114,7 +117,6 @@ class Feedback(panel.PlainPanel):
         when running this method.
 
         """
-        del args, kargs
         if not self.allowapplycodes:
             return False
 
@@ -139,8 +141,8 @@ class Feedback(panel.PlainPanel):
             record.value.ECFcode = gcode
             record.value.ECFname = fbplayer[constants.NAME]
             record.value.ECFactive = False
-            if fbplayer[_MERGECODE_LINE]:
-                record.value.ECFmerge = fbplayer[_MERGECODE_LINE]
+            if fbplayer[mergecodeline]:
+                record.value.ECFmerge = fbplayer[mergecodeline]
             record.put_record(database, filespec.ECFPLAYER_FILE_DEF)
             applycodesreport.append(
                 (
@@ -149,21 +151,16 @@ class Feedback(panel.PlainPanel):
                     "added as feedback update to master list",
                 )
             )
-            # Added to avoid pylint E1111 report (assignment-from-no-return).
-            # Gets pylint R1711 report (useless-return) and E1128 when called.
-            # Providing an alternative return value above avoids both R1711
-            # and E1128 when function is called 'f = new_ecf_player(1)'.
-            return None
 
         def update_ecf_player():
             # Unmerge not done by feedback merge line.
             # Currently wait for full Masterlist, but does absence of merge
             # line imply break merge if it does not exist?
-            if not fbplayer[_MERGECODE_LINE]:
+            if not fbplayer[mergecodeline]:
                 return False
 
-            if fbplayer[_MERGECODE_LINE] == ecfplayer.value.ECFmerge:
-                return None
+            if fbplayer[mergecodeline] == ecfplayer.value.ECFmerge:
+                return
             if ecfplayer.value.ECFmerge:
                 repmerge = " ".join(
                     ("replacing noted merge into", ecfplayer.value.ECFmerge)
@@ -171,10 +168,8 @@ class Feedback(panel.PlainPanel):
             else:
                 repmerge = ""
             ecfplayerclone = ecfplayer.clone()
-            ecfplayerclone.value.ECFmerge = fbplayer[_MERGECODE_LINE]
-            ecfplayerclone.value.ECFactive = not bool(
-                fbplayer[_MERGECODE_LINE]
-            )
+            ecfplayerclone.value.ECFmerge = fbplayer[mergecodeline]
+            ecfplayerclone.value.ECFactive = not bool(fbplayer[mergecodeline])
             ecfplayer.edit_record(
                 database,
                 filespec.ECFPLAYER_FILE_DEF,
@@ -186,7 +181,7 @@ class Feedback(panel.PlainPanel):
                     fbplayer[constants.BCF_CODE],
                     fbplayer[constants.NAME],
                     "noted as merged into",
-                    fbplayer[_MERGECODE_LINE],
+                    fbplayer[mergecodeline],
                     "in feedback update",
                     repmerge,
                 )
@@ -243,6 +238,7 @@ class Feedback(panel.PlainPanel):
                     )
                 )
 
+        ecfdate = "".join(datetime.date.today().isoformat().split("-"))
         applycodesreport = []
         self.allowapplycodes = False
         database = self.get_appsys().get_results_database()
@@ -254,14 +250,14 @@ class Feedback(panel.PlainPanel):
                 if fbplayer[constants.PIN] != constants.ECF_ZERO_NOT_0:
                     raise ValueError from exc
                 fbplayerpin = 0
-            if fbplayer[_PIN_LINE]:
+            if fbplayer[pinline]:
                 person = self._get_ecfmaprecord_for_new_person(
                     database, fbplayerpin
                 )
                 if person:
-                    ecfgcode = fbplayer[_NEWCODE_LINE]
-                    if fbplayer[_USECODE_LINE]:
-                        ecfgcode = fbplayer[_USECODE_LINE]
+                    ecfgcode = fbplayer[newcodeline]
+                    if fbplayer[usecodeline]:
+                        ecfgcode = fbplayer[usecodeline]
                     if ecfgcode:
                         if (
                             ecfrecord.get_ecf_player_for_grading_code(
@@ -281,10 +277,6 @@ class Feedback(panel.PlainPanel):
                     database, fbplayer[constants.BCF_CODE]
                 )
                 if ecfplayer is None:
-                    # Get pylint E1111 report (assignment-from-no-return)
-                    # with no return statement in function.
-                    # Get pylint E1128 report (assignment-from-none)
-                    # with 'return None' statement in function.
                     callup = new_ecf_player(fbplayer[constants.BCF_CODE])
                 else:
                     callup = update_ecf_player()
@@ -294,7 +286,7 @@ class Feedback(panel.PlainPanel):
                 if person:
                     if callup:
                         update_person(fbplayer[constants.BCF_CODE])
-                if fbplayer[_CLUB_LINE]:
+                if fbplayer[clubline]:
                     if self._is_ecf_club_code_a_new_club(
                         database, fbplayer[constants.CLUB_CODE]
                     ):
@@ -331,7 +323,7 @@ class Feedback(panel.PlainPanel):
                 ),
             )
         )
-        if applycodesreport:
+        if len(applycodesreport):
             self.applyctrl.insert(
                 tkinter.END,
                 "".join(
@@ -346,9 +338,9 @@ class Feedback(panel.PlainPanel):
                 tkinter.END,
                 "".join(
                     (
-                        "\n\nApply Feedback did no updates.  If some ",
-                        "potential updates are reported above it may be ",
-                        "because the feedback has already been applied.",
+                        "\n\nApply Feedback did no updates.  If some potential ",
+                        "updates are reported above it may be because the ",
+                        "feedback has already been applied.",
                     )
                 ),
             )
@@ -358,7 +350,7 @@ class Feedback(panel.PlainPanel):
         """Define all action buttons that may appear on Feedback page."""
         super().describe_buttons()
         self.define_button(
-            self.btn_closefeedback,
+            self._btn_closefeedback,
             text="Cancel Apply Feedback",
             tooltip="Cancel the feedback update.",
             underline=0,
@@ -382,31 +374,31 @@ class Feedback(panel.PlainPanel):
         ok = True
         pinstart = ": #PIN="
         fieldstart = ": #"
-        playerfields = {}
+        playerfields = dict()
 
         def report_player(playerfields):
-            if _SUBLINE in playerfields:
-                if playerfields[_NEWCODE_LINE]:
+            if subline in playerfields:
+                if playerfields[newcodeline]:
                     newcodesreport.append(
                         (
                             "New code",
-                            playerfields[_NEWCODE_LINE],
+                            playerfields[newcodeline],
                             "for Pin",
                             playerfields[constants.PIN],
                             playerfields[constants.NAME],
                         )
                     )
-                if playerfields[_USECODE_LINE]:
+                if playerfields[usecodeline]:
                     newcodesreport.append(
                         (
                             "Use code",
-                            playerfields[_USECODE_LINE],
+                            playerfields[usecodeline],
                             "for Pin",
                             playerfields[constants.PIN],
                             playerfields[constants.NAME],
                         )
                     )
-                if playerfields[_MERGECODE_LINE]:
+                if playerfields[mergecodeline]:
                     newcodesreport.append(
                         (
                             "    Code",
@@ -417,10 +409,10 @@ class Feedback(panel.PlainPanel):
                             "",
                             "",
                             "merged with",
-                            playerfields[_MERGECODE_LINE],
+                            playerfields[mergecodeline],
                         )
                     )
-                if playerfields[_PIN_LINE]:
+                if playerfields[pinline]:
                     if self._is_ecf_club_code_a_new_club(
                         database, playerfields[constants.CLUB_CODE]
                     ):
@@ -437,7 +429,7 @@ class Feedback(panel.PlainPanel):
                                 playerfields[constants.CLUB],
                             )
                         )
-                elif playerfields[_CLUB_LINE]:
+                elif playerfields[clubline]:
                     if self._is_ecf_club_code_a_new_club(
                         database, playerfields[constants.CLUB_CODE]
                     ):
@@ -461,75 +453,76 @@ class Feedback(panel.PlainPanel):
                 e = eb.decode()
                 if not e:
                     continue
-                if e.startswith(_SUBLINE):
+                if e.startswith(subline):
                     report_player(playerfields)
                     if e.find(pinstart) == -1:
                         ok = False
                         break
                     playerfields = {
-                        _PIN_LINE: False,
-                        _NEWCODE_LINE: False,
-                        _USECODE_LINE: False,
-                        _MERGECODE_LINE: False,
-                        _CLUB_LINE: False,
+                        pinline: False,
+                        newcodeline: False,
+                        usecodeline: False,
+                        mergecodeline: False,
+                        clubline: False,
                     }
-                    playerfields[_SUBLINE] = True
+                    playerfields[subline] = True
                     for fv in e.split(fieldstart, 1)[-1].strip().split("#"):
                         f, v = fv.split("=", 1)
                         playerfields[f] = v
                     self.newcodesapply.append(playerfields)
-                elif e.startswith(_PIN_LINE):
+                elif e.startswith(pinline):
                     if e.find(":") == -1:
                         ok = False
                         break
-                    start = e.split(":", 1)[0]
+                    start, end = e.split(":", 1)
                     if not start.endswith(playerfields[constants.PIN]):
                         ok = False
                         break
-                    playerfields[_PIN_LINE] = True
-                elif e.startswith(_NEWCODE_LINE):
-                    playerfields[_NEWCODE_LINE] = e.split()[-1]
-                elif e.startswith(_USECODE_LINE):
-                    playerfields[_USECODE_LINE] = e.split()[-1]
-                elif e.find(_MERGECODE_LINE) > 1:
-                    playerfields[_MERGECODE_LINE] = e.split()[-1][:-1]
-                elif e.find(_CLUB_LINE) > 1:
-                    playerfields[_CLUB_LINE] = True
+                    playerfields[pinline] = True
+                elif e.startswith(newcodeline):
+                    playerfields[newcodeline] = e.split()[-1]
+                elif e.startswith(usecodeline):
+                    playerfields[usecodeline] = e.split()[-1]
+                elif e.find(mergecodeline) > 1:
+                    playerfields[mergecodeline] = e.split()[-1][:-1]
+                elif e.find(clubline) > 1:
+                    playerfields[clubline] = True
             else:
                 report_player(playerfields)
         finally:
             database.end_read_only_transaction()
         if not newcodesreport:
             return "File has no new player grading codes"
-        if ok:
+        elif ok:
             self.allowapplycodes = True
             return "\n".join(["\t".join(e) for e in newcodesreport])
-        return "".join(
-            (
-                "File may be a feedback file with errors ",
-                "in new player sections.\n\n",
-                "\n".join(["\t".join(e) for e in newcodesreport]),
+        else:
+            return "".join(
+                (
+                    "File may be a feedback file with errors ",
+                    "in new player sections.\n\n",
+                    "\n".join(["\t".join(e) for e in newcodesreport]),
+                )
             )
-        )
 
     def on_cancel_apply_feedback(self, event=None):
         """Do any tidy up before switching to next panel."""
+        pass
 
     def on_apply_feedback(self, event=None):
         """Run apply_new_grading_codes in separate thread."""
-        del event
         self.tasklog.run_method(method=self.apply_new_grading_codes)
 
     def show_buttons_for_cancel_import(self):
         """Show buttons for actions allowed at start of import process."""
         self.hide_panel_buttons()
-        self.show_panel_buttons((self.btn_closefeedback,))
+        self.show_panel_buttons((self._btn_closefeedback,))
 
     def show_buttons_for_start_import(self):
         """Show buttons for actions allowed at start of import process."""
         self.hide_panel_buttons()
         self.show_panel_buttons(
-            (self.btn_closefeedback, self._btn_applyfeedback)
+            (self._btn_closefeedback, self._btn_applyfeedback)
         )
 
     def _get_ecfmaprecord_for_new_person(self, database, pin):
@@ -550,7 +543,6 @@ class Feedback(panel.PlainPanel):
                     if maprec.value.playerecfcode is None:
                         if maprec.value.playerecfname is not None:
                             return maprec
-        return None
 
     def _get_ecfmaprecord_for_person(self, database, pin):
         """Return ECFmapDBrecordPlayer() for pin or None.
@@ -570,7 +562,6 @@ class Feedback(panel.PlainPanel):
             if maprec:
                 if maprec.value.playercode:
                     return maprec
-        return None
 
     def _get_ecfmaprecord_for_player(self, database, pin):
         """Return ECFmapDBrecordClub() for pin or None.
@@ -587,7 +578,6 @@ class Feedback(panel.PlainPanel):
             if maprec:
                 if maprec.value.clubcode is None:
                     return maprec
-        return None
 
     def _is_ecf_club_code_a_new_club(self, database, ecfcode):
         """Return True if ecfcode is not on database or False.

@@ -15,11 +15,11 @@ from solentware_grid.datagrid import DataGridReadOnly
 from solentware_grid.core.dataclient import DataSource
 
 from solentware_misc.core import utilities
-from solentware_misc.gui import logpanel
+from solentware_misc.gui import logpanel, tasklog
 
 from ...core import filespec
-from ...minorbases.dbaseapi import DBaseapiError
-from ..minorbases.dbasedatarow import DBaseDataRow, DBaseDataHeader
+from ...minorbases.dbaseapi import dBaseapiError
+from ..minorbases.dbasedatarow import dBaseDataRow, dBaseDataHeader
 
 _REFRESH_FILE_FIELD = {
     filespec.ECFPLAYER_FILE_DEF: filespec.ECFPLAYERNAME_FIELD_DEF,
@@ -30,7 +30,7 @@ _REFRESH_FILE_FIELD = {
 class ImportECFData(logpanel.WidgetAndLogPanel):
     """The panel for importing an ECF dBaseIII reference file."""
 
-    btn_closeecfimport = "importecfdata_close"
+    _btn_closeecfimport = "importecfdata_close"
     _btn_startecfimport = "importecfdata_start"
 
     def __init__(
@@ -42,13 +42,10 @@ class ImportECFData(logpanel.WidgetAndLogPanel):
         starttaskmsg=None,
         tabtitle=None,
         copymethod=None,
-        # pylint W0102 dangerous-default-value.
-        # cnf used as tkinter.Frame argument, which defaults to {}.
-        cnf={},
+        cnf=dict(),
         **kargs
     ):
         """Extend and define the results ECF reference data import tab."""
-        del tabtitle
 
         def _create_ecf_datagrid_widget(master):
             """Create a DataGrid under master.
@@ -57,7 +54,6 @@ class ImportECFData(logpanel.WidgetAndLogPanel):
             to a WidgetAndLogPanel(...) call.
 
             """
-            del master
             self.ecfdatecontrol = tkinter.Entry(master=self.get_widget())
             self.ecfdatecontrol.pack(side=tkinter.TOP, fill=tkinter.X)
             self.ecfdatecontrol.insert(
@@ -70,29 +66,27 @@ class ImportECFData(logpanel.WidgetAndLogPanel):
             # this is not done in results, at least yet, so avoid the temporary
             # loss of focus to an empty popup menu.
             class ECFimportgrid(DataGridReadOnly):
-                """Customise DataGridReadOnly with 'do-nothing' popup."""
-
                 def show_popup_menu_no_row(self, event=None):
-                    """Override and do nothing."""
+                    pass
 
             self.datagrid = ECFimportgrid()
             try:
                 self.datagrid.set_data_source(
-                    DataSource(newrow=DBaseDataRow, *datafilespec)
+                    DataSource(newrow=dBaseDataRow, *datafilespec)
                 )
-                self.datagrid.set_data_header(header=DBaseDataHeader)
+                self.datagrid.set_data_header(header=dBaseDataHeader)
                 self.datagrid.make_header(
-                    DBaseDataHeader.make_header_specification(
+                    dBaseDataHeader.make_header_specification(
                         fieldnames=self.datagrid.get_database().fieldnames
                     )
                 )
                 return self.datagrid.frame
-            except DBaseapiError as msg:
+            except dBaseapiError as msg:
                 try:
-                    datafilespec[0].close_context()
+                    datafile.close_context()
                 except:
                     pass
-                tkinter.messagebox.showinfo(
+                dlg = tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message=str(msg),
                     title=" ".join(["Open ECF reference file"]),
@@ -102,42 +96,39 @@ class ImportECFData(logpanel.WidgetAndLogPanel):
                     datafilespec[0].close_context()
                 except:
                     pass
-                tkinter.messagebox.showinfo(
+                dlg = tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message=" ".join([str(Exception), str(msg)]),
                     title=" ".join(["Open ECF reference file"]),
                 )
-            return None
 
-        self.datagrid = None
-        self.ecfdatecontrol = None
-        super().__init__(
+        super(ImportECFData, self).__init__(
             parent=parent,
             taskheader="   ".join(
                 (datafilename[0], datafilename[1].join(("(", ")")))
             ),
             maketaskwidget=_create_ecf_datagrid_widget,
             taskbuttons={
-                self.btn_closeecfimport: {
-                    "text": "Cancel Import",
-                    "tooltip": "Cancel the Events import.",
-                    "underline": 0,
-                    "switchpanel": True,
-                    "command": self.on_cancel_ecf_import,
-                },
-                self._btn_startecfimport: {
-                    "text": "Start Import",
-                    "tooltip": "Start the Events import.",
-                    "underline": 6,
-                    "command": self.on_start_ecf_import,
-                },
+                self._btn_closeecfimport: dict(
+                    text="Cancel Import",
+                    tooltip="Cancel the Events import.",
+                    underline=0,
+                    switchpanel=True,
+                    command=self.on_cancel_ecf_import,
+                ),
+                self._btn_startecfimport: dict(
+                    text="Start Import",
+                    tooltip="Start the Events import.",
+                    underline=6,
+                    command=self.on_start_ecf_import,
+                ),
             },
             starttaskbuttons=(
-                self.btn_closeecfimport,
+                self._btn_closeecfimport,
                 self._btn_startecfimport,
             ),
             runmethod=False,
-            runmethodargs={},
+            runmethodargs=dict(),
             cnf=cnf,
             **kargs
         )
@@ -160,7 +151,7 @@ class ImportECFData(logpanel.WidgetAndLogPanel):
 
     def get_ecf_date(self):
         """Return ECF file date in 'yyyymmdd' format."""
-        if self.ecfdatecontrol is not None:
+        if self.ecfdatecontrol != None:
             ecfdate = utilities.AppSysDate()
             dv = self.ecfdatecontrol.get()
             d = ecfdate.parse_date(dv)
@@ -170,7 +161,7 @@ class ImportECFData(logpanel.WidgetAndLogPanel):
 
     def is_ecf_date_valid(self):
         """Show dialogue to confirm date of ECF master file."""
-        if self.ecfdatecontrol is not None:
+        if self.ecfdatecontrol != None:
             ecfdate = utilities.AppSysDate()
             dv = self.ecfdatecontrol.get()
             d = ecfdate.parse_date(dv)
@@ -188,14 +179,15 @@ class ImportECFData(logpanel.WidgetAndLogPanel):
                     title="Import ECF data",
                 ):
                     return "".join(ecfdate.iso_format_date().split("-"))
-                return False
-            tkinter.messagebox.showinfo(
+                else:
+                    return False
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join((dv, "is not a date")),
                 title="Import ECF data",
             )
         else:
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="A date for the ECF data is not available",
                 title="Import ECF data",
@@ -207,7 +199,6 @@ class ImportECFData(logpanel.WidgetAndLogPanel):
 
         Re-open the files that were closed on creating this widget.
         """
-        del event
         self.get_appsys().get_results_database().allocate_and_open_contexts(
             files=self._closecontexts
         )
@@ -231,7 +222,6 @@ class ImportECFData(logpanel.WidgetAndLogPanel):
 
     def on_start_ecf_import(self, event=None):
         """Run get_event_data_to_be_imported in separate thread."""
-        del event
         if not self.is_ecf_date_valid():
             return
 
@@ -242,22 +232,22 @@ class ImportECFData(logpanel.WidgetAndLogPanel):
         self.tasklog.run_method(
             method=self._copymethod,
             args=(self,),
-            kwargs={
-                "ecfdate": self.get_ecf_date(),
-                "datecontrol": self.ecfdatecontrol.get(),
-            },
+            kwargs=dict(
+                ecfdate=self.get_ecf_date(),
+                datecontrol=self.ecfdatecontrol.get(),
+            ),
         )
 
     def show_buttons_for_cancel_import(self):
         """Show buttons for actions allowed at start of import process."""
         self.hide_panel_buttons()
-        self.show_panel_buttons((self.btn_closeecfimport,))
+        self.show_panel_buttons((self._btn_closeecfimport,))
 
     def show_buttons_for_start_ecf_import(self):
         """Show buttons for actions allowed at start of import process."""
         self.hide_panel_buttons()
         self.show_panel_buttons(
-            (self.btn_closeecfimport, self._btn_startecfimport)
+            (self._btn_closeecfimport, self._btn_startecfimport)
         )
 
     def _get_date_from_filename(self, filename):
@@ -282,4 +272,5 @@ class ImportECFData(logpanel.WidgetAndLogPanel):
                     byear,
                 )
             )
-        return ""
+        else:
+            return ""

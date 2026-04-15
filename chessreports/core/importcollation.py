@@ -25,33 +25,33 @@ class ImportCollation(gameobjects.GameCollation):
 
         # Restore error attribute removed from GameCollation because main
         # subclass does not want it now.
-        # round=game.get(constants.ROUND_LOWER) is ok, compared with SwissGame,
+        # round=game.get(constants._round) is ok, compared with SwissGame,
         # because ImportReports class sets the game value to a str if at all.
         self.error = []
 
         self.importreport = importreport
-        for game in importreport.game.values():
+        for k, game in importreport.game.items():
             if (
-                constants.HOMETEAM not in game
-                or constants.AWAYTEAM not in game
+                constants._hometeam not in game
+                or constants._awayteam not in game
             ):
-                sectionkey = game[constants.SECTION]
+                sectionkey = game[constants._section]
                 section = self.games.setdefault(
                     sectionkey,
                     gameobjects.Section(
-                        competition=game[constants.SECTION], games=[]
+                        competition=game[constants._section], games=[]
                     ),
                 )
             else:
                 sectionkey = (
-                    game[constants.SECTION],
+                    game[constants._section],
                     (
-                        game[constants.HOMETEAM],
-                        game[constants.AWAYTEAM],
+                        game[constants._hometeam],
+                        game[constants._awayteam],
                         " ".join(
                             (
-                                game[constants.SECTION],
-                                game[constants.DATE],
+                                game[constants._section],
+                                game[constants._date],
                             )
                         ),
                     ),
@@ -59,25 +59,23 @@ class ImportCollation(gameobjects.GameCollation):
                 section = self.games.setdefault(
                     sectionkey,
                     gameobjects.MatchReport(
-                        competition=game[constants.SECTION],
-                        hometeam=game[constants.HOMETEAM],
-                        awayteam=game[constants.AWAYTEAM],
-                        round=game.get(constants.ROUND_LOWER),
+                        competition=game[constants._section],
+                        hometeam=game[constants._hometeam],
+                        awayteam=game[constants._awayteam],
+                        round=game.get(constants._round),
                         games=[],
                     ),
                 )
-            # pylint W0632 unbalanced-tuple-unpacking.
-            # self.collate_game_players returns a list with two items.
             hp, ap = self.collate_game_players(game)
-            hpw = homeplayercolour.get(game.get(constants.HOMEPLAYERWHITE))
-            if constants.ROUND_LOWER in game:
-                if constants.BOARD_LOWER in game:
+            hpw = homeplayercolour.get(game.get(constants._homeplayerwhite))
+            if constants._round in game:
+                if constants._board in game:
                     section.games.append(
                         gameobjects.SwissMatchGame(
-                            round=game[constants.ROUND_LOWER],
-                            board=game[constants.BOARD_LOWER],
-                            result=game[constants.RESULT],
-                            date=game[constants.DATE],
+                            round=game[constants._round],
+                            board=game[constants._board],
+                            result=game[constants._result],
+                            date=game[constants._date],
                             homeplayerwhite=hpw,
                             homeplayer=hp,
                             awayplayer=ap,
@@ -86,20 +84,20 @@ class ImportCollation(gameobjects.GameCollation):
                 else:
                     section.games.append(
                         gameobjects.SwissGame(
-                            round=game[constants.ROUND_LOWER],
-                            result=game[constants.RESULT],
-                            date=game[constants.DATE],
+                            round=game[constants._round],
+                            result=game[constants._result],
+                            date=game[constants._date],
                             homeplayerwhite=hpw,
                             homeplayer=hp,
                             awayplayer=ap,
                         )
                     )
-            elif constants.BOARD_LOWER in game:
+            elif constants._board in game:
                 section.games.append(
                     gameobjects.MatchGame(
-                        board=game[constants.BOARD_LOWER],
-                        result=game[constants.RESULT],
-                        date=game[constants.DATE],
+                        board=game[constants._board],
+                        result=game[constants._result],
+                        date=game[constants._date],
                         homeplayerwhite=hpw,
                         homeplayer=hp,
                         awayplayer=ap,
@@ -108,8 +106,8 @@ class ImportCollation(gameobjects.GameCollation):
             else:
                 section.games.append(
                     gameobjects.Game(
-                        result=game[constants.RESULT],
-                        date=game[constants.DATE],
+                        result=game[constants._result],
+                        date=game[constants._date],
                         homeplayerwhite=hpw,
                         homeplayer=hp,
                         awayplayer=ap,
@@ -121,18 +119,18 @@ class ImportCollation(gameobjects.GameCollation):
         pl = []
         for player, pin, affiliation, team, reportedcodes in (
             (
-                constants.HOMENAME,
-                constants.HOMEPIN,
-                constants.HOMEAFFILIATION,
-                constants.HOMETEAM,
-                constants.HOMEREPORTEDCODES,
+                constants._homename,
+                constants._homepin,
+                constants._homeaffiliation,
+                constants._hometeam,
+                constants._homereportedcodes,
             ),
             (
-                constants.AWAYNAME,
-                constants.AWAYPIN,
-                constants.AWAYAFFILIATION,
-                constants.AWAYTEAM,
-                constants.AWAYREPORTEDCODES,
+                constants._awayname,
+                constants._awaypin,
+                constants._awayaffiliation,
+                constants._awayteam,
+                constants._awayreportedcodes,
             ),
         ):
             pk = get_player_identifier(game, player, pin, affiliation)
@@ -141,21 +139,21 @@ class ImportCollation(gameobjects.GameCollation):
                 if game[team] is not None:
                     section = None
                 else:
-                    section = game[constants.SECTION]
-                attr = {
-                    "name": pk[0],
-                    "event": pk[1],
-                    "startdate": pk[2],
-                    "enddate": pk[3],
-                    "section": section,
-                    "pin": pk[5],
-                    "reported_codes": game[reportedcodes],
-                }
+                    section = game[constants._section]
+                attr = dict(
+                    name=pk[0],
+                    event=pk[1],
+                    startdate=pk[2],
+                    enddate=pk[3],
+                    section=section,
+                    pin=pk[5],
+                    reported_codes=game[reportedcodes],
+                )
                 if game[team]:
                     p = gameobjects.Player(club=pk[4], **attr)
                 else:
                     p = gameobjects.Player(**attr)
-                if constants.BOARD_LOWER in game:
+                if constants._board in game:
                     p.affiliation = game[affiliation]
                 self.players[pk] = p
             pl.append(p)

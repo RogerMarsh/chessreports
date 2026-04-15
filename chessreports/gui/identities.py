@@ -17,6 +17,7 @@ remote database.
 
 """
 
+import os
 import tkinter
 import tkinter.messagebox
 import tkinter.filedialog
@@ -36,7 +37,7 @@ class Identities(ExceptionHandler):
 
     def __init__(self):
         """Initialise attributes and create tkinter.Tk instance."""
-        super().__init__()
+        super(Identities, self).__init__()
 
         self.format_error = None
         self.importdata = None
@@ -68,21 +69,21 @@ class Identities(ExceptionHandler):
                 message="Please select an Identified Player",
             )
             return
-        if len(selection) > 1:
+        elif len(selection) > 1:
             tkinter.messagebox.showerror(
                 parent=self.get_widget(),
                 title="Break New Player Identification",
                 message="Please select just one Identified Player",
             )
             return
-        if not reduce(lambda a, b: a == b, selection):
+        elif not reduce(lambda a, b: a == b, selection):
             tkinter.messagebox.showerror(
                 parent=self.get_widget(),
                 title="Break New Player Identification",
                 message="The selection is not an Identified Player",
             )
             return
-        if not tkinter.messagebox.askyesno(
+        elif not tkinter.messagebox.askyesno(
             parent=self.get_widget(),
             title="Break New Player Identification",
             message="Please confirm break identification",
@@ -90,15 +91,59 @@ class Identities(ExceptionHandler):
             return
 
         index = selection[0][0]
-        new, known = self.map_lbii_rem_new[int(index)][1:]
+        name_text, new, known = self.map_lbii_rem_new[int(index)]
         self._unmap_known_to_new(known, new)
         self.lbidentified.delete(index)
         self._get_new_and_identified_players()
 
     def identify_new_player(self):
         """Indentify selected new player as selected known player."""
+
+        def ambiguous_identification(new, known):
+            # """if new == known:
+            # return False"""
+            if (
+                known
+                in importdata.localplayer[importdata.gameplayermerge[new]]
+            ):
+                if known in importdata.gameplayer:
+                    return False
+
+            # """if known in self.importdata.gameplayer:
+            #    return True
+
+            # not convinced this is correct - and it does not work
+            # did refer to remoteplayermerge deleted a while ago
+            # if not isinstance(self.importdata.remoteplayer[known], set):
+            #     known = self.importdata.remoteplayer[known]
+            # if self.importdata.known_to_new.get(known):
+            #     return True"""
+
+            return True
+
+        def is_ambiguous_identification(new, known):
+            if (
+                known
+                in importdata.localplayer[importdata.gameplayermerge[new]]
+            ):
+                # implies known in importdata is True
+                if known not in importdata.gameplayer:
+                    return True
+
+        def is_new_player(new, known):
+            if (
+                known
+                in importdata.localplayer[importdata.gameplayermerge[new]]
+            ):
+                # implies known in importdata is True
+                if known in importdata.gameplayer:
+                    return True
+
         importdata = self.importdata
-        if len(self.lbnew.selection) == 0 and len(self.lbknown.selection) == 0:
+        if (
+            len(self.lbnew._selection) == 0
+            and len(self.lbknown._selection) == 0
+        ):
             tkinter.messagebox.showerror(
                 parent=self.get_widget(),
                 title="Identify New Players",
@@ -107,14 +152,14 @@ class Identities(ExceptionHandler):
                 ),
             )
             return
-        if len(self.lbnew.selection) == 0:
+        elif len(self.lbnew._selection) == 0:
             tkinter.messagebox.showerror(
                 parent=self.get_widget(),
                 title="Identify New Players",
                 message="Please select a New Player.",
             )
             return
-        if len(self.lbknown.selection) == 0:
+        elif len(self.lbknown._selection) == 0:
             tkinter.messagebox.showerror(
                 parent=self.get_widget(),
                 title="Identify New Players",
@@ -122,8 +167,8 @@ class Identities(ExceptionHandler):
             )
             return
 
-        new = self.map_lbni_newplayer[int(self.lbnew.selection[0])]
-        known = self.map_lbki_remote[int(self.lbknown.selection[0])]
+        new = self.map_lbni_newplayer[int(self.lbnew._selection[0])]
+        known = self.map_lbki_remote[int(self.lbknown._selection[0])]
         if known in importdata.localplayer[importdata.gameplayermerge[new]]:
             # implies known in importdata.localplayer is True
             if known in importdata.gameplayer:
@@ -178,8 +223,8 @@ class Identities(ExceptionHandler):
                         "the same source to be the same player.\n\nMaybe",
                         "this known player selection is wrong, or an earlier",
                         "selection listed under Identified New Players is",
-                        "wrong.\n\nOtherwise some identifications on the",
-                        "sourceor destination databases are wrong.",
+                        "wrong.\n\nOtherwise some identifications on the source",
+                        "or destination databases are wrong.",
                     )
                 ),
             )
@@ -194,18 +239,18 @@ class Identities(ExceptionHandler):
         self.importdata.map_known_to_new(known, new)
 
         for lb in self.lbnew, self.lbknown:
-            lb.set_select_background_color(lb.selection, color=lb.bgcolor)
+            lb._set_select_background_color(lb._selection, color=lb._bgcolor)
             selection = list(lb.curselection())
             selection.reverse()
             for s in selection:
                 lb.selection_clear(s)
-            lb.selection = ()
+            lb._selection = ()
 
         self._get_new_and_identified_players()
         for e, v in enumerate(self.lbidentified.get(0, tkinter.END)):
             if v[0] == self.player_text(new):
                 self.lbidentified.see(e)
-                self.lbidentified.selection_clear_text(0, tkinter.END)
+                self.lbidentified.selection_clear(0, tkinter.END)
                 self.lbidentified.selection_set(e)
 
     def open_import(self):
@@ -324,8 +369,7 @@ class Identities(ExceptionHandler):
             self.remote.sort()
             # populate listbox
             lbk = self.lbknown
-            for mapitem in self.remote:
-                a = mapitem[1]
+            for n, a, p in self.remote:
                 lbk.insert(tkinter.END, self.player_text(a))
                 self.map_lbki_remote.append(a)  # maybe p or (a, p)
             self.lbidentified.pack(
@@ -418,14 +462,12 @@ class Identities(ExceptionHandler):
         self.map_lbni_newplayer = []
         lbn = self.lbnew
         lbn.delete(0, tkinter.END)
-        for mapitem in self.local:
-            a = mapitem[1]
+        for n, a, p in self.local:
             lbn.insert(tkinter.END, self.player_text(a))
             self.map_lbni_newplayer.append(a)  # maybe p or (a, p)
         lbi = self.lbidentified
         lbi.delete(0, tkinter.END)
-        for mapitem in self.map_lbii_rem_new:
-            new, known = mapitem[1:]
+        for n, new, known in self.map_lbii_rem_new:
             lbi.insert(
                 tkinter.END, (self.player_text(new), self.player_text(known))
             )
@@ -442,32 +484,31 @@ class Identities(ExceptionHandler):
 
         def append_player(es):
             n, e, sd, ed, s, p = player
-            identified.append("=".join((constants.EVENT, e)))
-            identified.append("=".join((constants.STARTDATE, sd)))
-            identified.append("=".join((constants.ENDDATE, ed)))
+            identified.append("=".join((constants._event, e)))
+            identified.append("=".join((constants._startdate, sd)))
+            identified.append("=".join((constants._enddate, ed)))
             for x in es:
-                identified.append("=".join((constants.EVENTSECTION, x)))
+                identified.append("=".join((constants._eventsection, x)))
             if s:
-                identified.append("=".join((constants.SECTION, s)))
+                identified.append("=".join((constants._section, s)))
             if p:
-                identified.append("=".join((constants.PIN_LOWER, str(p))))
+                identified.append("=".join((constants._pin, str(p))))
             elif p is False:
-                identified.append("=".join((constants.PINFALSE, "true")))
+                identified.append("=".join((constants._pinfalse, "true")))
             identified.append("=".join((identity, n)))
 
         get_event_from_player = importreports.get_event_from_player
         identified = []
         for t in importdata.textlines:
-            if t.startswith(constants.IDENTIFIED):
+            if t.startswith(constants._identified):
                 break
             identified.append(t)
         if self.map_lbii_rem_new:
-            identified.append("=".join((constants.IDENTIFIED, "true")))
-        for mapitem in self.map_lbii_rem_new:
-            new, known = mapitem[1:]
+            identified.append("=".join((constants._identified, "true")))
+        for n, new, known in self.map_lbii_rem_new:
             for identity, player, events in (
-                (constants.NEWIDENTITY, new, importdata.localevents),
-                (constants.KNOWNIDENTITY, known, importdata.remoteevents),
+                (constants._newidentity, new, importdata.localevents),
+                (constants._knownidentity, known, importdata.remoteevents),
             ):
                 append_player(events[get_event_from_player(player)])
 
@@ -504,7 +545,7 @@ class Identities(ExceptionHandler):
 
 
 class IdListbox(tkinter.Listbox, ExceptionHandler):
-    """Custom listbox for selecting one  from each of several lists."""
+    """Custom listbox for selecting one item from each of several lists."""
 
     def __init__(self, master, lblabel):
         """Customise tkinter.Listbox to display multi-list listbox."""
@@ -520,8 +561,9 @@ class IdListbox(tkinter.Listbox, ExceptionHandler):
         tkinter.Listbox.__init__(
             self, master=f, selectmode="single", selectbackground="yellow"
         )
-        self.bgcolor = self["background"]
+        self._bgcolor = self["background"]
         self._selection = ()
+        self._lbwidget = None
         self.pack(side=tkinter.TOP, expand=tkinter.YES, fill=tkinter.BOTH)
         self["yscrollcommand"] = self.try_command(vsb.set, self)
         self["xscrollcommand"] = self.try_command(hsb.set, self)
@@ -534,11 +576,6 @@ class IdListbox(tkinter.Listbox, ExceptionHandler):
         ):
             self._bindings.bind(self, sequence, function=function)
 
-    @property
-    def selection(self):
-        """Return self._selection."""
-        return self._selection
-
     def _button_1(self, event):
         self._remove_select_color(event)
         self._set_select_color(event)
@@ -550,21 +587,19 @@ class IdListbox(tkinter.Listbox, ExceptionHandler):
             self._selection = self.curselection()
 
     def _remove_select_color(self, event):
-        del event
         if not self._selection:
             return
-        self.set_select_background_color(self._selection, color=self.bgcolor)
+        self._set_select_background_color(self._selection, color=self._bgcolor)
         self._selection = ()
 
-    def set_select_background_color(self, selection, color=None):
-        """Set background color of selection."""
+    def _set_select_background_color(self, selection, color=None):
         try:
             for i in selection:
                 self.itemconfigure(i, background=color)
         except tkinter.TclError as exc:
             if self.curselection():
                 tkinter.messagebox.showinfo(
-                    parent=self.frame,
+                    parent=self.get_widget(),
                     title="Tcl Error",
                     message="".join(
                         (
@@ -580,7 +615,7 @@ class IdListbox(tkinter.Listbox, ExceptionHandler):
         self._selection = (
             self.index("@" + str(event.x) + "," + str(event.y)),
         )
-        self.set_select_background_color(self._selection, color="yellow")
+        self._set_select_background_color(self._selection, color="yellow")
 
     def _clear_selection(self, event):
         if self._selection:
@@ -600,16 +635,15 @@ class MatchListbox(tkinter.Frame, ExceptionHandler):
         self._bindings = Bindings()
         tkinter.Frame.__init__(self, master)
 
-        self._lbwidget = None
         self.lists = []
         tkinter.Label(master=self, text=caption).pack()
-        for item in labels:
+        for l in labels:
             frame = tkinter.Frame(self)
             frame.pack(
                 side=tkinter.LEFT, expand=tkinter.YES, fill=tkinter.BOTH
             )
-            if isinstance(item, str):
-                tkinter.Label(frame, text=item).pack(fill=tkinter.X)
+            if isinstance(l, str):
+                tkinter.Label(frame, text=l).pack(fill=tkinter.X)
             sb = tkinter.Scrollbar(frame, orient=tkinter.HORIZONTAL)
             sb.pack(side=tkinter.BOTTOM, fill=tkinter.X)
             lb = tkinter.Listbox(
@@ -657,13 +691,13 @@ class MatchListbox(tkinter.Frame, ExceptionHandler):
 
     def _scroll(self, *args):
         # """Scroll all tkinter.Texts to scrolling arguments in args."""
-        for item in self.lists:
-            item.yview(*args)
+        for l in self.lists:
+            l.yview(*args)
         return "break"
 
     def _select_item(self, event):
         # """Set selection at item nearest y coordinate of event."""
-        self.selection_clear_text(0, tkinter.END)
+        self.selection_clear(0, tkinter.END)
         self.selection_set(event.widget.nearest(event.y))
         return "break"
 
@@ -674,29 +708,26 @@ class MatchListbox(tkinter.Frame, ExceptionHandler):
 
     def _activate_item_home(self, event):
         # """Set selection at start of text and make visible.."""
-        del event
-        self.selection_clear_text(0, tkinter.END)
+        self.selection_clear(0, tkinter.END)
         self.selection_set(0)
         self.see(0)
         return "break"
 
     def _activate_item_end(self, event):
         # """Set selection at end of text and make visible.."""
-        del event
-        self.selection_clear_text(0, tkinter.END)
+        self.selection_clear(0, tkinter.END)
         self.selection_set(tkinter.END)
         self.see(tkinter.END)
         return "break"
 
     def _clear_selection(self, event):
         # """Cleasr selection."""
-        del event
-        self.selection_clear_text(0, tkinter.END)
+        self.selection_clear(0, tkinter.END)
         return "break"
 
     def _select_active_item(self, event):
         # """Set selection at active index and make it visible."""
-        self.selection_clear_text(0, tkinter.END)
+        self.selection_clear(0, tkinter.END)
         self.selection_set(event.widget.index(tkinter.ACTIVE))
         self.see(event.widget.index(tkinter.ACTIVE))
         return "break"
@@ -704,48 +735,47 @@ class MatchListbox(tkinter.Frame, ExceptionHandler):
     def _set_top_item(self):
         # """Scroll widgets to fit scrollbar adjusted to item nearest top."""
         top = self._lbwidget.nearest(0)
-        for item in self.lists:
-            item.yview(top)
+        for l in self.lists:
+            l.yview(top)
 
     def curselection(self):
         """Return list of items in selections in all tkinter.Texts."""
         result = []
-        for item in self.lists:
-            result.append(item.curselection())
+        for l in self.lists:
+            result.append(l.curselection())
         return list(zip(*result))
 
     def delete(self, first, last=None):
         """Delete elements from first to last in all tkinter.Texts."""
-        for item in self.lists:
-            item.delete(first, last)
+        for l in self.lists:
+            l.delete(first, last)
 
     def get(self, first, last=None):
         """Return list of text between first and last in all tkinter.Texts."""
         result = []
-        for item in self.lists:
-            result.append(item.get(first, last))
+        for l in self.lists:
+            result.append(l.get(first, last))
         return result
 
     def insert(self, index, *elements):
         """Insert elements at index in all tkinter.Texts."""
         for e in elements:
             i = 0
-            for item in self.lists:
-                item.insert(index, e[i])
+            for l in self.lists:
+                l.insert(index, e[i])
                 i = i + 1
 
     def see(self, index):
         """Make index visible in all tkinter.Texts."""
-        for item in self.lists:
-            item.see(index)
+        for l in self.lists:
+            l.see(index)
 
-    # Not 'selection_clear' because it overrides the tkinter.Frame method.
-    def selection_clear_text(self, first, last=None):
+    def selection_clear(self, first, last=None):
         """Clear selection from first to last index in all tkinter.Texts."""
-        for item in self.lists:
-            item.selection_clear(first, last)
+        for l in self.lists:
+            l.selection_clear(first, last)
 
     def selection_set(self, first, last=None):
         """Set selection from first to last index in all tkinter.Texts."""
-        for item in self.lists:
-            item.selection_set(first, last)
+        for l in self.lists:
+            l.selection_set(first, last)

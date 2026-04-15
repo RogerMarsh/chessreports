@@ -4,6 +4,8 @@
 
 """Datagrid classes for allocating ECF online grading codes to players."""
 
+import tkinter
+
 from solentware_grid.core import dataclient
 
 from . import ecfogdrow
@@ -17,10 +19,10 @@ class ECFOGDPlayerGrid(playergrids.PlayerGrid):
 
 
 class OGDPersonGrid(ECFOGDPlayerGrid):
-    """Grid linking players to ECF grading code on Online Grading Database."""
+    """Grid for players linked to ECF grading code on Online Grading Database."""
 
     def __init__(self, **kwargs):
-        """Customise record selection widget and note sibling grids."""
+        """Extend, customise record selection widget, and note sibling grids."""
         super().__init__(**kwargs)
         self.make_header(
             ecfgcodemaprow.ECFmapOGDrowPlayer.header_specification
@@ -36,27 +38,25 @@ class OGDPersonGrid(ECFOGDPlayerGrid):
             self, self.on_data_change
         )
 
-    def encode_navigate_grid_key(self, key, encoding="utf8"):
+    def encode_navigate_grid_key(self, key):
         """Return key after formatting and delegating encoding to superclass.
 
-        This method is used to process text entered by the user.  It is not
-        used by the standard navigation functions (page up and so on).
+        This method is used to process text entered by the user.
+        It is not used by the standard navigation functions (page up and so on).
 
         This method converts key to look like the start of a <key> held on the
         database after a repr(<key>) call.
 
         """
         k = repr((key,))
-        return super().encode_navigate_grid_key(
-            k[: k.index(key) + len(key)], encoding=encoding
-        )
+        return super().encode_navigate_grid_key(k[: k.index(key) + len(key)])
 
 
 class ECFOGDPersonGrid(ECFOGDPlayerGrid):
     """Grid for players on Online Grading Database with ECF grading codes."""
 
     def __init__(self, **kwargs):
-        """Customise record selection widget and note sibling grids."""
+        """Extend, customise record selection widget, and note sibling grids."""
         super().__init__(**kwargs)
         self.make_header(ecfogdrow.ECFrefOGDrowPlayer.header_specification)
         ds = dataclient.DataSource(

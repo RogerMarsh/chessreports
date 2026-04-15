@@ -17,10 +17,9 @@ from .. import (
 
 def write_error_to_log():
     """Write the exception to the error log with a time stamp."""
-    with open(
-        os.path.join(sys.argv[1], ERROR_LOG), "a", encoding="utf8"
-    ) as outf:
-        outf.write(
+    f = open(os.path.join(sys.argv[1], ERROR_LOG), "a")
+    try:
+        f.write(
             "".join(
                 (
                     "\n\n\n",
@@ -39,3 +38,5 @@ def write_error_to_log():
                 )
             )
         )
+    finally:
+        f.close()

@@ -13,6 +13,7 @@ import os
 import io
 
 from solentware_misc.gui import panel, dialogue
+from solentware_misc.core.utilities import AppSysPersonName
 
 from chessvalidate.core import gameresults
 
@@ -26,6 +27,7 @@ from ..core.importreports import convert_alias_to_transfer_format
 from . import (
     eventgrids,
     gamesummary,
+    reports,
 )
 from .taskpanel import TaskPanel
 
@@ -66,30 +68,24 @@ class Events(panel.PanelGridSelector):
     """The Events panel for a Results database."""
 
     _btn_dropevent = "events_drop"
-    btn_exportevents = "events_export"
-    btn_game_summary = "events_game_summary"
+    _btn_exportevents = "events_export"
+    _btn_game_summary = "events_game_summary"
     _btn_save = "events_save"
-    btn_event_summary = "events_event_summary"
-    btn_join_event_new_players = "events_join"
+    _btn_event_summary = "events_event_summary"
+    _btn_join_event_new_players = "events_join"
 
-    # pylint W0102 dangerous-default-value.
-    # cnf used as tkinter.Frame argument, which defaults to {}.
-    def __init__(self, parent=None, cnf={}, **kargs):
+    def __init__(self, parent=None, cnf=dict(), **kargs):
         """Extend and define the results database events panel."""
         self.eventgrid = None
-        super().__init__(parent=parent, cnf=cnf, **kargs)
-        self.__exportdata = None
-        self.__eventsummary = None
+        super(Events, self).__init__(parent=parent, cnf=cnf, **kargs)
         self.show_event_panel_actions_allowed_buttons()
         self.create_buttons()
-        # pylint W0632 unbalanced-tuple-unpacking.
-        # self.make_grids returns a list with same length as argument.
         (self.eventgrid,) = self.make_grids(
             (
-                {
-                    "grid": eventgrids.EventGrid,
-                    "gridfocuskey": "<KeyPress-F7>",
-                },
+                dict(
+                    grid=eventgrids.EventGrid,
+                    gridfocuskey="<KeyPress-F7>",
+                ),
             )
         )
 
@@ -99,6 +95,7 @@ class Events(panel.PanelGridSelector):
         Used, at least, as callback from AppSysFrame container.
 
         """
+        pass
 
     def generate_event_export(self, database, logwidget):
         """Write events selected for export to serial file."""
@@ -122,7 +119,6 @@ class Events(panel.PanelGridSelector):
         ):
             def agpte(player):
                 aliastext, m, a, affiliation, reportedcodes = player
-                del m, a
                 exportdata.append("=".join((cname, aliastext[0])))
                 if aliastext[6]:
                     exportdata.append("=".join((cpin, str(aliastext[6]))))
@@ -137,18 +133,18 @@ class Events(panel.PanelGridSelector):
             return agpte
 
         add_game_homeplayer_to_export = add_game_player_to_export(
-            constants.HOMENAME,
-            constants.HOMEPIN,
-            constants.HOMEPINFALSE,
-            constants.HOMEAFFILIATION,
-            constants.HOMEREPORTEDCODES,
+            constants._homename,
+            constants._homepin,
+            constants._homepinfalse,
+            constants._homeaffiliation,
+            constants._homereportedcodes,
         )
         add_game_awayplayer_to_export = add_game_player_to_export(
-            constants.AWAYNAME,
-            constants.AWAYPIN,
-            constants.AWAYPINFALSE,
-            constants.AWAYAFFILIATION,
-            constants.AWAYREPORTEDCODES,
+            constants._awayname,
+            constants._awaypin,
+            constants._awaypinfalse,
+            constants._awayaffiliation,
+            constants._awayreportedcodes,
         )
 
         def add_game_to_export(game):
@@ -160,37 +156,39 @@ class Events(panel.PanelGridSelector):
             event = resultsrecord.get_event_from_record_value(
                 database.get_primary_record(filespec.EVENT_FILE_DEF, v.event)
             ).value
-            exportdata.append("=".join((constants.EVENT, event.name)))
-            exportdata.append("=".join((constants.STARTDATE, event.startdate)))
-            exportdata.append("=".join((constants.ENDDATE, event.enddate)))
+            exportdata.append("=".join((constants._event, event.name)))
+            exportdata.append(
+                "=".join((constants._startdate, event.startdate))
+            )
+            exportdata.append("=".join((constants._enddate, event.enddate)))
             for s in event.sections:
-                add_name_to_export(constants.EVENTSECTION, s)
+                add_name_to_export(constants._eventsection, s)
             if v.homeplayerwhite is True:
                 exportdata.append(
-                    "=".join((constants.HOMEPLAYERWHITE, constants.YES))
+                    "=".join((constants._homeplayerwhite, constants._yes))
                 )
             elif v.homeplayerwhite is False:
                 exportdata.append(
-                    "=".join((constants.HOMEPLAYERWHITE, constants.NO))
+                    "=".join((constants._homeplayerwhite, constants._no))
                 )
             else:
                 exportdata.append(
-                    "=".join((constants.HOMEPLAYERWHITE, constants.NOCOLOR))
+                    "=".join((constants._homeplayerwhite, constants.NOCOLOR))
                 )
-            exportdata.append("=".join((constants.DATE, v.date)))
+            exportdata.append("=".join((constants._date, v.date)))
             if v.board:
-                exportdata.append("=".join((constants.BOARD_LOWER, v.board)))
+                exportdata.append("=".join((constants._board, v.board)))
             if v.round:
-                exportdata.append("=".join((constants.ROUND_LOWER, v.round)))
+                exportdata.append("=".join((constants._round, v.round)))
             if v.hometeam:
-                add_name_to_export(constants.HOMETEAM, v.hometeam)
+                add_name_to_export(constants._hometeam, v.hometeam)
             if v.awayteam:
-                add_name_to_export(constants.AWAYTEAM, v.awayteam)
+                add_name_to_export(constants._awayteam, v.awayteam)
             if v.section:
-                add_name_to_export(constants.SECTION, v.section)
+                add_name_to_export(constants._section, v.section)
             add_game_homeplayer_to_export(players[gameplayers[v.homeplayer]])
             add_game_awayplayer_to_export(players[gameplayers[v.awayplayer]])
-            exportdata.append("=".join((constants.RESULT, v.result)))
+            exportdata.append("=".join((constants._result, v.result)))
             return True
 
         esel = self.eventgrid.selection
@@ -214,7 +212,7 @@ class Events(panel.PanelGridSelector):
                 )
                 logwidget.append_text_only("")
                 return
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (
@@ -253,7 +251,7 @@ class Events(panel.PanelGridSelector):
                     "Finding all player names on the database."
                 )
                 logwidget.append_text_only("")
-            players = {}
+            players = dict()
             gai = resultsrecord.get_alias_identity
             pr = resultsrecord.ResultsDBrecordPlayer()
             pk = pr.key
@@ -300,7 +298,7 @@ class Events(panel.PanelGridSelector):
                     "Finding all player names in the events."
                 )
             eventplayers = set()
-            gameplayers = {}
+            gameplayers = dict()
             for g in games:
                 for ak in (g.value.homeplayer, g.value.awayplayer):
                     k = ak  # Legacy of {coded:decoded} mapping.
@@ -314,22 +312,20 @@ class Events(panel.PanelGridSelector):
             main_alias_values = {type(True), type(False), type(None)}
             exportdata = []
             for k, v in players.items():
-                pi, pm, pa = v[:-2]
+                pi, pm, pa, paff, prc = v
                 if type(pm) in main_alias_values:
                     for a in pa:
                         if a != k:
                             exportdata.extend(
                                 convert_alias_to_transfer_format(
-                                    players[a][0], constants.NAME_LOWER
+                                    players[a][0], constants._name
                                 )
                             )
                     exportdata.extend(
-                        convert_alias_to_transfer_format(
-                            pi, constants.NAME_LOWER
-                        )
+                        convert_alias_to_transfer_format(pi, constants._name)
                     )
                     exportdata.append(
-                        "=".join((constants.EXPORTEDEVENTPLAYER, "true"))
+                        "=".join((constants._exportedeventplayer, "true"))
                     )
 
             # add all games being exported to export data
@@ -359,21 +355,18 @@ class Events(panel.PanelGridSelector):
 
     def on_drop_event(self, event=None):
         """Delete selecte events."""
-        del event
         self.delete_events()
         return "break"
 
     def on_join_event_new_players(self, event=None):
         """Do processing for 'join event new players' button."""
-        del event
         if not self.is_event_selected():
             return "break"
-        return None
 
     def is_event_selected(self):
         """Return True if events selected.  Otherwise False."""
         if len(self.eventgrid.selection) == 0:
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="No event selected for joining event players",
                 title="Events",
@@ -383,107 +376,101 @@ class Events(panel.PanelGridSelector):
 
     def on_export_events(self, event=None):
         """Export selected events."""
-        del event
         self.get_appsys().set_kwargs_for_next_tabclass_call(
-            {
-                "runmethod": self.get_appsys()
+            dict(
+                runmethod=self.get_appsys()
                 .get_results_database()
                 .do_database_task,
-                "starttaskmsg": "Export events task started",
-                "tabtitle": "Export Events",
-                "runmethodargs": {"taskmethod": self.generate_event_export},
-                "taskbuttons": {
-                    TaskPanel.btn_closebackgroundtask: {
-                        "text": "Cancel",
-                        "tooltip": "Dismiss the Export Events task log.",
-                        "underline": 0,
-                        "switchpanel": True,
-                        "command": self._on_dismiss_exported_events,
-                    },
-                    Events._btn_save: {
-                        "text": "Save Exported Events",
-                        "tooltip": "Save the Export Events.",
-                        "underline": 2,
-                        "command": self._on_save_exported_events,
-                    },
+                starttaskmsg="Export events task started",
+                tabtitle="Export Events",
+                runmethodargs=dict(taskmethod=self.generate_event_export),
+                taskbuttons={
+                    TaskPanel._btn_closebackgroundtask: dict(
+                        text="Cancel",
+                        tooltip="Dismiss the Export Events task log.",
+                        underline=0,
+                        switchpanel=True,
+                        command=self._on_dismiss_exported_events,
+                    ),
+                    Events._btn_save: dict(
+                        text="Save Exported Events",
+                        tooltip="Save the Export Events.",
+                        underline=2,
+                        command=self._on_save_exported_events,
+                    ),
                 },
-                "starttaskbuttons": (
-                    TaskPanel.btn_closebackgroundtask,
+                starttaskbuttons=(
+                    TaskPanel._btn_closebackgroundtask,
                     Events._btn_save,
                 ),
-            }
+            )
         )
 
     def on_game_summary(self, event=None):
         """Display game summary for each selected event."""
-        del event
         self.get_appsys().set_kwargs_for_next_tabclass_call(
-            {
-                "runmethod": self.get_appsys()
+            dict(
+                runmethod=self.get_appsys()
                 .get_results_database()
                 .do_database_task,
-                "starttaskmsg": "Game Summary by event task started",
-                "tabtitle": "Game Summary",
-                "runmethodargs": {"taskmethod": self.display_game_summary},
-                "taskbuttons": {
-                    TaskPanel.btn_closebackgroundtask: {
-                        "text": "Cancel",
-                        "tooltip": "Dismiss the Game Summary task log.",
-                        "underline": 0,
-                        "switchpanel": True,
-                        "command": False,  # use default on_dismiss
-                    },
+                starttaskmsg="Game Summary by event task started",
+                tabtitle="Game Summary",
+                runmethodargs=dict(taskmethod=self.display_game_summary),
+                taskbuttons={
+                    TaskPanel._btn_closebackgroundtask: dict(
+                        text="Cancel",
+                        tooltip="Dismiss the Game Summary task log.",
+                        underline=0,
+                        switchpanel=True,
+                        command=False,  # use default on_dismiss
+                    ),
                 },
-                "starttaskbuttons": (TaskPanel.btn_closebackgroundtask,),
-            }
+                starttaskbuttons=(TaskPanel._btn_closebackgroundtask,),
+            )
         )
 
     def on_event_summary(self, event=None):
         """Display event summary for selected events."""
-        del event
         self.get_appsys().set_kwargs_for_next_tabclass_call(
-            {
-                "runmethod": self.get_appsys()
+            dict(
+                runmethod=self.get_appsys()
                 .get_results_database()
                 .do_database_task,
-                "starttaskmsg": "Event summary task started",
-                "tabtitle": "Event Summary",
-                "runmethodargs": {"taskmethod": self.generate_event_summary},
-                "taskbuttons": {
-                    TaskPanel.btn_closebackgroundtask: {
-                        "text": "Cancel",
-                        "tooltip": "Dismiss the Event Summary task log.",
-                        "underline": 0,
-                        "switchpanel": True,
-                        "command": self._on_dismiss_event_summary,
-                    },
-                    Events._btn_save: {
-                        "text": "Save Event Summary",
-                        "tooltip": "Save the Event Summary.",
-                        "underline": 2,
-                        "command": self._on_save_event_summary,
-                    },
+                starttaskmsg="Event summary task started",
+                tabtitle="Event Summary",
+                runmethodargs=dict(taskmethod=self.generate_event_summary),
+                taskbuttons={
+                    TaskPanel._btn_closebackgroundtask: dict(
+                        text="Cancel",
+                        tooltip="Dismiss the Event Summary task log.",
+                        underline=0,
+                        switchpanel=True,
+                        command=self._on_dismiss_event_summary,
+                    ),
+                    Events._btn_save: dict(
+                        text="Save Event Summary",
+                        tooltip="Save the Event Summary.",
+                        underline=2,
+                        command=self._on_save_event_summary,
+                    ),
                 },
-                "starttaskbuttons": (
-                    TaskPanel.btn_closebackgroundtask,
+                starttaskbuttons=(
+                    TaskPanel._btn_closebackgroundtask,
                     Events._btn_save,
                 ),
-            }
+            )
         )
 
     def _on_dismiss_exported_events(self, event=None):
         """Tidy up when finished with export event task log."""
-        del event
         self.__exportdata = None
 
     def _on_dismiss_event_summary(self, event=None):
         """Tidy up when finished with event summary task log."""
-        del event
         self.__eventsummary = None
 
     def _on_save_exported_events(self, event=None):
         """Save exported events dialogue."""
-        del event
         if self.__exportdata is None:
             return
         conf = configuration.Configuration()
@@ -518,7 +505,6 @@ class Events(panel.PanelGridSelector):
 
     def _on_save_event_summary(self, event=None):
         """Save event_summary dialogue."""
-        del event
         if self.__eventsummary is None:
             return
         conf = configuration.Configuration()
@@ -625,7 +611,7 @@ class Events(panel.PanelGridSelector):
                 delete_events.append(e)
 
         if len(delete_events) == 0:
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="Cannot delete events when no events selected.",
                 title="Events",
@@ -700,28 +686,27 @@ class Events(panel.PanelGridSelector):
                 )
             )
             return
-        dlg = dialogue.ModalConfirm(
-            parent=self,
-            title="Confirm Delete Events",
-            text="\n\n".join(
-                (
-                    "The events listed below will be deleted",
-                    "\n".join(event_report),
-                )
-            ),
-            action_titles={
-                "Cancel": "Cancel Delete Events",
-                "Ok": "Delete Events",
-            },
-            # close=('Cancel', 'Cancel Delete Events', 'Tooltip',),
-            # ok=('Ok', 'Delete Events', 'Tooltip',),
-            wrap=tkinter.WORD,
-            tabstyle="tabular",
-        )
-        # Method is defined by setattr in a superclass.
-        # pylint: disable-next=no-member
-        if not dlg.ok_pressed():
-            return
+        else:
+            dlg = dialogue.ModalConfirm(
+                parent=self,
+                title="Confirm Delete Events",
+                text="\n\n".join(
+                    (
+                        "The events listed below will be deleted",
+                        "\n".join(event_report),
+                    )
+                ),
+                action_titles={
+                    "Cancel": "Cancel Delete Events",
+                    "Ok": "Delete Events",
+                },
+                # close=('Cancel', 'Cancel Delete Events', 'Tooltip',),
+                # ok=('Ok', 'Delete Events', 'Tooltip',),
+                wrap=tkinter.WORD,
+                tabstyle="tabular",
+            )
+            if not dlg.ok_pressed():
+                return
 
         def unset_name(skey):
             """Get name record and decrement reference count."""
@@ -742,11 +727,11 @@ class Events(panel.PanelGridSelector):
                 if players[skey].value.section:
                     unset_name(players[skey].value.section)
 
-        events = {}
+        events = dict()
         games = []
-        players = {}
-        names = {}
-        namesamend = {}
+        players = dict()
+        names = dict()
+        namesamend = dict()
 
         db.start_transaction()
         for e in delete_events:
@@ -769,32 +754,32 @@ class Events(panel.PanelGridSelector):
 
         for g in games:
             g.delete_record(db, filespec.GAME_FILE_DEF)
-        for key, value in names.items():
-            if key in namesamend:
-                rc = namesamend[key].value.reference_count
+        for n in names:
+            if n in namesamend:
+                rc = namesamend[n].value.reference_count
                 if rc <= 0:
-                    value.delete_record(db, filespec.NAME_FILE_DEF)
-                elif value.value.reference_count != rc:
-                    value.edit_record(
+                    names[n].delete_record(db, filespec.NAME_FILE_DEF)
+                elif names[n].value.reference_count != rc:
+                    names[n].edit_record(
                         db,
                         filespec.NAME_FILE_DEF,
                         filespec.NAME_FIELD_DEF,
-                        namesamend[key],
+                        namesamend[n],
                     )
-        for key, value in players.items():
-            if isinstance(value.value.merge, int):
-                prforp = resultsrecord.get_person_from_alias(db, value)
+        for p in players:
+            if isinstance(players[p].value.merge, int):
+                prforp = resultsrecord.get_person_from_alias(db, players[p])
                 prforpamend = prforp.clone()
-                prforpamend.value.alias.remove(key)
+                prforpamend.value.alias.remove(p)
                 prforp.edit_record(
                     db,
                     filespec.PLAYER_FILE_DEF,
                     filespec.PLAYER_FIELD_DEF,
                     prforpamend,
                 )
-            value.delete_record(db, filespec.PLAYER_FILE_DEF)
-        for value in events.values():
-            value.delete_record(db, filespec.EVENT_FILE_DEF)
+            players[p].delete_record(db, filespec.PLAYER_FILE_DEF)
+        for e in events:
+            events[e].delete_record(db, filespec.EVENT_FILE_DEF)
         db.commit()
         self.refresh_controls((self.eventgrid,))
 
@@ -809,7 +794,7 @@ class Events(panel.PanelGridSelector):
             command=self.on_drop_event,
         )
         self.define_button(
-            self.btn_join_event_new_players,
+            self._btn_join_event_new_players,
             text="Join Event New Players",
             tooltip="Join new players with same same as earlier events.",
             underline=0,
@@ -817,7 +802,7 @@ class Events(panel.PanelGridSelector):
             command=self.on_join_event_new_players,
         )
         self.define_button(
-            self.btn_exportevents,
+            self._btn_exportevents,
             text="Export Events",
             tooltip=" ".join(
                 (
@@ -830,7 +815,7 @@ class Events(panel.PanelGridSelector):
             command=self.on_export_events,
         )
         self.define_button(
-            self.btn_game_summary,
+            self._btn_game_summary,
             text="Game Summary",
             tooltip="Show game summary for selected events.",
             underline=2,
@@ -838,7 +823,7 @@ class Events(panel.PanelGridSelector):
             command=self.on_game_summary,
         )
         self.define_button(
-            self.btn_event_summary,
+            self._btn_event_summary,
             text="Event Summary",
             tooltip="Show event summary for selected events.",
             underline=7,
@@ -869,10 +854,10 @@ class Events(panel.PanelGridSelector):
         self.show_panel_buttons(
             (
                 self._btn_dropevent,
-                self.btn_join_event_new_players,
-                self.btn_exportevents,
-                self.btn_game_summary,
-                self.btn_event_summary,
+                self._btn_join_event_new_players,
+                self._btn_exportevents,
+                self._btn_game_summary,
+                self._btn_event_summary,
             )
         )
 
@@ -899,7 +884,7 @@ class Events(panel.PanelGridSelector):
                 )
                 logwidget.append_text_only("")
                 return
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     ("Cannot display game summary", "when no events selected.")
@@ -923,12 +908,10 @@ class Events(panel.PanelGridSelector):
 
     def get_gradingcodes(self, database, players):
         """Return dict of ECF codes for players, default empty dict."""
-        del database, players
         return {}
 
     def get_ecfplayernames(self, database, gradingcodes):
         """Return dict of player names for ECF codes, default empty dict."""
-        del database, gradingcodes
         return {}
 
     def generate_event_summary(self, database, logwidget):
@@ -954,15 +937,17 @@ class Events(panel.PanelGridSelector):
                 )
                 logwidget.append_text_only("")
                 return
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (
-                        "Cannot generate event summary",
-                        "when no events selected.",
-                    )
+                        (
+                            "Cannot generate event summary",
+                            "when no events selected.",
+                        )
+                    ),
+                    title="Events",
                 ),
-                title="Events",
             )
             return
 
@@ -1009,7 +994,7 @@ class Events(panel.PanelGridSelector):
         teams = set()
         sections = set()
         events = set()
-        gamecounts = {}
+        gamecounts = dict()
         for g in games:
             for ak in (g.value.homeplayer, g.value.awayplayer):
                 players.add(ak)
@@ -1026,23 +1011,19 @@ class Events(panel.PanelGridSelector):
             for e in events
         }
         teams = {
-            t: (
-                resultsrecord.get_name_from_record_value(
-                    database.get_primary_record(filespec.NAME_FILE_DEF, t)
-                ).value.name
-                if t
-                else ""
-            )
+            t: resultsrecord.get_name_from_record_value(
+                database.get_primary_record(filespec.NAME_FILE_DEF, t)
+            ).value.name
+            if t
+            else ""
             for t in teams
         }
         sections = {
-            s: (
-                resultsrecord.get_name_from_record_value(
-                    database.get_primary_record(filespec.NAME_FILE_DEF, s)
-                ).value.name
-                if s
-                else ""
-            )
+            s: resultsrecord.get_name_from_record_value(
+                database.get_primary_record(filespec.NAME_FILE_DEF, s)
+            ).value.name
+            if s
+            else ""
             for s in sections
         }
 
@@ -1096,16 +1077,12 @@ class Events(panel.PanelGridSelector):
                     g.value.round if g.value.round else "",
                     g.value.date if g.value.date else "",
                     g.value.board if g.value.board else "",
-                    (
-                        ecfplayers[g.value.homeplayer]
-                        if g.value.homeplayer in ecfplayers
-                        else ""
-                    ),
-                    (
-                        ecfplayers[g.value.awayplayer]
-                        if g.value.awayplayer in ecfplayers
-                        else ""
-                    ),
+                    ecfplayers[g.value.homeplayer]
+                    if g.value.homeplayer in ecfplayers
+                    else "",
+                    ecfplayers[g.value.awayplayer]
+                    if g.value.awayplayer in ecfplayers
+                    else "",
                     players[g.value.homeplayer],
                     players[g.value.awayplayer],
                     gameresults.displayresult.get(g.value.result, ""),

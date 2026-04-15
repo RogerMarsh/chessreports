@@ -11,7 +11,7 @@ if __name__ == "__main__":
     # and remove a few too.
     # results_lite.py is a slight misnomer because nothing is taken out of
     # the imaginary results.py module.
-    _APPLICATION_NAME = "".join((APPLICATION_NAME, ""))
+    application_name = "".join((APPLICATION_NAME, ""))
     try:
         from solentware_misc.gui.startstop import (
             start_application_exception,
@@ -26,44 +26,31 @@ if __name__ == "__main__":
                 title="Start Exception",
                 message=".\n\nThe reported exception is:\n\n".join(
                     (
-                        "".join(
-                            (
-                                "Unable to import ",
-                                "solentware_misc.gui.startstop module",
-                            )
-                        ),
+                        "Unable to import solentware_misc.gui.startstop module",
                         str(error),
                     )
                 ),
             )
-        except Exception as exc:
-            raise SystemExit(
-                "Exception while reporting problem importing start module"
-            ) from exc
-        raise SystemExit(
-            "Unable to import start application utilities"
-        ) from error
+        except:
+            pass
+        raise SystemExit("Unable to import start application utilities")
     try:
         from .gui.resultsroot import Results
         from .gui.lite.leagues_lite import Leagues
     except Exception as error:
         start_application_exception(
-            error, appname=_APPLICATION_NAME, action="import"
+            error, appname=application_name, action="import"
         )
-        raise SystemExit(
-            " import ".join(("Unable to", _APPLICATION_NAME))
-        ) from error
+        raise SystemExit(" import ".join(("Unable to", application_name)))
     try:
         app = Results(
-            title=_APPLICATION_NAME, gui_module=Leagues, width=400, height=200
+            title=application_name, gui_module=Leagues, width=400, height=200
         )
     except Exception as error:
         start_application_exception(
-            error, appname=_APPLICATION_NAME, action="initialise"
+            error, appname=application_name, action="initialise"
         )
-        raise SystemExit(
-            " initialise ".join(("Unable to", _APPLICATION_NAME))
-        ) from error
+        raise SystemExit(" initialise ".join(("Unable to", application_name)))
     try:
         app.root.mainloop()
     except SystemExit:
@@ -74,6 +61,6 @@ if __name__ == "__main__":
             error,
             app,
             app.root,
-            title=_APPLICATION_NAME,
-            appname=_APPLICATION_NAME,
+            title=application_name,
+            appname=application_name,
         )

@@ -12,7 +12,7 @@ can be corrected.
 import tkinter
 import tkinter.messagebox
 
-from solentware_misc.gui import panel, dialogue
+from solentware_misc.gui import panel, reports, dialogue
 
 from . import playergrids
 from . import playerdetail
@@ -30,14 +30,12 @@ class Players(panel.PanedPanelGridSelectorBar):
     _btn_demerge_player = "players_demerge_player"
     _btn_break_merge = "players_break_merge"
 
-    # pylint W0102 dangerous-default-value.
-    # cnf used as tkinter.Frame argument, which defaults to {}.
-    def __init__(self, parent=None, cnf={}, **kargs):
+    def __init__(self, parent=None, cnf=dict(), **kargs):
         """Extend and define the results database player panel."""
         self.aliasgrid = None
         self.playergrid = None
 
-        super().__init__(parent=parent, cnf=cnf, **kargs)
+        super(Players, self).__init__(parent=parent, cnf=cnf, **kargs)
 
         self.show_panel_buttons(
             (
@@ -48,22 +46,20 @@ class Players(panel.PanedPanelGridSelectorBar):
         )
         self.create_buttons()
 
-        # pylint W0632 unbalanced-tuple-unpacking.
-        # self.make_grids returns a list with same length as argument.
         self.aliasgrid, self.playergrid = self.make_grids(
             (
-                {
-                    "grid": playergrids.AliasGrid,
-                    "selectlabel": "Select Player:  ",
-                    "gridfocuskey": "<KeyPress-F7>",
-                    "selectfocuskey": "<KeyPress-F5>",
-                },
-                {
-                    "grid": playergrids.IdentityGrid,
-                    "selectlabel": "Select Player Reference:  ",
-                    "gridfocuskey": "<KeyPress-F8>",
-                    "selectfocuskey": "<KeyPress-F6>",
-                },
+                dict(
+                    grid=playergrids.AliasGrid,
+                    selectlabel="Select Player:  ",
+                    gridfocuskey="<KeyPress-F7>",
+                    selectfocuskey="<KeyPress-F5>",
+                ),
+                dict(
+                    grid=playergrids.IdentityGrid,
+                    selectlabel="Select Player Reference:  ",
+                    gridfocuskey="<KeyPress-F8>",
+                    selectfocuskey="<KeyPress-F6>",
+                ),
             )
         )
 
@@ -82,24 +78,24 @@ class Players(panel.PanedPanelGridSelectorBar):
         db = self.get_appsys().get_results_database()
         if len(psel) == 0:
             if len(asel) == 0:
-                tkinter.messagebox.showinfo(
+                dlg = tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message=" ".join(
                         (
                             "Please select the main alias for the player in",
-                            "the lower list and the alias to be demerged in",
-                            "the upper list",
+                            "the lower list and the alias to be demerged in the",
+                            "upper list",
                         )
                     ),
                     title=title,
                 )
                 return
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (
-                        "Please select the main alias for the player in ",
-                        "the upper list.\n\n",
+                        "Please select the main alias for the player in the upper",
+                        "list.\n\n",
                         "The alias to be demerged is already selected in the",
                         "lower list.",
                     )
@@ -109,14 +105,14 @@ class Players(panel.PanedPanelGridSelectorBar):
             return
 
         if len(asel) == 0:
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (
                         "Please select the alias to be demerged in the upper",
                         "list.\n\n",
-                        "The main alias for the player is already selected",
-                        "in the lower list.",
+                        "The main alias for the player is already selected in the",
+                        "lower list.",
                     )
                 ),
                 title=title,
@@ -129,7 +125,7 @@ class Players(panel.PanedPanelGridSelectorBar):
         finally:
             db.end_read_only_transaction()
         if mainentry is None:
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (
@@ -146,7 +142,7 @@ class Players(panel.PanedPanelGridSelectorBar):
         finally:
             db.end_read_only_transaction()
         if demergeentry is None:
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (
@@ -229,12 +225,12 @@ class Players(panel.PanedPanelGridSelectorBar):
                                 )
                 finally:
                     db.end_read_only_transaction()
-                if rep:
+                if len(rep):
                     rep.insert(
                         0, "The following aliases can be demerged singly:\n"
                     )
                 inf = "\n".join(rep)
-                dialogue.ModalInformation(
+                cdlg = dialogue.ModalInformation(
                     parent=self,
                     title=title,
                     text="\n\n".join(("".join(head), inf)),
@@ -255,7 +251,7 @@ class Players(panel.PanedPanelGridSelectorBar):
             finally:
                 db.end_read_only_transaction()
             if demergekey not in mainentry.value.alias:
-                tkinter.messagebox.showinfo(
+                dlg = tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message="".join(
                         (
@@ -291,7 +287,7 @@ class Players(panel.PanedPanelGridSelectorBar):
             finally:
                 db.end_read_only_transaction()
             if r is None:
-                tkinter.messagebox.showinfo(
+                dlg = tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message="".join(
                         (
@@ -316,7 +312,7 @@ class Players(panel.PanedPanelGridSelectorBar):
                 newaliasrecord,
             )
         elif demergekey != mainentry.key.recno:
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -364,7 +360,7 @@ class Players(panel.PanedPanelGridSelectorBar):
                 )
             if msg:
                 msg.append("\n\nThere are no aliases.")
-                tkinter.messagebox.showinfo(
+                dlg = tkinter.messagebox.showinfo(
                     parent=self.get_widget(), message="".join(msg), title=title
                 )
                 return
@@ -401,7 +397,7 @@ class Players(panel.PanedPanelGridSelectorBar):
         )
         db.commit()
 
-        if not mainentry.value.get_alias_list():
+        if not len(mainentry.value.get_alias_list()):
             if psel[0] in self.playergrid.bookmarks:
                 self.playergrid.bookmarks.remove(psel[0])
             self.playergrid.selection[:] = []
@@ -433,7 +429,7 @@ class Players(panel.PanedPanelGridSelectorBar):
         msgtitle = "Undo all Merges for Player"
         psel = self.playergrid.selection
         if len(psel) == 0:
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join(
                     (
@@ -452,7 +448,7 @@ class Players(panel.PanedPanelGridSelectorBar):
         finally:
             db.end_read_only_transaction()
         if mainentry is None:
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="Cannot find identified player for selection.",
                 title=msgtitle,
@@ -486,8 +482,9 @@ class Players(panel.PanedPanelGridSelectorBar):
                                     db, rvi
                                 )
                             )
-                if rep:
+                if len(rep):
                     rep.insert(0, "The following aliases will be demerged:\n")
+                inf = "\n".join(rep)
                 rrgpn = resultsrecord.get_player_name_text_tabs(db, pvi)
             finally:
                 db.end_read_only_transaction()
@@ -551,8 +548,6 @@ class Players(panel.PanedPanelGridSelectorBar):
                     wrap=tkinter.WORD,
                     tabstyle="tabular",
                 )
-            # Method is defined by setattr in a superclass.
-            # pylint: disable-next=no-member
             if not cdlg.ok_pressed():
                 return
         else:
@@ -578,7 +573,7 @@ class Players(panel.PanedPanelGridSelectorBar):
                 ):
                     return
             else:
-                tkinter.messagebox.showinfo(
+                dlg = tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message="".join(
                         (
@@ -646,6 +641,7 @@ class Players(panel.PanedPanelGridSelectorBar):
         Used, at least, as callback from AppSysFrame container.
 
         """
+        pass
 
     def describe_buttons(self):
         """Define all action buttons that may appear on players page."""
@@ -653,9 +649,7 @@ class Players(panel.PanedPanelGridSelectorBar):
         self.define_button(
             self._btn_aliases,
             text="Player Details",
-            tooltip=(
-                "Show details, including all aliases, of selected players."
-            ),
+            tooltip="Show details, including all aliases, of selected players.",
             underline=1,
             command=self.on_aliases,
         )
@@ -692,7 +686,7 @@ class Players(panel.PanedPanelGridSelectorBar):
         asel = self.aliasgrid.selection
         if len(psel) == 0:
             if len(asel) == 0:
-                tkinter.messagebox.showinfo(
+                dlg = tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
                     message=" ".join(
                         (
@@ -720,21 +714,18 @@ class Players(panel.PanedPanelGridSelectorBar):
 
     def on_aliases(self, event=None):
         """Display details for a player."""
-        del event
         self.display_player_details()
         self.playergrid.set_select_hint_label()
         return "break"
 
     def on_break_merge(self, event=None):
         """Break merge for one of a player's names."""
-        del event
         self.break_one_player_merge()
         self.aliasgrid.set_select_hint_label()
         return "break"
 
     def on_demerge_player(self, event=None):
         """Break all merges for a player."""
-        del event
         self.break_player_merges()
         self.aliasgrid.set_select_hint_label()
         return "break"

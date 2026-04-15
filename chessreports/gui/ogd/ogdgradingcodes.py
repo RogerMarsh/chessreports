@@ -11,6 +11,7 @@ import tkinter.messagebox
 from solentware_misc.gui import panel
 
 from . import ogdplayergrids
+from ..ecf import ecfdetail
 from ...core.ogd import ecfogdrecord
 from ...core.ogd import ecfgcodemaprecord
 from ...core import resultsrecord
@@ -23,14 +24,12 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
     _btn_identify = "ecfgradingcodes_identify"
     _btn_remove_code = "ecfgradingcodes_remove"
 
-    # pylint W0102 dangerous-default-value.
-    # cnf used as tkinter.Frame argument, which defaults to {}.
-    def __init__(self, parent=None, cnf={}, **kargs):
+    def __init__(self, parent=None, cnf=dict(), **kargs):
         """Extend and define the results database ECF grading code panel."""
         self.persongrid = None
         self.ecfpersongrid = None
 
-        super().__init__(parent=parent, cnf=cnf, **kargs)
+        super(ECFGradingCodes, self).__init__(parent=parent, cnf=cnf, **kargs)
 
         self.show_panel_buttons(
             (
@@ -40,22 +39,20 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
         )
         self.create_buttons()
 
-        # pylint W0632 unbalanced-tuple-unpacking.
-        # self.make_grids returns a list with same length as argument.
         self.persongrid, self.ecfpersongrid = self.make_grids(
             (
-                {
-                    "grid": ogdplayergrids.OGDPersonGrid,
-                    "selectlabel": "Select Player:  ",
-                    "gridfocuskey": "<KeyPress-F7>",
-                    "selectfocuskey": "<KeyPress-F5>",
-                },
-                {
-                    "grid": ogdplayergrids.ECFOGDPersonGrid,
-                    "selectlabel": "Select Player Reference:  ",
-                    "gridfocuskey": "<KeyPress-F8>",
-                    "selectfocuskey": "<KeyPress-F6>",
-                },
+                dict(
+                    grid=ogdplayergrids.OGDPersonGrid,
+                    selectlabel="Select Player:  ",
+                    gridfocuskey="<KeyPress-F7>",
+                    selectfocuskey="<KeyPress-F5>",
+                ),
+                dict(
+                    grid=ogdplayergrids.ECFOGDPersonGrid,
+                    selectlabel="Select Player Reference:  ",
+                    gridfocuskey="<KeyPress-F8>",
+                    selectfocuskey="<KeyPress-F6>",
+                ),
             )
         )
 
@@ -64,9 +61,10 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
 
         Used, at least, as callback from AppSysFrame container
         """
+        pass
 
     def describe_buttons(self):
-        """Define all action buttons for ECF grading code page."""
+        """Define all action buttons that may appear on ECF grading code page."""
         super().describe_buttons()
         self.define_button(
             self._btn_identify,
@@ -85,14 +83,12 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
 
     def on_identify(self, event=None):
         """Link a player name with a grading code record."""
-        del event
         self.select_grading_code()
         self.ecfpersongrid.set_select_hint_label()
         return "break"
 
     def on_remove_code(self, event=None):
-        """Dialogue to break player name link to grading code record."""
-        del event
+        """Dialogue to break link between player name and grading code record."""
         self.remove_grading_code()
         return "break"
 
@@ -107,7 +103,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                     "link will be removed.",
                 )
             )
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(), message=msg, title=msgtitle
             )
             return
@@ -115,7 +111,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
         db = self.get_appsys().get_results_database()
         mr = ecfgcodemaprecord.get_person_for_player(db, psel[0][-1])
         if mr is None:
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -179,7 +175,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
                     )
                 )
 
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(), message=msg, title=msgtitle
             )
             return
@@ -188,7 +184,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
         selrec = self.persongrid.objects[psel[0]]
         linkrec = ecfgcodemaprecord.get_person_for_player(db, psel[0][-1])
         if linkrec:
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -213,7 +209,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             aliasrec = resultsrecord.get_alias(
                 db, literal_eval(cpc.value.playerkey)
             )
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
@@ -245,7 +241,7 @@ class ECFGradingCodes(panel.PanedPanelGridSelectorBar):
             else:
                 pselkey = None
         if pselkey is None:
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (

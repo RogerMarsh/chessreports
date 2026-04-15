@@ -13,11 +13,9 @@ from ...core import resultsrecord
 class Events(events_lite.Events):
     """The Events panel for a Results database."""
 
-    # pylint W0102 dangerous-default-value.
-    # cnf used as tkinter.Frame argument, which defaults to {}.
-    def __init__(self, parent=None, cnf={}, **kargs):
+    def __init__(self, parent=None, cnf=dict(), **kargs):
         """Extend and define the results database events panel."""
-        super().__init__(parent=parent, cnf=cnf, **kargs)
+        super(Events, self).__init__(parent=parent, cnf=cnf, **kargs)
 
     def get_gradingcodes(self, database, players):
         """Return dict of ECF codes for players, default empty dict."""
@@ -31,13 +29,11 @@ class Events(events_lite.Events):
     def get_ecfplayernames(self, database, gradingcodes):
         """Return dict of player names for ECF codes, default empty dict."""
         ecfplayers = {
-            p: (
-                ecfogdrecord.get_ecf_ogd_player_for_grading_code(
-                    database, gradingcodes[p]
-                ).value.ECFOGDname
-                if gradingcodes[p]
-                else ""
-            )
+            p: ecfogdrecord.get_ecf_ogd_player_for_grading_code(
+                database, gradingcodes[p]
+            ).value.ECFOGDname
+            if gradingcodes[p]
+            else ""
             for p in gradingcodes
         }
         return ecfplayers

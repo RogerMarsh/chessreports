@@ -16,7 +16,7 @@ may still exist.
 """
 
 from solentware_base.core.record import KeyData
-from solentware_base.core.record import ValueList, Record
+from solentware_base.core.record import Value, ValueList, Record
 
 from .. import filespec
 
@@ -28,16 +28,16 @@ class ECFrefOGDkeyPlayer(KeyData):
 class ECFrefOGDvaluePlayer(ValueList):
     """Player data from ECF."""
 
-    attributes = {
-        "ECFOGDcode": None,
-        "ECFOGDname": None,
-        "ECFOGDclubs": list,
-    }
+    attributes = dict(
+        ECFOGDcode=None,
+        ECFOGDname=None,
+        ECFOGDclubs=list,
+    )
     _attribute_order = tuple(sorted(attributes.keys()))
 
     def pack(self):
         """Extend, return ECF player record and index data."""
-        v = super().pack()
+        v = super(ECFrefOGDvaluePlayer, self).pack()
         index = v[1]
         index[filespec.OGDPLAYERCODE_FIELD_DEF] = [self.ECFOGDcode]
         if self.ECFOGDname:
@@ -55,7 +55,7 @@ class ECFrefOGDrecordPlayer(Record):
         self, keyclass=ECFrefOGDkeyPlayer, valueclass=ECFrefOGDvaluePlayer
     ):
         """Customise Record with ECFrefOGDkeyPlayer, ECFrefOGDvaluePlayer."""
-        super().__init__(keyclass, valueclass)
+        super(ECFrefOGDrecordPlayer, self).__init__(keyclass, valueclass)
 
 
 def get_ecf_ogd_player(database, key):
@@ -80,4 +80,3 @@ def get_ecf_ogd_player_for_grading_code(database, key):
         pr = ECFrefOGDrecordPlayer()
         pr.load_record(r)
         return pr
-    return None

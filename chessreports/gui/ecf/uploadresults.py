@@ -16,28 +16,22 @@ import subprocess
 import os
 
 try:
+    if subprocess.run(["curl", "-V"], capture_output=True).returncode:
+        curl = False
+    else:
+        curl = True
+except:
+    curl = False
+try:
     import requests
 except ModuleNotFoundError:
-    pass
+    requests = None
 
 from solentware_bind.gui.bindings import Bindings
 
 from ...core.ecf import feedback_html
 from ...core import configuration
 from ...core import constants
-
-try:
-    # Explicit 'check=False' to avoid pylint W1510 messsage.
-    if subprocess.run(
-        ["curl", "-V"], capture_output=True, check=False
-    ).returncode:
-        CURL = False
-    else:
-        CURL = True
-except:
-    CURL = False
-
-REQUESTS = "requests" in globals()
 
 _AVOID_SCROLLBAR = "avoidscrollbar"
 _START_TEXT = " ".join(
@@ -72,7 +66,7 @@ _OTHER_OPTIONS_TEXT = " ".join(
     )
 )
 _DEFAULT_LIVE_URL = "https://rating.englishchess.org.uk/v2/submit/"
-_DEFAULT_TEST_URL = "https://rating-sbox.englishchess.org.uk/v2/submit/"
+_DEFAULT_TEST_URL = "https://rating.englishchess.org.uk/sandbox/submit/"
 _EVENT_DETAILS = "EVENT DETAILS"
 _EVENT_CODE = "EVENT CODE"
 _SUBMISSION_INDEX = "SUBMISSION INDEX"
@@ -82,6 +76,8 @@ _RESULTS_OFFICER_ADDRESS = "RESULTS OFFICER ADDRESS"
 
 class UploadResultsError(Exception):
     """Exception class for uploadresults module."""
+
+    pass
 
 
 class _UploadResults:
@@ -235,7 +231,6 @@ class _UploadResults:
 
     def select_submission_file(self, event=None):
         """Select a results submission file."""
-        del event
         conf = configuration.Configuration()
         localfilename = tkinter.filedialog.askopenfilename(
             parent=self.text,
@@ -254,39 +249,37 @@ class _UploadResults:
         )
         self.filename.set(localfilename)
         try:
-            with open(localfilename, encoding="utf8") as rft:
-                if not self.is_results_file_text_sane(rft.read()):
-                    message = "".join(
-                        (localfilename, " cannot be a valid submission file")
-                    )
-                    self.insert_text(message + ".\n\n")
-                    tkinter.messagebox.showinfo(
-                        title="Submission File", message=message
-                    )
-                else:
-                    self.insert_text(
-                        "".join(
-                            (
-                                localfilename,
-                                " may be a valid submission file: a few ",
-                                "mandatory items are present.\n\n",
-                            )
-                        )
-                    )
+            rft = open(localfilename).read()
         except Exception as exc:
             tkinter.messagebox.showinfo(
                 title="Open Submission File", message=str(exc)
             )
             return
+        if not self.is_results_file_text_sane(rft):
+            message = "".join(
+                (localfilename, " cannot be a valid submission file")
+            )
+            self.insert_text(message + ".\n\n")
+            tkinter.messagebox.showinfo(
+                title="Submission File", message=message
+            )
+        else:
+            self.insert_text(
+                "".join(
+                    (
+                        localfilename,
+                        " may be a valid submission file: a few mandatory items",
+                        " are present.\n\n",
+                    )
+                )
+            )
 
     def set_default_live_upload_url(self, event=None):
         """Open or download a zip file by URL."""
-        del event
         self.urlname.set(_DEFAULT_LIVE_URL)
 
     def set_default_test_upload_url(self, event=None):
         """Open or download a zip file by URL."""
-        del event
         self.urlname.set(_DEFAULT_TEST_URL)
 
     def set_email_graders_option(self, options):
@@ -314,7 +307,6 @@ class _UploadResults:
         from Steve Bush is used if Requests package has to be used.
 
         """
-        del event
         try:
             urlp = urllib.parse.urlparse(self.urlname.get())
         except ValueError as exc:
@@ -351,20 +343,20 @@ class _UploadResults:
             return
         localfilename = self.filename.get()
         try:
-            with open(localfilename, encoding="utf8") as rft:
-                if not self.is_results_file_text_sane(rft.read()):
-                    message = "".join(
-                        (localfilename, " cannot be a valid submission file")
-                    )
-                    self.insert_text(message + ".\n\n")
-                    tkinter.messagebox.showinfo(
-                        title="Submission File", message=message
-                    )
-                    return
+            rft = open(localfilename).read()
         except Exception as exc:
             self.insert_text(str(exc) + ".\n\n")
             tkinter.messagebox.showinfo(
                 title="Open Submission File", message=str(exc)
+            )
+            return
+        if not self.is_results_file_text_sane(rft):
+            message = "".join(
+                (localfilename, " cannot be a valid submission file")
+            )
+            self.insert_text(message + ".\n\n")
+            tkinter.messagebox.showinfo(
+                title="Submission File", message=message
             )
             return
         if not self.username.get():
@@ -377,7 +369,7 @@ class _UploadResults:
             self.insert_text(message + ".\n\n")
             tkinter.messagebox.showinfo(title="Password", message=message)
             return
-        if not CURL and not REQUESTS:
+        if not curl and not requests:
             message = "No method of submitting results is available"
             self.insert_text(
                 "".join(
@@ -398,7 +390,7 @@ class _UploadResults:
                 message="Do you want to upload to the live ECF database?",
             ):
                 return
-        if CURL:
+        if curl:
             args = ["curl", "-k", "-L"]
             args.append("-F username=" + self.username.get())
             args.append("-F password=" + self.password.get())
@@ -407,8 +399,7 @@ class _UploadResults:
             self.set_report_only_option(args)
             self.set_create_new_ecf_codes_option(args)
             args.append(self.urlname.get())
-            # Explicit 'check=False' to avoid pylint W1510 messsage.
-            cp = subprocess.run(args, capture_output=True, check=False)
+            cp = subprocess.run(args, capture_output=True)
             if cp.returncode:
                 message = "".join(
                     (
@@ -459,7 +450,7 @@ class _UploadResults:
             )
             self.password.set("")
             return
-        if REQUESTS:
+        if requests:
             postdata = {
                 "username": self.username.get(),
                 "password": self.password.get(),
@@ -469,19 +460,19 @@ class _UploadResults:
             self.set_create_new_ecf_codes_option(postdata)
             filename = self.filename.get()
             try:
-                with open(filename, "rb") as outf:
-                    filedata = {"uploaded_file": (filename, outf)}
-                    try:
-                        response = requests.post(
-                            self.urlname.get(), data=postdata, files=filedata
-                        )
-                    except Exception as exc:
-                        self.insert_text(str(exc) + ".\n\n")
-                        tkinter.messagebox.showinfo(
-                            title="Submit Results File", message=str(exc)
-                        )
-                        self.password.set("")
-                        return
+                of = open(filename, "rb")
+            except Exception as exc:
+                self.insert_text(str(exc) + ".\n\n")
+                tkinter.messagebox.showinfo(
+                    title="Submit Results File", message=str(exc)
+                )
+                self.password.set("")
+                return
+            filedata = {"uploaded_file": (filename, of)}
+            try:
+                response = requests.post(
+                    self.urlname.get(), data=postdata, files=filedata
+                )
             except Exception as exc:
                 self.insert_text(str(exc) + ".\n\n")
                 tkinter.messagebox.showinfo(
@@ -551,7 +542,6 @@ class _UploadResults:
         return False
 
     def process_response(self, response):
-        """Process the feedback."""
         fb = feedback_html.FeedbackHTML()
         fb.submission_file_name = self.filename.get()
         fb.responsestring = response
@@ -590,8 +580,8 @@ class _UploadResults:
         self.insert_text(
             "".join(
                 (
-                    "\n\nThe submission PINs and feedback players in ",
-                    "display order match up as follows:\n\n",
+                    "\n\nThe submission PINs and feedback players in display order ",
+                    "match up as follows:\n\n",
                 )
             )
         )
@@ -639,7 +629,6 @@ class _UploadResults:
     #
     def save_response(self, event=None):
         """Save response to a successful upload."""
-        del event
         if self.most_recent_response is None:
             tkinter.messagebox.showinfo(
                 title="Save Response", message="No response available to save"
@@ -698,9 +687,9 @@ class _UploadResults:
             constants.RECENT_FEEDBACK,
             conf.convert_home_directory_to_tilde(os.path.dirname(filename)),
         )
+        of = open(filename, mode="w")
         try:
-            with open(filename, mode="w", encoding="utf8") as outf:
-                outf.write(self.most_recent_response.responsestring)
+            of.write(self.most_recent_response.responsestring)
         except Exception as exc:
             message = "Error while saving response"
             self.insert_text(
@@ -716,6 +705,8 @@ class _UploadResults:
             )
             tkinter.messagebox.showinfo(title=title, message=message)
             return
+        finally:
+            of.close()
         self.insert_text(
             "".join(
                 (
@@ -742,9 +733,9 @@ class SubmitResults(_UploadResults):
 
     def set_email_graders_option(self, options):
         """Send response to grader by email."""
-        if CURL:
+        if curl:
             options.append("-F email_graders=")
-        elif REQUESTS:
+        elif requests:
             options["email_graders"] = "on"
 
     def set_report_only_option(self, options):
@@ -777,9 +768,9 @@ class SubmitResultsFromPrincipals(SubmitResults):
     def set_create_new_ecf_codes_option(self, options):
         """Create new ECF codes when requested if submission file is valid."""
         if self.create_new_ecf_codes.get():
-            if CURL:
+            if curl:
                 options.append("-F auto_create_players=")
-            elif REQUESTS:
+            elif requests:
                 options["auto_create_players"] = "on"
 
 
@@ -806,9 +797,9 @@ class CheckAndReportResults(_UploadResults):
 
     def set_report_only_option(self, options):
         """Validate submission but do not commit."""
-        if CURL:
+        if curl:
             options.append("-F report_only=")
-        elif REQUESTS:
+        elif requests:
             options["report_only"] = "on"
 
     def set_create_new_ecf_codes_option(self, options):

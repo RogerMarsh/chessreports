@@ -33,11 +33,11 @@ def _do_ecf_downloaded_data_import(
     results.do_database_task(
         import_method,
         logwidget=logwidget,
-        taskmethodargs={
-            "ecfdata": ecfdata,
-            "parent": widget.get_widget(),
-            "downloaddate": downloaddate,
-        },
+        taskmethodargs=dict(
+            ecfdata=ecfdata,
+            parent=widget.get_widget(),
+            downloaddate=downloaddate,
+        ),
         use_specification_items=specification_items,
     )
 
@@ -84,13 +84,13 @@ def _do_ecf_reference_data_import(
     results.do_database_task(
         import_method,
         logwidget=logwidget,
-        taskmethodargs={
-            "ecffile": ecffile,
-            "ecfdate": ecfdate,
-            "parent": widget.get_widget(),
-            # "datecontrol": widget.ecfdatecontrol.get(),
-            "datecontrol": datecontrol,  # See --enable-threads comment above.
-        },
+        taskmethodargs=dict(
+            ecffile=ecffile,
+            ecfdate=ecfdate,
+            parent=widget.get_widget(),
+            # datecontrol=widget.ecfdatecontrol.get(),
+            datecontrol=datecontrol,  # See --enable-threads comment just above.
+        ),
         use_specification_items=specification_items,
     )
 

@@ -28,25 +28,21 @@ from ...core import constants
 class Control(control_database.Control):
     """The Control panel for a Results database."""
 
-    btn_copyecfogdratingfile = "control_ogd_copy_rating"
+    _btn_copyecfogdratingfile = "control_ogd_copy_rating"
     _btn_ecfogdratingfile = "control_ogd_rating_file"
-    btn_copyecfogdgradingfile = "control_ogd_copy_grading"
+    _btn_copyecfogdgradingfile = "control_ogd_copy_grading"
     _btn_ecfogdgradingfile = "control_ogd_grading_file"
     _btn_quitecfogdzippedfiles = "control_ogd_quit"
 
-    # pylint W0102 dangerous-default-value.
-    # cnf used as tkinter.Frame argument, which defaults to {}.
-    def __init__(self, parent=None, cnf={}, **kargs):
+    def __init__(self, parent=None, cnf=dict(), **kargs):
         """Extend and define the results database control panel."""
-        super().__init__(parent=parent, cnf=cnf, **kargs)
+        super(Control, self).__init__(parent=parent, cnf=cnf, **kargs)
 
-        self.ecf_reference_file = None
-        self._ecf_reference_widget = None
         self.ecfogdfile = None
 
     def close_update_resources(self):
         """Close any open files containing master data from ECF."""
-        if self.ecfogdfile is not None:
+        if self.ecfogdfile != None:
             self.ecfogdfile.close_context()
             self._delete_text_files(self.ecfogdfile)
             self.ecfogdfile = None
@@ -62,7 +58,7 @@ class Control(control_database.Control):
             command=self.on_ecf_ogd_rating_file,
         )
         self.define_button(
-            self.btn_copyecfogdratingfile,
+            self._btn_copyecfogdratingfile,
             text="Show ECF Rating List",
             tooltip="Build new Master file for players.",
             underline=13,
@@ -77,7 +73,7 @@ class Control(control_database.Control):
             command=self.on_ecf_ogd_grading_file,
         )
         self.define_button(
-            self.btn_copyecfogdgradingfile,
+            self._btn_copyecfogdgradingfile,
             text="Show ECF Grading List",
             tooltip="Build new Master file for players.",
             underline=13,
@@ -105,7 +101,7 @@ class Control(control_database.Control):
             ),
         )
         if not filepath:
-            return None
+            return
         conf.set_configuration_value(
             constants.RECENT_RATING_LIST,
             conf.convert_home_directory_to_tilde(os.path.dirname(filepath)),
@@ -139,7 +135,6 @@ class Control(control_database.Control):
             self.ecf_reference_file = listbox
             self._ecf_reference_widget = frame
             return True
-        return None
 
     def display_ecf_ogd_zipped_file_contents(self):
         """Display ECF master data with date for confirmation of update."""
@@ -154,13 +149,14 @@ class Control(control_database.Control):
             ),
         )
         if not filepath:
-            return None
+            return
         conf.set_configuration_value(
             constants.RECENT_GRADING_LIST,
             conf.convert_home_directory_to_tilde(os.path.dirname(filepath)),
         )
 
-        with zipfile.ZipFile(filepath, "r") as ziparchive:
+        ziparchive = zipfile.ZipFile(filepath, "r")
+        try:
             namelist = ziparchive.namelist()
             if len(namelist):
                 frame = tkinter.Frame(master=self.get_widget())
@@ -188,11 +184,11 @@ class Control(control_database.Control):
                 self.ecf_reference_file = listbox
                 self._ecf_reference_widget = frame
                 return True
-            return None
+        finally:
+            ziparchive.close()
 
     def on_quit_ecf_ogd_data(self, event=None):
         """Do quit import ECF Grading List actions."""
-        del event
         if self.close_import_file("ECF Online Grading Database"):
             self.show_buttons_for_open_database()
             self.create_buttons()
@@ -202,9 +198,9 @@ class Control(control_database.Control):
         self.hide_panel_buttons()
         self.show_panel_buttons(
             (
-                self.btn_closedatabase,
+                self._btn_closedatabase,
                 self._btn_quitecfogdzippedfiles,
-                self.btn_copyecfogdratingfile,
+                self._btn_copyecfogdratingfile,
             )
         )
 
@@ -213,9 +209,9 @@ class Control(control_database.Control):
         self.hide_panel_buttons()
         self.show_panel_buttons(
             (
-                self.btn_closedatabase,
+                self._btn_closedatabase,
                 self._btn_quitecfogdzippedfiles,
-                self.btn_copyecfogdgradingfile,
+                self._btn_copyecfogdgradingfile,
             )
         )
 
@@ -224,10 +220,10 @@ class Control(control_database.Control):
         self.hide_panel_buttons()
         self.show_panel_buttons(
             (
-                self.btn_closedatabase,
+                self._btn_closedatabase,
                 self._btn_ecfogdratingfile,
                 self._btn_ecfogdgradingfile,
-                self.btn_importevents,
+                self._btn_importevents,
             )
         )
 
@@ -242,11 +238,9 @@ class Control(control_database.Control):
                     os.remove(obj["file"])
                 except:
                     pass
-        return None
 
     def on_quit_ecf_ogd_zipped_files(self, event=None):
         """Do quit import ECF Grading List actions."""
-        del event
         self._ecf_reference_widget.destroy()
         self._ecf_reference_widget = None
         self.datafilepath.configure(
@@ -258,76 +252,59 @@ class Control(control_database.Control):
 
     def on_ecf_ogd_rating_file(self, event=None):
         """Do display ECF Rating List actions."""
-        del event
         if self.display_ecf_ogd_csv_file_contents():
             self.show_buttons_for_import_ecf_ogd_rating_data()
             self.create_buttons()
 
     def on_copy_ecf_ogd_rating_file(self, event=None):
         """Do copy ECF Grading List actions."""
-        del event
         dbspec = self._get_memory_csv_from_csvfile(ecfogddb.ECFOGD)
         if dbspec is None:
-            self.inhibit_context_switch(self.btn_copyecfogdratingfile)
+            self.inhibit_context_switch(self._btn_copyecfogdratingfile)
             return
         self.get_appsys().set_kwargs_for_next_tabclass_call(
-            {
-                "datafilespec": (
-                    dbspec[0],
-                    ecfogddb.PLAYERS,
-                    ecfogddb.PLAYERS,
-                ),
-                "datafilename": dbspec[1],
-                "closecontexts": (
+            dict(
+                datafilespec=(dbspec[0], ecfogddb.PLAYERS, ecfogddb.PLAYERS),
+                datafilename=dbspec[1],
+                closecontexts=(
                     ECFOGDPLAYER_FILE_DEF,
                     MAPECFOGDPLAYER_FILE_DEF,
                 ),
-                "tabtitle": "Rating List",
-                "copymethod": (
-                    ecfogddataimport.copy_ecf_ord_players_post_2006_rules
-                ),
-            }
+                tabtitle="Rating List",
+                copymethod=ecfogddataimport.copy_ecf_ord_players_post_2006_rules,
+            )
         )
 
     def on_ecf_ogd_grading_file(self, event=None):
         """Do display ECF Grading List actions."""
-        del event
         if self.display_ecf_ogd_zipped_file_contents():
             self.show_buttons_for_import_ecf_ogd_data()
             self.create_buttons()
 
     def on_copy_ecf_ogd_grading_file(self, event=None):
         """Do copy ECF Grading List actions."""
-        del event
         dbspec = self._get_memory_csv_from_zipfile(ecfogddb.ECFOGD)
         if dbspec is None:
-            self.inhibit_context_switch(self.btn_copyecfogdgradingfile)
+            self.inhibit_context_switch(self._btn_copyecfogdgradingfile)
             return
-        mod = ecfogddataimport
         self.get_appsys().set_kwargs_for_next_tabclass_call(
-            {
-                "datafilespec": (
-                    dbspec[0],
-                    ecfogddb.PLAYERS,
-                    ecfogddb.PLAYERS,
-                ),
-                "datafilename": dbspec[1],
-                "closecontexts": (
+            dict(
+                datafilespec=(dbspec[0], ecfogddb.PLAYERS, ecfogddb.PLAYERS),
+                datafilename=dbspec[1],
+                closecontexts=(
                     ECFOGDPLAYER_FILE_DEF,
                     MAPECFOGDPLAYER_FILE_DEF,
                 ),
-                "tabtitle": "Grading List",
-                "copymethod": (
-                    mod.validate_and_copy_ecf_ogd_players_post_2006_rules
-                ),
-            }
+                tabtitle="Grading List",
+                copymethod=ecfogddataimport.validate_and_copy_ecf_ogd_players_post_2006_rules,
+            )
         )
 
     def _get_memory_csv_from_csvfile(self, dbdefinition):
         """Create 'in-memory' CSV file from csv file."""
         selection = self.ecf_reference_file.curselection()
         if not selection:
-            return None
+            return
         selected_file = self.datafilepath.cget("text")
         selected_element = self.ecf_reference_file.get(selection)
         return self.open_file_from_ecf_csv_master_file(
@@ -342,10 +319,12 @@ class Control(control_database.Control):
         self, dbdefinition, dbset, dbname, archive, element
     ):
         """Display ECF rating list data with date for update confirmation."""
-        del dbset, dbname
         memory_file = None
-        with open(archive, "rb") as csvarchive:
+        csvarchive = open(archive, "rb")
+        try:
             memory_file = io.BytesIO(csvarchive.read())
+        finally:
+            csvarchive.close()
 
         ecffile = dbdefinition(memory_file)
         try:
@@ -356,7 +335,7 @@ class Control(control_database.Control):
                 ecffile.close_context()
             except:
                 pass
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=str(msg),
                 title=" ".join(["Open ECF Rating file"]),
@@ -366,18 +345,17 @@ class Control(control_database.Control):
                 ecffile.close_context()
             except:
                 pass
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join([str(Exception), str(msg)]),
                 title=" ".join(["Open ECF Rating file"]),
             )
-        return None
 
     def _get_memory_csv_from_zipfile(self, dbdefinition):
         """Create 'in-memory' CSV file from zipped file."""
         selection = self.ecf_reference_file.curselection()
         if not selection:
-            return None
+            return
         selected_file = self.datafilepath.cget("text")
         selected_element = self.ecf_reference_file.get(selection)
         return self.open_file_from_ecf_zipped_master_file(
@@ -392,13 +370,15 @@ class Control(control_database.Control):
         self, dbdefinition, dbset, dbname, archive, element
     ):
         """Display ECF grading list data with date for update confirmation."""
-        del dbset, dbname
         memory_file = None
-        with zipfile.ZipFile(archive, "r") as ziparchive:
+        ziparchive = zipfile.ZipFile(archive, "r")
+        try:
             for za in ziparchive.namelist():
                 if za == element:
                     memory_file = io.BytesIO(ziparchive.read(za))
                     break
+        finally:
+            ziparchive.close()
 
         ecffile = dbdefinition(memory_file)
         try:
@@ -409,7 +389,7 @@ class Control(control_database.Control):
                 ecffile.close_context()
             except:
                 pass
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=str(msg),
                 title=" ".join(["Open ECF Grading file"]),
@@ -419,9 +399,8 @@ class Control(control_database.Control):
                 ecffile.close_context()
             except:
                 pass
-            tkinter.messagebox.showinfo(
+            dlg = tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message=" ".join([str(Exception), str(msg)]),
                 title=" ".join(["Open ECF Grading file"]),
             )
-        return None

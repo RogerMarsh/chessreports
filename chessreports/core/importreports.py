@@ -24,27 +24,27 @@ def convert_alias_to_transfer_format(alias, cname):
 
     """
     outputdata = [
-        "=".join((constants.EVENT, alias[3])),
-        "=".join((constants.STARTDATE, alias[1])),
-        "=".join((constants.ENDDATE, alias[2])),
+        "=".join((constants._event, alias[3])),
+        "=".join((constants._startdate, alias[1])),
+        "=".join((constants._enddate, alias[2])),
     ]
     for s in alias[4]:
-        outputdata.append("=".join((constants.EVENTSECTION, s)))
+        outputdata.append("=".join((constants._eventsection, s)))
     if alias[5]:
-        outputdata.append("=".join((constants.SECTION, alias[5])))
+        outputdata.append("=".join((constants._section, alias[5])))
     if alias[6]:
-        outputdata.append("=".join((constants.PIN_LOWER, str(alias[6]))))
+        outputdata.append("=".join((constants._pin, str(alias[6]))))
     elif alias[6] is False:
-        outputdata.append("=".join((constants.PINFALSE, "true")))
+        outputdata.append("=".join((constants._pinfalse, "true")))
     outputdata.append("=".join((cname, alias[0])))
     return outputdata
 
 
 def get_player_identifier(
     data,
-    player=constants.NAME_LOWER,
-    pin=constants.PIN_LOWER,
-    section=constants.SECTION,
+    player=constants._name,
+    pin=constants._pin,
+    section=constants._section,
 ):
     """Return player identifier tuple from data details.
 
@@ -68,49 +68,50 @@ def get_player_identifier(
     if data[pin] is not None:
         return (
             data[player],
-            data[constants.EVENT],
-            data[constants.STARTDATE],
-            data[constants.ENDDATE],
-            data[constants.SECTION],
+            data[constants._event],
+            data[constants._startdate],
+            data[constants._enddate],
+            data[constants._section],
             data[pin],
         )
-    if section is not constants.SECTION:  # data[section] is not None?
+    elif section is not constants._section:  # data[section] is not None?
         return (
             data[player],
-            data[constants.EVENT],
-            data[constants.STARTDATE],
-            data[constants.ENDDATE],
+            data[constants._event],
+            data[constants._startdate],
+            data[constants._enddate],
             data[section],
             None,
         )
-    return (
-        data[player],
-        data[constants.EVENT],
-        data[constants.STARTDATE],
-        data[constants.ENDDATE],
-        None,
-        None,
-    )
+    else:
+        return (
+            data[player],
+            data[constants._event],
+            data[constants._startdate],
+            data[constants._enddate],
+            None,
+            None,
+        )
 
 
-class ImportReports:
+class ImportReports(object):
     """Class for importing results data."""
 
     def __init__(self, textlines):
         """Initialise for import report of results in textlines."""
-        super().__init__()
+        super(ImportReports, self).__init__()
         self.textlines = textlines
-        self.game = {}
+        self.game = dict()
         self.gameplayer = set()
-        self.localplayer = {}  # set()
-        self.gameplayermerge = {}
-        self.remoteplayer = {}
-        self.new_to_known = {}
-        self.known_to_new = {}
-        self.localevents = {}
-        self.remoteevents = {}
-        self.newevents = {}
-        self.knownevents = {}
+        self.localplayer = dict()  # set()
+        self.gameplayermerge = dict()
+        self.remoteplayer = dict()
+        self.new_to_known = dict()
+        self.known_to_new = dict()
+        self.localevents = dict()
+        self.remoteevents = dict()
+        self.newevents = dict()
+        self.knownevents = dict()
         self._newidentifier = None
         self.error = []
 
@@ -118,14 +119,14 @@ class ImportReports:
         """Extract result and player identification data."""
 
         def translate_data(items, translateitems):
-            for k in data:
+            for k in data.keys():
                 if k not in items:
                     return False
             for k, v in translateitems.items():
                 if k in data:
                     if v in data:
                         return False
-                    if data[k]:
+                    elif data[k]:
                         data[v] = False
                     del data[k]
                 elif v in data:
@@ -134,9 +135,10 @@ class ImportReports:
                 if k not in data:
                     if v is True:
                         return False
-                    if v is False:
+                    elif v is False:
                         continue
-                    data[k] = v
+                    else:
+                        data[k] = v
             for v in datalistitems.values():
                 if v in data:
                     # data[v] can be None for reported codes.
@@ -152,19 +154,19 @@ class ImportReports:
             if not translate_data(gameitems, translategameitems):
                 return False
             if (
-                data[constants.RESULT] not in displayresult
+                data[constants._result] not in displayresult
             ):  # constants._storeresults:
                 return False
             for name, pin, affiliation in (
                 (
-                    constants.HOMENAME,
-                    constants.HOMEPIN,
-                    constants.HOMEAFFILIATION,
+                    constants._homename,
+                    constants._homepin,
+                    constants._homeaffiliation,
                 ),
                 (
-                    constants.AWAYNAME,
-                    constants.AWAYPIN,
-                    constants.AWAYAFFILIATION,
+                    constants._awayname,
+                    constants._awaypin,
+                    constants._awayaffiliation,
                 ),
             ):
                 identity = get_player_identifier(
@@ -180,9 +182,9 @@ class ImportReports:
         def get_event_identifier():
             """Return event identifier from data details."""
             return (
-                data[constants.EVENT],
-                data[constants.STARTDATE],
-                data[constants.ENDDATE],
+                data[constants._event],
+                data[constants._startdate],
+                data[constants._enddate],
             )
 
         def get_player_key(player):
@@ -195,11 +197,20 @@ class ImportReports:
             """
             return (
                 data[player],
-                data[constants.EVENT],
-                data[constants.STARTDATE],
-                data[constants.ENDDATE],
-                data[constants.SECTION],
-                data[constants.PIN_LOWER],
+                data[constants._event],
+                data[constants._startdate],
+                data[constants._enddate],
+                data[constants._section],
+                data[constants._pin],
+            )
+
+        def get_section_identifier():
+            """Return event identifier from data details."""
+            return (
+                data[constants._event],
+                data[constants._startdate],
+                data[constants._enddate],
+                data[constants._section],
             )
 
         def known_player():
@@ -208,7 +219,7 @@ class ImportReports:
             if not translate_data(knownplayeritems, translateknownplayeritems):
                 return False
             merge_event_sections(self.knownevents)
-            known = get_player_key(constants.KNOWNIDENTITY)
+            known = get_player_key(constants._knownidentity)
             if known in self.known_to_new:
                 return False
             self.map_known_to_new(known, self._newidentifier)
@@ -222,15 +233,15 @@ class ImportReports:
             if not translate_data(newplayeritems, translatenewplayeritems):
                 return False
             merge_event_sections(self.newevents)
-            self._newidentifier = get_player_key(constants.NEWIDENTITY)
+            self._newidentifier = get_player_key(constants._newidentity)
             data.clear()
             return True
 
         def merge_local_players():
-            for k in data:
+            for k in data.keys():
                 if k not in mergeplayeritems:
                     return False
-            if merges:
+            if len(merges):
                 player = merges[-1]
                 self.localplayer[player] = set(merges)
                 for m in merges:
@@ -240,11 +251,11 @@ class ImportReports:
             return True
 
         def merge_remote_players():
-            for k in data:
+            for k in data.keys():
                 if k not in mergeremoteplayeritems:
                     return False
-            if merges:
-                aliases = data[constants.ALIASES]
+            if len(merges):
+                aliases = data[constants._aliases]
                 player = merges.pop()
                 m = set(merges)
                 if len(m) != len(merges):
@@ -257,7 +268,7 @@ class ImportReports:
             return True
 
         def players_on_export_database():
-            for k in data:
+            for k in data.keys():
                 if k not in notmergeplayeritems:
                     return False
             data.clear()
@@ -270,7 +281,7 @@ class ImportReports:
             ):
                 return False
             merge_event_sections(self.remoteevents)
-            identity = get_player_key(constants.PLAYER)
+            identity = get_player_key(constants._player)
             if identity in self.remoteplayer:
                 data.clear()
                 return True
@@ -282,7 +293,7 @@ class ImportReports:
             if not translate_data(playeritems, translateplayeritems):
                 return False
             merge_event_sections(self.localevents)
-            identity = get_player_key(constants.NAME_LOWER)
+            identity = get_player_key(constants._name)
             if identity in self.localplayer:
                 return False
             merges.append(identity)
@@ -291,21 +302,21 @@ class ImportReports:
             return True
 
         def games_finished():
-            for key in constants.RESULT, constants.PIN_LOWER:
+            for key in constants._result, constants._pin:
                 del context[key]
-            context[constants.IDENTIFIED] = remote_players_finished
+            context[constants._identified] = remote_players_finished
             return True
 
         def local_players_finished():
             for key in (
-                constants.EXPORTEDEVENTPLAYER,
-                constants.EXPORTEDPLAYER,
-                constants.NAME_LOWER,
-                constants.HOMEPLAYERWHITE,
+                constants._exportedeventplayer,
+                constants._exportedplayer,
+                constants._name,
+                constants._homeplayerwhite,
             ):
                 del context[key]
-            context[constants.PIN_LOWER] = games_finished
-            context[constants.IDENTIFIED] = remote_players_finished
+            context[constants._pin] = games_finished
+            context[constants._identified] = remote_players_finished
             return True
 
         def ignore_merge_instructions():
@@ -320,179 +331,215 @@ class ImportReports:
         def merge_event_sections(events):
             e = get_event_identifier()
             es = events.setdefault(e, set())
-            es.update(data[constants.EVENTSECTIONS])
+            es.update(data[constants._eventsections])
 
         def remote_players_finished():
-            for k in data:
-                if k != constants.IDENTIFIED:
+            for k in data.keys():
+                if k != constants._identified:
                     return False
             for key in (
-                constants.PLAYER,
-                constants.ALIASES,
-                constants.IDENTIFIED,
+                constants._player,
+                constants._aliases,
+                constants._identified,
             ):
                 del context[key]
-            context[constants.KNOWNIDENTITY] = known_player
-            context[constants.NEWIDENTITY] = new_player
-            context[constants.ALIASES] = ignore_merge_instructions
+            context[constants._knownidentity] = known_player
+            context[constants._newidentity] = new_player
+            context[constants._aliases] = ignore_merge_instructions
             data.clear()
             return True
 
         context = {
-            constants.RESULT: game,
-            constants.NAME_LOWER: local_player,
-            constants.PLAYER: remote_player,
-            constants.EXPORTEDEVENTPLAYER: merge_local_players,
-            constants.EXPORTEDPLAYER: players_on_export_database,
-            constants.HOMEPLAYERWHITE: local_players_finished,
-            constants.ALIASES: merge_remote_players,
+            constants._result: game,
+            constants._name: local_player,
+            constants._player: remote_player,
+            constants._exportedeventplayer: merge_local_players,
+            constants._exportedplayer: players_on_export_database,
+            constants._homeplayerwhite: local_players_finished,
+            constants._aliases: merge_remote_players,
         }
 
         datalistitems = {
-            constants.EVENTSECTION: constants.EVENTSECTIONS,
-            constants.HOMEREPORTEDCODES: constants.HOMEREPORTEDCODES,
-            constants.AWAYREPORTEDCODES: constants.AWAYREPORTEDCODES,
+            constants._eventsection: constants._eventsections,
+            constants._homereportedcodes: constants._homereportedcodes,
+            constants._awayreportedcodes: constants._awayreportedcodes,
+        }
+
+        items = {
+            constants._startdate,
+            constants._enddate,
+            constants._event,
+            constants._eventsections,
+            constants._section,
+            constants._date,
+            constants._homeplayerwhite,
+            constants._homename,
+            constants._awayname,
+            constants._homepin,
+            constants._awaypin,
+            constants._homeaffiliation,
+            constants._awayaffiliation,
+            constants._homereportedcodes,
+            constants._awayreportedcodes,
+            constants._result,
+            constants._hometeam,
+            constants._awayteam,
+            constants._board,
+            constants._round,
+            constants._homepinfalse,
+            constants._awaypinfalse,
+            constants._name,
+            constants._pin,
+            constants._pinfalse,
+            constants._affiliation,
+            constants._exportedeventplayer,
+            constants._exportedplayer,
+            constants._player,
+            constants._aliases,
+            constants._newidentity,
+            constants._knownidentity,
+            constants._identified,
         }
 
         inputitems = {
-            constants.STARTDATE,
-            constants.ENDDATE,
-            constants.EVENT,
-            constants.EVENTSECTION,
-            constants.SECTION,
-            constants.DATE,
-            constants.HOMEPLAYERWHITE,
-            constants.HOMENAME,
-            constants.AWAYNAME,
-            constants.HOMEPIN,
-            constants.AWAYPIN,
-            constants.HOMEAFFILIATION,
-            constants.AWAYAFFILIATION,
-            constants.HOMEREPORTEDCODES,
-            constants.AWAYREPORTEDCODES,
-            constants.RESULT,
-            constants.HOMETEAM,
-            constants.AWAYTEAM,
-            constants.BOARD_LOWER,
-            constants.ROUND_LOWER,
-            constants.HOMEPINFALSE,
-            constants.AWAYPINFALSE,
-            constants.NAME_LOWER,
-            constants.PIN_LOWER,
-            constants.PINFALSE,
-            constants.AFFILIATION,
-            constants.EXPORTEDEVENTPLAYER,
-            constants.EXPORTEDPLAYER,
-            constants.PLAYER,
-            constants.ALIASES,
-            constants.NEWIDENTITY,
-            constants.KNOWNIDENTITY,
-            constants.IDENTIFIED,
+            constants._startdate,
+            constants._enddate,
+            constants._event,
+            constants._eventsection,
+            constants._section,
+            constants._date,
+            constants._homeplayerwhite,
+            constants._homename,
+            constants._awayname,
+            constants._homepin,
+            constants._awaypin,
+            constants._homeaffiliation,
+            constants._awayaffiliation,
+            constants._homereportedcodes,
+            constants._awayreportedcodes,
+            constants._result,
+            constants._hometeam,
+            constants._awayteam,
+            constants._board,
+            constants._round,
+            constants._homepinfalse,
+            constants._awaypinfalse,
+            constants._name,
+            constants._pin,
+            constants._pinfalse,
+            constants._affiliation,
+            constants._exportedeventplayer,
+            constants._exportedplayer,
+            constants._player,
+            constants._aliases,
+            constants._newidentity,
+            constants._knownidentity,
+            constants._identified,
         }
 
         gameitems = {
-            constants.STARTDATE: True,
-            constants.ENDDATE: True,
-            constants.EVENT: True,
-            constants.EVENTSECTIONS: True,
-            constants.SECTION: None,
-            constants.DATE: True,
-            constants.HOMEPLAYERWHITE: True,
-            constants.HOMENAME: True,
-            constants.AWAYNAME: True,
-            constants.HOMEPIN: None,
-            constants.AWAYPIN: None,
-            constants.HOMEAFFILIATION: None,
-            constants.AWAYAFFILIATION: None,
-            constants.HOMEREPORTEDCODES: None,
-            constants.AWAYREPORTEDCODES: None,
-            constants.RESULT: True,
-            constants.HOMETEAM: None,
-            constants.AWAYTEAM: None,
-            constants.BOARD_LOWER: None,
-            constants.ROUND_LOWER: None,
-            constants.HOMEPINFALSE: False,
-            constants.AWAYPINFALSE: False,
+            constants._startdate: True,
+            constants._enddate: True,
+            constants._event: True,
+            constants._eventsections: True,
+            constants._section: None,
+            constants._date: True,
+            constants._homeplayerwhite: True,
+            constants._homename: True,
+            constants._awayname: True,
+            constants._homepin: None,
+            constants._awaypin: None,
+            constants._homeaffiliation: None,
+            constants._awayaffiliation: None,
+            constants._homereportedcodes: None,
+            constants._awayreportedcodes: None,
+            constants._result: True,
+            constants._hometeam: None,
+            constants._awayteam: None,
+            constants._board: None,
+            constants._round: None,
+            constants._homepinfalse: False,
+            constants._awaypinfalse: False,
         }
 
         mergeremoteplayeritems = {
-            constants.ALIASES: True,
+            constants._aliases: True,
         }
 
         newplayeritems = {
-            constants.STARTDATE: True,
-            constants.ENDDATE: True,
-            constants.EVENT: True,
-            constants.EVENTSECTIONS: True,
-            constants.SECTION: None,
-            constants.NEWIDENTITY: True,
-            constants.PIN_LOWER: None,
-            constants.PINFALSE: False,
+            constants._startdate: True,
+            constants._enddate: True,
+            constants._event: True,
+            constants._eventsections: True,
+            constants._section: None,
+            constants._newidentity: True,
+            constants._pin: None,
+            constants._pinfalse: False,
         }
 
         knownplayeritems = {
-            constants.STARTDATE: True,
-            constants.ENDDATE: True,
-            constants.EVENT: True,
-            constants.EVENTSECTIONS: True,
-            constants.SECTION: None,
-            constants.KNOWNIDENTITY: True,
-            constants.PIN_LOWER: None,
-            constants.PINFALSE: False,
+            constants._startdate: True,
+            constants._enddate: True,
+            constants._event: True,
+            constants._eventsections: True,
+            constants._section: None,
+            constants._knownidentity: True,
+            constants._pin: None,
+            constants._pinfalse: False,
         }
 
         mergeplayeritems = {
-            constants.EXPORTEDEVENTPLAYER: True,
+            constants._exportedeventplayer: True,
         }
 
         notmergeplayeritems = {
-            constants.EXPORTEDPLAYER: True,
+            constants._exportedplayer: True,
         }
 
         playeritems = {
-            constants.STARTDATE: True,
-            constants.ENDDATE: True,
-            constants.EVENT: True,
-            constants.EVENTSECTIONS: True,
-            constants.SECTION: None,
-            constants.NAME_LOWER: True,
-            constants.PIN_LOWER: None,
-            constants.PINFALSE: False,
+            constants._startdate: True,
+            constants._enddate: True,
+            constants._event: True,
+            constants._eventsections: True,
+            constants._section: None,
+            constants._name: True,
+            constants._pin: None,
+            constants._pinfalse: False,
         }
 
         remoteplayeritems = {
-            constants.STARTDATE: True,
-            constants.ENDDATE: True,
-            constants.EVENT: True,
-            constants.EVENTSECTIONS: True,
-            constants.SECTION: None,
-            constants.PLAYER: True,
-            constants.PIN_LOWER: None,
-            constants.PINFALSE: False,
+            constants._startdate: True,
+            constants._enddate: True,
+            constants._event: True,
+            constants._eventsections: True,
+            constants._section: None,
+            constants._player: True,
+            constants._pin: None,
+            constants._pinfalse: False,
         }
 
         translategameitems = {
-            constants.HOMEPINFALSE: constants.HOMEPIN,
-            constants.AWAYPINFALSE: constants.AWAYPIN,
+            constants._homepinfalse: constants._homepin,
+            constants._awaypinfalse: constants._awaypin,
         }
 
         translateknownplayeritems = {
-            constants.PINFALSE: constants.PIN_LOWER,
+            constants._pinfalse: constants._pin,
         }
 
         translatenewplayeritems = {
-            constants.PINFALSE: constants.PIN_LOWER,
+            constants._pinfalse: constants._pin,
         }
 
         translateremoteplayeritems = {
-            constants.PINFALSE: constants.PIN_LOWER,
+            constants._pinfalse: constants._pin,
         }
 
         translateplayeritems = {
-            constants.PINFALSE: constants.PIN_LOWER,
+            constants._pinfalse: constants._pin,
         }
 
-        data = {}
+        data = dict()
         merges = []
         for e, t in enumerate(self.textlines):
             ts = t.split("=", 1)
@@ -510,10 +557,10 @@ class ImportReports:
                     self.error = ["Field processing error", e, t]
                     return False
         if len(data):
-            self.error = ["Unprocessed data", len(self.textlines), ""]
+            self.error = ["Unprocessed data", e, t]
             return False
         if self._newidentifier is not None:
-            self.error = ["Not new identifier", len(self.textlines), ""]
+            self.error = ["Not new identifier", e, t]
             return False
         return True
 
@@ -614,7 +661,7 @@ class ImportReports:
         gameplayer = self.gameplayer
         gameplayermerge = self.gameplayermerge
         localplayer = self.localplayer
-        players = {}
+        players = dict()
         for gp in gameplayer:
             gpm = gameplayermerge[gp]
             if gpm in gameplayer:  # is exporter main alias used in games
@@ -637,4 +684,3 @@ def get_import_event_reports(data):
     importdata = ImportReports(data)
     if importdata.translate_results_format():
         return importdata
-    return None

@@ -27,24 +27,25 @@ class TextDataHeader(DataHeader):
         """Return dbase file header specification."""
         if fieldnames is None:
             return TextDataRow.header_specification
-        hs = []
-        for col, fn in enumerate(fieldnames):
-            hs.append(TextDataRow.header_specification[0].copy())
-            hs[-1][GRID_CONFIGURE] = {"column": col, "sticky": tkinter.EW}
-            hs[-1][WIDGET_CONFIGURE] = {"text": fn}
-        return hs
+        else:
+            hs = []
+            for col, fn in enumerate(fieldnames):
+                hs.append(TextDataRow.header_specification[0].copy())
+                hs[-1][GRID_CONFIGURE] = dict(column=col, sticky=tkinter.EW)
+                hs[-1][WIDGET_CONFIGURE] = dict(text=fn)
+            return hs
 
 
 class TextDataRow(RecordText, DataRow):
-    """Provide methods to display a row of data from a text file."""
+    """Provide methods to create, for display, a row of data from a text file."""
 
     # The header is derived from file so define a null header here
     header_specification = (
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": ""},
-            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1},
+            WIDGET_CONFIGURE: dict(text=""),
+            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1),
             ROW: 0,
         },
     )
@@ -52,8 +53,8 @@ class TextDataRow(RecordText, DataRow):
     row_specification = (
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {},
-            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+            WIDGET_CONFIGURE: dict(),
+            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
             ROW: 0,
         },
     )
@@ -64,28 +65,27 @@ class TextDataRow(RecordText, DataRow):
         self.set_database(database)
         self.row_specification = []
 
-    def grid_row(self, textitems=(), **kargs):
+    def grid_row(self, **kargs):
         """Return tuple of instructions to create row.
 
         Create row specification for text file treating line as one field.
         Create textitems argument for TextDataRow instance.
-
-        textitems arguments is ignored and is present for compatibility.
 
         """
         r = (self.value.text,)
         self.row_specification = self.make_row_specification(
             list(range(len(r)))
         )
-        return super().grid_row(textitems=r, **kargs)
+        return super(TextDataRow, self).grid_row(textitems=r, **kargs)
 
     @staticmethod
     def make_row_specification(fieldnames=None):
         """Return dbase file row specification."""
         if fieldnames is None:
             return TextDataRow.row_specification
-        hs = []
-        for col in range(len(fieldnames)):
-            hs.append(TextDataRow.row_specification[0].copy())
-            hs[-1][GRID_CONFIGURE] = {"column": col, "sticky": tkinter.EW}
-        return hs
+        else:
+            hs = []
+            for col, fn in enumerate(fieldnames):
+                hs.append(TextDataRow.row_specification[0].copy())
+                hs[-1][GRID_CONFIGURE] = dict(column=col, sticky=tkinter.EW)
+            return hs

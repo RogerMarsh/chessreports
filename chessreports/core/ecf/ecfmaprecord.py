@@ -7,7 +7,7 @@
 from ast import literal_eval
 
 from solentware_base.core.record import KeyData
-from solentware_base.core.record import ValueList, Record
+from solentware_base.core.record import ValueList, Record, Value
 
 from .. import filespec
 from . import ecfrecord
@@ -17,17 +17,19 @@ from ..resultsrecord import get_unpacked_player_identity
 class ECFmapDBkeyClub(KeyData):
     """Primary key of club data for player in event."""
 
+    pass
+
 
 class ECFmapDBvalueClub(ValueList):
     """ECF club for player in event."""
 
-    attributes = {
-        "playerkey": None,
-        "playername": None,
-        "clubcode": None,
-        "clubecfname": None,
-        "clubecfcode": None,
-    }
+    attributes = dict(
+        playerkey=None,
+        playername=None,
+        clubcode=None,
+        clubecfname=None,
+        clubecfcode=None,
+    )
     _attribute_order = (
         "clubcode",  # ecf club code from ecf club file
         "playerkey",  # internal key for player on current database
@@ -38,8 +40,6 @@ class ECFmapDBvalueClub(ValueList):
 
     def empty(self):
         """(Re)Initialize value attribute."""
-        # Attributes set by ValueList.__init__() method.
-        # pylint: disable=attribute-defined-outside-init
         self.playerkey = ""
         self.playername = ""
         self.clubcode = None
@@ -48,7 +48,7 @@ class ECFmapDBvalueClub(ValueList):
 
     def pack(self):
         """Extend, return player to ECF club record and index data."""
-        v = super().pack()
+        v = super(ECFmapDBvalueClub, self).pack()
         index = v[1]
         index[filespec.PLAYERALIASID_FIELD_DEF] = [self.playerkey]
         if self.clubcode is None:
@@ -74,21 +74,23 @@ class ECFmapDBrecordClub(Record):
 
     def __init__(self, keyclass=ECFmapDBkeyClub, valueclass=ECFmapDBvalueClub):
         """Customise Record with ECFmapDBkeyClub and ECFmapDBvalueClub."""
-        super().__init__(keyclass, valueclass)
+        super(ECFmapDBrecordClub, self).__init__(keyclass, valueclass)
 
 
 class ECFmapDBkeyEvent(KeyData):
     """Primary key of event."""
 
+    pass
+
 
 class ECFmapDBvalueEvent(ValueList):
     """Event data."""
 
-    attributes = {
-        "eventkey": None,
-        "eventname": None,
-        "eventcode": None,
-    }
+    attributes = dict(
+        eventkey=None,
+        eventname=None,
+        eventcode=None,
+    )
     _attribute_order = (
         "eventcode",  # event code reported on results input
         "eventkey",  # internal key for event on current database
@@ -97,8 +99,6 @@ class ECFmapDBvalueEvent(ValueList):
 
     def empty(self):
         """(Re)Initialize value attribute."""
-        # Attributes set by ValueList.__init__() method.
-        # pylint: disable=attribute-defined-outside-init
         self.eventkey = ""
         self.eventname = None
         self.eventcode = ""
@@ -111,23 +111,25 @@ class ECFmapDBrecordEvent(Record):
         self, keyclass=ECFmapDBkeyEvent, valueclass=ECFmapDBvalueEvent
     ):
         """Customise Record with ECFmapDBkeyEvent and ECFmapDBvalueEvent."""
-        super().__init__(keyclass, valueclass)
+        super(ECFmapDBrecordEvent, self).__init__(keyclass, valueclass)
 
 
 class ECFmapDBkeyPlayer(KeyData):
     """Primary key of player."""
 
+    pass
+
 
 class ECFmapDBvaluePlayer(ValueList):
     """ECF name and grading code for player in event."""
 
-    attributes = {
-        "playerkey": None,
-        "playername": None,
-        "playercode": None,
-        "playerecfname": None,
-        "playerecfcode": None,
-    }
+    attributes = dict(
+        playerkey=None,
+        playername=None,
+        playercode=None,
+        playerecfname=None,
+        playerecfcode=None,
+    )
     _attribute_order = (
         "playercode",  # ecf grading code from ecf master file
         "playerkey",  # internal key for player on current database
@@ -138,8 +140,6 @@ class ECFmapDBvaluePlayer(ValueList):
 
     def empty(self):
         """(Re)Initialize value attribute."""
-        # Attributes set by ValueList.__init__() method.
-        # pylint: disable=attribute-defined-outside-init
         self.playerkey = ""
         self.playername = ""
         self.playercode = None
@@ -148,7 +148,7 @@ class ECFmapDBvaluePlayer(ValueList):
 
     def pack(self):
         """Extend, return player to ECF grading code record and index data."""
-        v = super().pack()
+        v = super(ECFmapDBvaluePlayer, self).pack()
         index = v[1]
         index[filespec.PERSONID_FIELD_DEF] = [self.playerkey]
         if self.playercode is None:
@@ -183,7 +183,7 @@ class ECFmapDBrecordPlayer(Record):
         self, keyclass=ECFmapDBkeyPlayer, valueclass=ECFmapDBvaluePlayer
     ):
         """Customise Record with ECFmapDBkeyPlayer and ECFmapDBvaluePlayer."""
-        super().__init__(keyclass, valueclass)
+        super(ECFmapDBrecordPlayer, self).__init__(keyclass, valueclass)
 
 
 def get_club_details_for_player(database, player):
@@ -276,7 +276,6 @@ def get_new_person_for_identity(database, identity):
                 if p is not None:
                     pr.load_record(p)
                     return pr
-        return None
     finally:
         cursor.close()
 
@@ -298,7 +297,6 @@ def get_new_person_for_grading_code(database, code):
                 if code == pr.value.playerecfcode:
                     return pr
             r = cursor.next()
-        return None
     finally:
         cursor.close()
 
@@ -310,7 +308,6 @@ def get_person(database, key):
         ar = ECFmapDBrecordPlayer()
         ar.load_record(a)
         return ar
-    return None
 
 
 def get_person_for_alias(database, aliaskey):
@@ -338,7 +335,6 @@ def get_person_for_alias(database, aliaskey):
                 pr = ECFmapDBrecordPlayer()
                 pr.load_record(p)
                 return pr
-    return None
 
 
 def get_person_for_grading_code(database, code):
@@ -359,7 +355,6 @@ def get_person_for_grading_code(database, code):
             pr = ECFmapDBrecordPlayer()
             pr.load_record(p)
             return pr
-    return None
 
 
 def get_person_for_player(database, code):
@@ -380,7 +375,6 @@ def get_person_for_player(database, code):
             pr = ECFmapDBrecordPlayer()
             pr.load_record(p)
             return pr
-    return None
 
 
 def get_player(database, key):
@@ -390,7 +384,6 @@ def get_player(database, key):
         ar = ECFmapDBrecordClub()
         ar.load_record(a)
         return ar
-    return None
 
 
 def get_player_for_alias(database, aliaskey):
@@ -418,12 +411,11 @@ def get_player_for_alias(database, aliaskey):
                 pr = ECFmapDBrecordClub()
                 pr.load_record(p)
                 return pr
-    return None
 
 
 def get_player_clubs_for_games(database, games):
     """Return {record key : ECFmapDBrecordClub(), ...} for games."""
-    players = {}
+    players = dict()
     cursor = database.database_cursor(
         filespec.MAPECFCLUB_FILE_DEF, filespec.PLAYERALIASID_FIELD_DEF
     )

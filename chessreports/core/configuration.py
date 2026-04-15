@@ -12,8 +12,6 @@ from solentware_misc.core import configuration
 
 import ecfformat.core.constants
 
-import chessvalidate.core.constants
-
 from . import constants
 
 
@@ -23,10 +21,10 @@ class Configuration(configuration.Configuration):
     _CONFIGURATION = ".chessreports.conf"
     _DEFAULT_ITEM_VAULES = (
         (constants.RECENT_DATABASE, "~"),
-        (chessvalidate.core.constants.RECENT_EMAIL_SELECTION, "~"),
-        (chessvalidate.core.constants.RECENT_EMAIL_EXTRACTION, "~"),
-        (chessvalidate.core.constants.RECENT_CSV_DOWNLOAD, "~"),
-        (chessvalidate.core.constants.RECENT_DOCUMENT, "~"),
+        (constants.RECENT_EMAIL_SELECTION, "~"),
+        (constants.RECENT_EMAIL_EXTRACTION, "~"),
+        (constants.RECENT_CSV_DOWNLOAD, "~"),
+        (constants.RECENT_DOCUMENT, "~"),
         (constants.RECENT_SUBMISSION, "~"),
         (constants.RECENT_SOURCE_SUBMISSION, "~"),
         (constants.RECENT_FEEDBACK, "~"),

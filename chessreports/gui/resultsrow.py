@@ -25,71 +25,69 @@ class ResultsDBrowEvent(resultsrecord.ResultsDBrecordEvent, DataRow):
     header_specification = [
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Start date", "anchor": tkinter.CENTER},
-            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 0, "uniform": "edate"},
+            WIDGET_CONFIGURE: dict(text="Start date", anchor=tkinter.CENTER),
+            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=0, uniform="edate"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "End date", "anchor": tkinter.CENTER},
-            GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 0, "uniform": "edate"},
+            WIDGET_CONFIGURE: dict(text="End date", anchor=tkinter.CENTER),
+            GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=0, uniform="edate"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Name", "anchor": tkinter.CENTER},
-            GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "ename"},
+            WIDGET_CONFIGURE: dict(text="Name", anchor=tkinter.CENTER),
+            GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="ename"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Sections", "anchor": tkinter.W},
-            GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "esections"},
+            WIDGET_CONFIGURE: dict(text="Sections", anchor=tkinter.W),
+            GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="esections"),
             ROW: 0,
         },
     ]
 
     def __init__(self, database=None):
         """Extend, link event record without affiliation to database."""
-        super().__init__()
+        super(ResultsDBrowEvent, self).__init__()
         self.set_database(database)
         self.row_specification = [
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
-                GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
+                GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
-                GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
+                GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
-                GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
+                GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.W},
-                GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
+                GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
                 ROW: 0,
             },
         ]
 
-    def grid_row(self, textitems=(), **kargs):
+    def grid_row(self, **kargs):
         """Return tuple of instructions to create row.
 
         Create textitems argument for ResultsDBrowEvent instance.
-
-        textitems arguments is ignored and is present for compatibility.
 
         """
         st = []
@@ -100,7 +98,7 @@ class ResultsDBrowEvent(resultsrecord.ResultsDBrecordEvent, DataRow):
                 )
             )
 
-        return super().grid_row(
+        return super(ResultsDBrowEvent, self).grid_row(
             textitems=(
                 "".join((self.value.startdate, "\t")),
                 "".join((self.value.enddate, "\t")),
@@ -117,61 +115,59 @@ class ResultsDBrowIdentity(resultsrecord.ResultsDBrecordPlayer, DataRow):
     header_specification = [
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Name", "anchor": tkinter.CENTER},
-            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "iname"},
+            WIDGET_CONFIGURE: dict(text="Name", anchor=tkinter.CENTER),
+            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="iname"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Event details", "anchor": tkinter.W},
-            GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "ievent"},
+            WIDGET_CONFIGURE: dict(text="Event details", anchor=tkinter.W),
+            GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="ievent"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "", "anchor": tkinter.W},
-            GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "isection"},
+            WIDGET_CONFIGURE: dict(text="", anchor=tkinter.W),
+            GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="isection"),
             ROW: 0,
         },
     ]
 
     def __init__(self, database=None):
         """Extend, link identified player record to database."""
-        super().__init__()
+        super(ResultsDBrowIdentity, self).__init__()
         self.set_database(database)
         self.row_specification = [
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
-                GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
+                GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.W},
-                GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
+                GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.W},
-                GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
+                GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
                 ROW: 0,
             },
         ]
 
-    def grid_row(self, textitems=(), **kargs):
+    def grid_row(self, **kargs):
         """Return tuple of instructions to create row.
 
         Create textitems argument for ResultsDBrowIdentity instance.
 
-        textitems arguments is ignored and is present for compatibility.
-
         """
-        return super().grid_row(
+        return super(ResultsDBrowIdentity, self).grid_row(
             textitems=(
                 self.value.name,
                 resultsrecord.get_event_details(
@@ -191,91 +187,89 @@ class ResultsDBrowNewPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
     header_specification = [
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Name", "anchor": tkinter.CENTER},
-            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "npname"},
+            WIDGET_CONFIGURE: dict(text="Name", anchor=tkinter.CENTER),
+            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="npname"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Event details", "anchor": tkinter.W},
-            GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "npevent"},
+            WIDGET_CONFIGURE: dict(text="Event details", anchor=tkinter.W),
+            GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="npevent"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "", "anchor": tkinter.W},
-            GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "npsection"},
+            WIDGET_CONFIGURE: dict(text="", anchor=tkinter.W),
+            GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="npsection"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Association", "anchor": tkinter.W},
-            GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "npaff"},
+            WIDGET_CONFIGURE: dict(text="Association", anchor=tkinter.W),
+            GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="npaff"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Reported Codes", "anchor": tkinter.W},
-            GRID_CONFIGURE: {"column": 4, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "npcodes"},
+            WIDGET_CONFIGURE: dict(text="Reported Codes", anchor=tkinter.W),
+            GRID_CONFIGURE: dict(column=4, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="npcodes"),
             ROW: 0,
         },
     ]
 
     def __init__(self, database=None):
         """Extend, link new player record to database."""
-        super().__init__()
+        super(ResultsDBrowNewPlayer, self).__init__()
         self.set_database(database)
         self.row_specification = [
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
-                GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
+                GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.W},
-                GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
+                GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.W},
-                GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
+                GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.W},
-                GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
+                GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.W},
-                GRID_CONFIGURE: {"column": 4, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
+                GRID_CONFIGURE: dict(column=4, sticky=tkinter.EW),
                 ROW: 0,
             },
         ]
 
-    def grid_row(self, textitems=(), **kargs):
+    def grid_row(self, **kargs):
         """Return tuple of instructions to create row.
 
         Create textitems argument for ResultsDBrowNewPlayer instance.
-
-        textitems arguments is ignored and is present for compatibility.
 
         """
         if self.value.reported_codes:
             reportedcodes = "   ".join(self.value.reported_codes)
         else:
             reportedcodes = ""
-        return super().grid_row(
+        return super(ResultsDBrowNewPlayer, self).grid_row(
             textitems=(
                 self.value.name,
                 resultsrecord.get_event_details(
@@ -299,74 +293,72 @@ class ResultsDBrowAlias(resultsrecord.ResultsDBrecordPlayer, DataRow):
     header_specification = [
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Name", "anchor": tkinter.CENTER},
-            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "npname"},
+            WIDGET_CONFIGURE: dict(text="Name", anchor=tkinter.CENTER),
+            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="npname"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Event details", "anchor": tkinter.W},
-            GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "npevent"},
+            WIDGET_CONFIGURE: dict(text="Event details", anchor=tkinter.W),
+            GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="npevent"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "", "anchor": tkinter.W},
-            GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "npsection"},
+            WIDGET_CONFIGURE: dict(text="", anchor=tkinter.W),
+            GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="npsection"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Association", "anchor": tkinter.W},
-            GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "npaff"},
+            WIDGET_CONFIGURE: dict(text="Association", anchor=tkinter.W),
+            GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="npaff"),
             ROW: 0,
         },
     ]
 
     def __init__(self, database=None):
         """Extend, link new player record to database."""
-        super().__init__()
+        super(ResultsDBrowAlias, self).__init__()
         self.set_database(database)
         self.row_specification = [
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
-                GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
+                GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.W},
-                GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
+                GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.W},
-                GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
+                GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.W},
-                GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
+                GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
                 ROW: 0,
             },
         ]
 
-    def grid_row(self, textitems=(), **kargs):
+    def grid_row(self, **kargs):
         """Return tuple of instructions to create row.
 
         Create textitems argument for ResultsDBrowAlias instance.
 
-        textitems arguments is ignored and is present for compatibility.
-
         """
-        return super().grid_row(
+        return super(ResultsDBrowAlias, self).grid_row(
             textitems=(
                 self.value.name,
                 resultsrecord.get_event_details(
@@ -389,74 +381,86 @@ class ResultsDBrowPlayer(resultsrecord.ResultsDBrecordPlayer, DataRow):
     header_specification = [
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Name", "anchor": tkinter.CENTER},
-            GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "pname"},
+            WIDGET_CONFIGURE: dict(text="Name", anchor=tkinter.CENTER),
+            GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="pname"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Event details", "anchor": tkinter.W},
-            GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "pevent"},
+            WIDGET_CONFIGURE: dict(text="Event details", anchor=tkinter.W),
+            GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="pevent"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "", "anchor": tkinter.W},
-            GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "psection"},
+            WIDGET_CONFIGURE: dict(text="", anchor=tkinter.W),
+            GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="psection"),
             ROW: 0,
         },
         {
             WIDGET: tkinter.Label,
-            WIDGET_CONFIGURE: {"text": "Association", "anchor": tkinter.W},
-            GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
-            GRID_COLUMNCONFIGURE: {"weight": 1, "uniform": "paff"},
+            WIDGET_CONFIGURE: dict(text="Association", anchor=tkinter.W),
+            GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
+            GRID_COLUMNCONFIGURE: dict(weight=1, uniform="paff"),
             ROW: 0,
         },
     ]
 
     def __init__(self, database=None):
         """Extend, link player record to database."""
-        super().__init__()
+        super(ResultsDBrowPlayer, self).__init__()
         self.set_database(database)
         self.row_specification = [
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.CENTER},
-                GRID_CONFIGURE: {"column": 0, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.CENTER),
+                GRID_CONFIGURE: dict(column=0, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.W},
-                GRID_CONFIGURE: {"column": 1, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
+                GRID_CONFIGURE: dict(column=1, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.W},
-                GRID_CONFIGURE: {"column": 2, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
+                GRID_CONFIGURE: dict(column=2, sticky=tkinter.EW),
                 ROW: 0,
             },
             {
                 WIDGET: tkinter.Label,
-                WIDGET_CONFIGURE: {"anchor": tkinter.W},
-                GRID_CONFIGURE: {"column": 3, "sticky": tkinter.EW},
+                WIDGET_CONFIGURE: dict(anchor=tkinter.W),
+                GRID_CONFIGURE: dict(column=3, sticky=tkinter.EW),
                 ROW: 0,
             },
         ]
 
-    def grid_row(self, textitems=(), **kargs):
+    def grid_row(self, **kargs):
         """Return tuple of instructions to create row.
 
         Create textitems argument for ResultsDBrowPlayer instance.
 
-        textitems arguments is ignored and is present for compatibility.
-
         """
-        return super().grid_row(
+        items = (
+            (
+                self.value.name,
+                resultsrecord.get_event_details(
+                    self.database, self.value.event
+                ),
+                resultsrecord.get_section_details(
+                    self.database, self.value.section, self.value.pin
+                ),
+                resultsrecord.get_affiliation_details(
+                    self.database, self.value.affiliation
+                ),
+            ),
+        )
+        return super(ResultsDBrowPlayer, self).grid_row(
             textitems=(
                 self.value.name,
                 resultsrecord.get_event_details(

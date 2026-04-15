@@ -9,11 +9,12 @@ import tkinter.messagebox
 import tkinter.filedialog
 import os
 
-# __import__ is still used in places, a legacy of pre-3.1 origin of module.
+# __import__ is still used in places, a legacy of pre-3.1 origin of this module.
 import importlib
 
 from solentware_base import modulequery
 
+from chessvalidate.core.season import Season
 from chessvalidate.gui import leagues_validate
 
 from ..core.takeonseason import TakeonSeason
@@ -32,18 +33,10 @@ from .. import KNOWN_NAME_DATASOURCE_MODULE
 from ..core import configuration
 from ..core import constants
 
-
-# Convert module constants _ResultsDB and others to class attribute
-# names because the default class-attribute-naming-style is 'any'.
-class _Import:
-    """Names of classes imported by import_module from alternative modules.
-
-    For runtime "from <db|dpt>reports import ResultsDatabase" and similar.
-    """
-
-    ResultsDatabase = "ResultsDatabase"
-    DataSourceSet = "DataSourceSet"
-    KnownNamesDS = "KnownNamesDS"
+# for runtime "from <db|dpt>results import ResultsDatabase"
+_ResultsDB = "ResultsDatabase"
+_DataSourceSet = "DataSourceSet"
+_KnownNamesDS = "KnownNamesDS"
 
 
 class Leagues(leagues_validate.Leagues):
@@ -73,14 +66,10 @@ class Leagues(leagues_validate.Leagues):
 
     def __init__(self, master=None, cnf=None, **kargs):
         """Extend and define the results database results frame."""
-        super().__init__(master=master, cnf=cnf, **kargs)
+        super(Leagues, self).__init__(master=master, cnf=cnf, **kargs)
         self.database = None
         self.database_folder = None
         self._database_modulename = None
-        self._knownnamesdatasource_module = None
-        self._knownnames_class = None
-        self._database_class = None
-        self._database_enginename = None
 
     def define_menus(self):
         """Override.  Define the application menus."""
@@ -138,8 +127,8 @@ class Leagues(leagues_validate.Leagues):
             tooltip="Open and close databases and import data.",
             underline=0,
             tabclass=lambda **k: self.results_control(**k),
-            create_actions=(control_database.Control.btn_opendatabase,),
-            destroy_actions=(control_database.Control.btn_closedatabase,),
+            create_actions=(control_database.Control._btn_opendatabase,),
+            destroy_actions=(control_database.Control._btn_closedatabase,),
         )
         self.define_tab(
             self._tab_events,
@@ -149,7 +138,7 @@ class Leagues(leagues_validate.Leagues):
             tabclass=lambda **k: self.results_events(
                 gridhorizontal=False, **k
             ),
-            destroy_actions=(control_database.Control.btn_closedatabase,),
+            destroy_actions=(control_database.Control._btn_closedatabase,),
         )
         self.define_tab(
             self._tab_takeonedit,
@@ -174,7 +163,7 @@ class Leagues(leagues_validate.Leagues):
             tabclass=lambda **k: self.results_newplayers(
                 gridhorizontal=False, **k
             ),
-            destroy_actions=(control_database.Control.btn_closedatabase,),
+            destroy_actions=(control_database.Control._btn_closedatabase,),
         )
         self.define_tab(
             self._tab_players,
@@ -182,7 +171,7 @@ class Leagues(leagues_validate.Leagues):
             tooltip="Merge or separate existing players.",
             underline=0,
             tabclass=lambda **k: players.Players(gridhorizontal=False, **k),
-            destroy_actions=(control_database.Control.btn_closedatabase,),
+            destroy_actions=(control_database.Control._btn_closedatabase,),
         )
         self.define_tab(
             self._tab_joineventplayers,
@@ -191,8 +180,8 @@ class Leagues(leagues_validate.Leagues):
             underline=-1,
             tabclass=lambda **k: joineventplayers.JoinEventPlayers(**k),
             destroy_actions=(
-                joineventplayers.JoinEventPlayers.btn_cancel,
-                control_database.Control.btn_closedatabase,
+                joineventplayers.JoinEventPlayers._btn_cancel,
+                control_database.Control._btn_closedatabase,
             ),
         )
         self.define_tab(
@@ -202,8 +191,8 @@ class Leagues(leagues_validate.Leagues):
             underline=-1,
             tabclass=lambda **k: importevents.ImportEvents(**k),
             destroy_actions=(
-                importevents.ImportEvents.btn_closeimport,
-                control_database.Control.btn_closedatabase,
+                importevents.ImportEvents._btn_closeimport,
+                control_database.Control._btn_closedatabase,
             ),
         )
         self.define_tab(
@@ -213,8 +202,8 @@ class Leagues(leagues_validate.Leagues):
             underline=-1,
             tabclass=lambda **k: taskpanel.TaskPanel(**k),
             destroy_actions=(
-                taskpanel.TaskPanel.btn_closebackgroundtask,
-                control_database.Control.btn_closedatabase,
+                taskpanel.TaskPanel._btn_closebackgroundtask,
+                control_database.Control._btn_closedatabase,
             ),
         )
 
@@ -258,15 +247,15 @@ class Leagues(leagues_validate.Leagues):
                 ],
                 (
                     self._state_dbclosed,
-                    control_database.Control.btn_opendatabase,
+                    control_database.Control._btn_opendatabase,
                 ): [self._state_dbopen, self._tab_events],
                 (
                     self._state_dataopen,
-                    control_database.Control.btn_opendatabase,
+                    control_database.Control._btn_opendatabase,
                 ): [self._state_dataopen_dbopen, self._tab_sourceedit],
                 (
                     self._state_takeonopen,
-                    control_database.Control.btn_opendatabase,
+                    control_database.Control._btn_opendatabase,
                 ): [self._state_takeonopen_dbopen, self._tab_takeonedit],
                 (
                     self._state_dataopen_dbopen,
@@ -282,77 +271,77 @@ class Leagues(leagues_validate.Leagues):
                 ): [self._state_dbopen, self._tab_events],
                 (
                     self._state_dbopen,
-                    control_database.Control.btn_closedatabase,
+                    control_database.Control._btn_closedatabase,
                 ): [self._state_dbclosed, None],
                 (
                     self._state_dataopen_dbopen,
-                    control_database.Control.btn_closedatabase,
+                    control_database.Control._btn_closedatabase,
                 ): [self._state_dataopen, self._tab_sourceedit],
                 (
                     self._state_takeonopen_dbopen,
-                    control_database.Control.btn_closedatabase,
+                    control_database.Control._btn_closedatabase,
                 ): [self._state_takeonopen, self._tab_takeonedit],
                 (
                     self._state_dbopen,
-                    control_database.Control.btn_importevents,
+                    control_database.Control._btn_importevents,
                 ): [
                     self._state_dbopen_import_events,
                     self._tab_importevents,
                 ],
                 (
                     self._state_dbopen,
-                    events_database.Events.btn_join_event_new_players,
+                    events_database.Events._btn_join_event_new_players,
                 ): [self._state_joineventplayers, self._tab_joineventplayers],
                 (
                     self._state_joineventplayers,
-                    joineventplayers.JoinEventPlayers.btn_cancel,
+                    joineventplayers.JoinEventPlayers._btn_cancel,
                 ): [self._state_dbopen, self._tab_events],
                 (
                     self._state_dbopen_import_events,
-                    importevents.ImportEvents.btn_closeimport,
+                    importevents.ImportEvents._btn_closeimport,
                 ): [self._state_dbopen, self._tab_control],
                 (
                     self._state_dbopen,
-                    events_database.Events.btn_exportevents,
+                    events_database.Events._btn_exportevents,
                 ): [
                     self._state_dbopen_report_event,
                     self._tab_reportevent,
                 ],
                 (
                     self._state_dbopen,
-                    events_database.Events.btn_event_summary,
+                    events_database.Events._btn_event_summary,
                 ): [
                     self._state_dbopen_report_event,
                     self._tab_reportevent,
                 ],
                 (
                     self._state_dbopen,
-                    events_database.Events.btn_game_summary,
+                    events_database.Events._btn_game_summary,
                 ): [
                     self._state_dbopen_report_event,
                     self._tab_reportevent,
                 ],
                 (
                     self._state_dbopen_report_event,
-                    taskpanel.TaskPanel.btn_closebackgroundtask,
+                    taskpanel.TaskPanel._btn_closebackgroundtask,
                 ): [self._state_dbopen, self._tab_events],
                 (
                     self._state_dbopen_report_event,
-                    control_database.Control.btn_closedatabase,
+                    control_database.Control._btn_closedatabase,
                 ): [self._state_dbclosed, None],
                 (
                     self._state_dbopen_import_events,
-                    control_database.Control.btn_closedatabase,
+                    control_database.Control._btn_closedatabase,
                 ): [self._state_dbclosed, None],
                 (
                     self._state_joineventplayers,
-                    control_database.Control.btn_closedatabase,
+                    control_database.Control._btn_closedatabase,
                 ): [self._state_dbclosed, None],
             }
         )
         return switch_table
 
-    def add_ecf_url_item(self, menu):
+    def _add_ecf_url_item(self, menu):
         """Override in subclasses if edit ECF URL defaults needed."""
 
     def database_close(self):
@@ -378,14 +367,15 @@ class Leagues(leagues_validate.Leagues):
             if dlg == tkinter.messagebox.YES:
                 self._database_close()
                 self.database = None
-                self.switch_context(control_database.Control.btn_closedatabase)
-                self.set_error_file_on_close_database()
+                self.switch_context(
+                    control_database.Control._btn_closedatabase
+                )
+                self.set_error_file_on_close_databasee()
                 # return False to inhibit context switch if invoked from close
                 # Database button on tab because no state change is, or can be,
                 # defined for that button.  The switch_context call above has
                 # done what is needed.
                 return False
-        return None
 
     def database_delete(self):
         """Delete results database."""
@@ -436,8 +426,8 @@ class Leagues(leagues_validate.Leagues):
                 )
             )
             self.database = None
-            self.switch_context(control_database.Control.btn_closedatabase)
-            self.set_error_file_on_close_database()
+            self.switch_context(control_database.Control._btn_closedatabase)
+            self.set_error_file_on_close_databasee()
             tkinter.messagebox.showinfo(
                 parent=self.get_widget(), title="Delete", message=message
             )
@@ -473,8 +463,10 @@ class Leagues(leagues_validate.Leagues):
             return
 
         if os.path.exists(database_folder):
-            if modulequery.modules_for_existing_databases(
-                database_folder, FileSpec()
+            if len(
+                modulequery.modules_for_existing_databases(
+                    database_folder, FileSpec()
+                )
             ):
                 tkinter.messagebox.showinfo(
                     parent=self.get_widget(),
@@ -537,8 +529,8 @@ class Leagues(leagues_validate.Leagues):
                 parent=self.get_widget(),
                 message="".join(
                     (
-                        "None of the available database engines can be ",
-                        "used to create a database.",
+                        "None of the available database engines can be used to ",
+                        "create a database.",
                     )
                 ),
                 title="New",
@@ -599,13 +591,12 @@ class Leagues(leagues_validate.Leagues):
                 title="Open",
             )
             return
-        if len(ed) > 1:
+        elif len(ed) > 1:
             tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
                 message="".join(
                     (
-                        "There is more than one results database in folder",
-                        "\n\n",
+                        "There is more than one results database in folder\n\n",
                         os.path.basename(database_folder),
                         "\n\nMove the databases to separate folders and try ",
                         "again.  (Use the platform tools for moving files to ",
@@ -684,16 +675,9 @@ class Leagues(leagues_validate.Leagues):
                     return None
                 return getattr(module, name)
 
-            self._database_class = import_name(
-                _modulename, _Import.ResultsDatabase
-            )
+            self._database_class = import_name(_modulename, _ResultsDB)
             self._knownnames_class = import_name(
-                # See comments for set_knownnamesdatasource_module() method.
-                # The _knownnames_modulename class attributes should be
-                # redundant.
-                # pylint: disable-next=protected-access
-                self._database_class._knownnames_modulename,
-                _Import.KnownNamesDS,
+                self._database_class._knownnames_modulename, _KnownNamesDS
             )
             self.set_ecfdataimport_module(_enginename)
             self.set_ecfogddataimport_module(_enginename)
@@ -733,7 +717,7 @@ class Leagues(leagues_validate.Leagues):
         self.database_folder = database_folder
         self.set_error_file()
         self.set_ecf_url_defaults()
-        self.switch_context(control_database.Control.btn_opendatabase)
+        self.switch_context(control_database.Control._btn_opendatabase)
         self.get_control_context().show_buttons_for_open_database()
         self.get_control_context().create_buttons()
 
@@ -772,7 +756,6 @@ class Leagues(leagues_validate.Leagues):
                 return False
         self._database_quit()
         self.get_widget().winfo_toplevel().destroy()
-        return None
 
     def results_control(self, **kargs):
         """Return control_database.Control class instance."""
@@ -794,9 +777,17 @@ class Leagues(leagues_validate.Leagues):
         """Return the database interface class."""
         return self._database_class
 
+    def get_ecfdataimport_module(self):
+        """Return the ECF reference data import module."""
+        return self._ecfdataimport_module
+
     def get_knownnamesdatasource_module(self):
         """Return the known names datasource module."""
         return self._knownnamesdatasource_module
+
+    def get_ecfogddataimport_module(self):
+        """Return the ECF Online Grading Database import module."""
+        return self._ecfogddataimport_module
 
     def get_results_database(self):
         """Return the open database."""
@@ -857,7 +848,6 @@ class Leagues(leagues_validate.Leagues):
             self.set_error_file()
             self.set_takeon_edit_context()
             return True
-        return None
 
     def _database_close(self):
         """Close results database."""
@@ -889,12 +879,10 @@ class Leagues(leagues_validate.Leagues):
         if not self.is_state_switch_allowed(self._menu_opentakeondata):
             tkinter.messagebox.showinfo(
                 parent=self.get_widget(),
-                message=(
-                    "Cannot open a Data Takeon folder from the current tab"
-                ),
+                message="Cannot open a Data Takeon folder from the current tab",
                 title=title,
             )
-            return None
+            return
 
         if self.results_data is not None:
             tkinter.messagebox.showinfo(
@@ -908,7 +896,7 @@ class Leagues(leagues_validate.Leagues):
                 ),
                 title=title,
             )
-            return None
+            return
 
         if self._results_folder is None:
             initdir = "~"
@@ -934,23 +922,22 @@ class Leagues(leagues_validate.Leagues):
                     ),
                     title=title,
                 ):
-                    return None
+                    return
                 try:
                     os.makedirs(_results_folder)
                 except OSError:
-                    tkinter.messagebox.showinfo(
+                    dlg = tkinter.messagebox.showinfo(
                         parent=self.get_widget(),
                         message=" ".join(
                             (_results_folder, "\ncould not be created.")
                         ),
                         title=title,
                     )
-                    return None
+                    return
             if results_data.open_documents(self.get_widget()):
                 self.results_data = results_data
                 self._results_folder = _results_folder
                 return True
-        return None
 
     def set_error_file(self):
         """Set the error log for file being opened.
@@ -979,7 +966,7 @@ class Leagues(leagues_validate.Leagues):
                 os.path.join(self.database_folder, ERROR_LOG)
             )
 
-    def set_error_file_on_close_database(self):
+    def set_error_file_on_close_databasee(self):
         """Set the error log after database is closed.
 
         If a source document is open use it's error log, otherwise None.

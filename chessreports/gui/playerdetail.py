@@ -25,8 +25,8 @@ from ..core.ogd import ecfogdrecord
 def display_player_details(myself, selections, title):
     """Show dialogue giving details of events player took part in."""
     db = myself.get_appsys().get_results_database()
-    entries = {}
-    mainnotfound = {}
+    entries = dict()
+    mainnotfound = dict()
     db.start_read_only_transaction()
     try:
         for s in selections:
@@ -39,7 +39,7 @@ def display_player_details(myself, selections, title):
     finally:
         db.end_read_only_transaction()
     if len(entries) == 0:
-        tkinter.messagebox.showinfo(
+        dlg = tkinter.messagebox.showinfo(
             parent=myself.get_widget(),
             message=" ".join(
                 (
@@ -52,7 +52,7 @@ def display_player_details(myself, selections, title):
         )
         return
     if len(mainnotfound):
-        tkinter.messagebox.showinfo(
+        dlg = tkinter.messagebox.showinfo(
             parent=myself.get_widget(),
             message=" ".join(
                 (
@@ -72,7 +72,6 @@ def display_player_details(myself, selections, title):
             if detail is None:
                 continue
             identity, ecf, ogd, caption, aliases = detail
-            del caption
             if ecf or ogd:
                 header = "".join(
                     (
@@ -181,12 +180,12 @@ def _alias_details(myself, selection, title):
     finally:
         db.end_read_only_transaction()
     if mainentry is None:
-        tkinter.messagebox.showinfo(
+        dlg = tkinter.messagebox.showinfo(
             parent=myself.get_widget(),
             message="Cannot find identified player for selection.",
             title=title,
         )
-        return None
+        return
 
     ecfline = ""
     caption = ""

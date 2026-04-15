@@ -34,15 +34,14 @@ def copy_ecf_clubs_post_2020_rules(
     results, logwidget=None, ecfdata=None, downloaddate=None, **kwargs
 ):
     """Copy downloaded club records in ecfdata to database."""
-    del kwargs
-    keybyteify = results.keybyteify
+    keybyteify = results._keybyteify
 
     # downloaddate replaces the datecontrol and ecfdate arguments.
     # Keep the original names within the procedure.
     datecontrol = downloaddate
     ecfdate = downloaddate
 
-    # The strify method of the Database instance is not needed because the
+    # The _strify method of the Database instance is not needed because the
     # source is not a DBF file but from a json.loads() call.
     # Assume any encoding problems caused the json.loads() call to fail.
 
@@ -76,7 +75,7 @@ def copy_ecf_clubs_post_2020_rules(
                 filespec.ECFDATE_FIELD_DEF,
                 r,
             )
-            if daterecord.value.ECFobjtype == ecfrecord.OBJTYPE_CLUB:
+            if daterecord.value.ECFobjtype == ecfrecord.objtypeClub:
                 if ecfdate != daterecord.value.appliedECFdate:
                     newdaterecord = daterecord.clone()
                     newdaterecord.value.appliedECFdate = ecfdate
@@ -92,8 +91,8 @@ def copy_ecf_clubs_post_2020_rules(
         if not ecfdateexists:
             txndaterec = ecfrecord.ECFrefDBrecordECFdate()
             txndaterec.value.ECFdate = ecfdate
-            txndaterec.value.ECFtxntype = ecfrecord.TXN_NEW
-            txndaterec.value.ECFobjtype = ecfrecord.OBJTYPE_CLUB
+            txndaterec.value.ECFtxntype = ecfrecord.txnNew
+            txndaterec.value.ECFobjtype = ecfrecord.objtypeClub
             txndaterec.value.appliedECFdate = ecfdate
             txndaterec.key.recno = None
             txndaterec.put_record(results, filespec.ECFTXN_FILE_DEF)
@@ -126,7 +125,7 @@ def copy_ecf_clubs_post_2020_rules(
                 assoc_code = ""
             ecfrec = ecfrecord.ECFrefDBrecordECFclub()
             record = ecfcursor.nearest(keybyteify(club_code))
-            if record is None:
+            if record == None:
                 ecfrec.key.recno = None
                 ecfrec.value.ECFcode = club_code
                 ecfrec.value.ECFactive = True
@@ -209,8 +208,7 @@ def copy_ecf_players_post_2020_rules(
     results, logwidget=None, ecfdata=None, downloaddate=None, **kwargs
 ):
     """Copy downloaded player records in ecfdata to database."""
-    del kwargs
-    keybyteify = results.keybyteify
+    keybyteify = results._keybyteify
 
     # downloaddate replaces the datecontrol argument.
     # ecfdate is replaced by ... in ecfdata.
@@ -218,7 +216,7 @@ def copy_ecf_players_post_2020_rules(
     datecontrol = downloaddate
     ecfdate = ecfdata["rating_effective_date"]
 
-    # The strify method of the Database instance is not needed because the
+    # The _strify method of the Database instance is not needed because the
     # source is not a DBF file but from a json.loads() call.
     # Assume any encoding problems caused the json.loads() call to fail.
     if logwidget:
@@ -251,7 +249,7 @@ def copy_ecf_players_post_2020_rules(
                 filespec.ECFDATE_FIELD_DEF,
                 r,
             )
-            if daterecord.value.ECFobjtype == ecfrecord.OBJTYPE_PLAYER:
+            if daterecord.value.ECFobjtype == ecfrecord.objtypePlayer:
                 if ecfdate != daterecord.value.appliedECFdate:
                     newdaterecord = daterecord.clone()
                     newdaterecord.value.appliedECFdate = ecfdate
@@ -267,8 +265,8 @@ def copy_ecf_players_post_2020_rules(
         if not ecfdateexists:
             txndaterec = ecfrecord.ECFrefDBrecordECFdate()
             txndaterec.value.ECFdate = ecfdate
-            txndaterec.value.ECFtxntype = ecfrecord.TXN_NEW
-            txndaterec.value.ECFobjtype = ecfrecord.OBJTYPE_PLAYER
+            txndaterec.value.ECFtxntype = ecfrecord.txnNew
+            txndaterec.value.ECFobjtype = ecfrecord.objtypePlayer
             txndaterec.value.appliedECFdate = ecfdate
             txndaterec.key.recno = None
             txndaterec.put_record(results, filespec.ECFTXN_FILE_DEF)
@@ -293,9 +291,9 @@ def copy_ecf_players_post_2020_rules(
         name_index = ecfdata["column_names"].index("full_name")
         club_code_index = (ecfdata["column_names"].index("club_code"),)
         for data in ecfdata["players"]:
-            ecf_code = data[code_index]
-            if ecf_code is None:
-                ecf_code = ""
+            ECF_code = data[code_index]
+            if ECF_code is None:
+                ECF_code = ""
             full_name = data[name_index]
             if full_name is None:
                 full_name = ""
@@ -308,18 +306,18 @@ def copy_ecf_players_post_2020_rules(
                     clubcodes.append(str(c).zfill(4))
             clubcodes.sort()
             ecfrec = ecfrecord.ECFrefDBrecordECFplayer()
-            record = ecfcursor.nearest(keybyteify(ecf_code))
-            if record is None:
+            record = ecfcursor.nearest(keybyteify(ECF_code))
+            if record == None:
                 ecfrec.key.recno = None
-                ecfrec.value.ECFcode = ecf_code
+                ecfrec.value.ECFcode = ECF_code
                 ecfrec.value.ECFactive = True
                 ecfrec.value.ECFname = full_name
                 ecfrec.value.ECFclubcodes = clubcodes
                 ecf_codes.add(ecfrec.value.ECFcode)
                 ecfrec.put_record(results, filespec.ECFPLAYER_FILE_DEF)
-            elif record[0] != ecf_code:
+            elif record[0] != ECF_code:
                 ecfrec.key.recno = None
-                ecfrec.value.ECFcode = ecf_code
+                ecfrec.value.ECFcode = ECF_code
                 ecfrec.value.ECFactive = True
                 ecfrec.value.ECFname = full_name
                 ecfrec.value.ECFclubcodes = clubcodes
@@ -445,9 +443,8 @@ def copy_ecf_players_post_2011_rules(
     widget - the manager object for the ecf data import tab
 
     """
-    del parent, kwargs
-    strify = results.strify
-    keyify = results.keyify
+    strify = results._strify
+    keyify = results._keyify
     if logwidget:
         logwidget.append_text("", timestamp=False)
         logwidget.append_text(
@@ -472,7 +469,7 @@ def copy_ecf_players_post_2011_rules(
                 filespec.ECFDATE_FIELD_DEF,
                 r,
             )
-            if daterecord.value.ECFobjtype == ecfrecord.OBJTYPE_PLAYER:
+            if daterecord.value.ECFobjtype == ecfrecord.objtypePlayer:
                 if ecfdate != daterecord.value.appliedECFdate:
                     newdaterecord = daterecord.clone()
                     newdaterecord.value.appliedECFdate = ecfdate
@@ -488,8 +485,8 @@ def copy_ecf_players_post_2011_rules(
         if not ecfdateexists:
             txndaterec = ecfrecord.ECFrefDBrecordECFdate()
             txndaterec.value.ECFdate = ecfdate
-            txndaterec.value.ECFtxntype = ecfrecord.TXN_NEW
-            txndaterec.value.ECFobjtype = ecfrecord.OBJTYPE_PLAYER
+            txndaterec.value.ECFtxntype = ecfrecord.txnNew
+            txndaterec.value.ECFobjtype = ecfrecord.objtypePlayer
             txndaterec.value.appliedECFdate = ecfdate
             txndaterec.key.recno = None
             txndaterec.put_record(results, filespec.ECFTXN_FILE_DEF)
@@ -521,14 +518,14 @@ def copy_ecf_players_post_2011_rules(
                     ecffile, ecfplayerdb.PLAYERS, ecfplayerdb.PLAYERS, data
                 )
                 clubcodes = []
-                for f in ecfrecord.ECFplayerclubsfields:
+                for f in ecfrecord._ECFplayerclubsfields:
                     c = ecfimp.value.__dict__.get(f)
                     if c:
                         clubcodes.append(strify(c))
                 clubcodes.sort()
                 ecfrec = ecfrecord.ECFrefDBrecordECFplayer()
                 record = ecfcursor.nearest(keyify(ecfimp.value.REF))
-                if record is None:
+                if record == None:
                     ecfrec.key.recno = None
                     ecfrec.value.ECFcode = strify(ecfimp.value.REF)
                     ecfrec.value.ECFactive = True
@@ -668,9 +665,8 @@ def copy_ecf_clubs_post_2011_rules(
     widget - the manager object for the ecf data import tab
 
     """
-    del parent, datekey, kwargs
-    strify = results.strify
-    keyify = results.keyify
+    strify = results._strify
+    keyify = results._keyify
     if logwidget:
         logwidget.append_text("", timestamp=False)
         logwidget.append_text(
@@ -695,7 +691,7 @@ def copy_ecf_clubs_post_2011_rules(
                 filespec.ECFDATE_FIELD_DEF,
                 r,
             )
-            if daterecord.value.ECFobjtype == ecfrecord.OBJTYPE_CLUB:
+            if daterecord.value.ECFobjtype == ecfrecord.objtypeClub:
                 if ecfdate != daterecord.value.appliedECFdate:
                     newdaterecord = daterecord.clone()
                     newdaterecord.value.appliedECFdate = ecfdate
@@ -711,8 +707,8 @@ def copy_ecf_clubs_post_2011_rules(
         if not ecfdateexists:
             txndaterec = ecfrecord.ECFrefDBrecordECFdate()
             txndaterec.value.ECFdate = ecfdate
-            txndaterec.value.ECFtxntype = ecfrecord.TXN_NEW
-            txndaterec.value.ECFobjtype = ecfrecord.OBJTYPE_CLUB
+            txndaterec.value.ECFtxntype = ecfrecord.txnNew
+            txndaterec.value.ECFobjtype = ecfrecord.objtypeClub
             txndaterec.value.appliedECFdate = ecfdate
             txndaterec.key.recno = None
             txndaterec.put_record(results, filespec.ECFTXN_FILE_DEF)
@@ -743,7 +739,7 @@ def copy_ecf_clubs_post_2011_rules(
                 )
                 ecfrec = ecfrecord.ECFrefDBrecordECFclub()
                 record = ecfcursor.nearest(keyify(ecfimp.value.CODE))
-                if record is None:
+                if record == None:
                     ecfrec.key.recno = None
                     ecfrec.value.ECFcode = strify(ecfimp.value.CODE)
                     ecfrec.value.ECFactive = True
@@ -828,10 +824,9 @@ def copy_single_ecf_club_post_2020_rules(results, ecfdata=None, **kwargs):
     list.
 
     """
-    del kwargs
-    keybyteify = results.keybyteify
+    keybyteify = results._keybyteify
 
-    # The strify method of the Database instance is not needed because the
+    # The _strify method of the Database instance is not needed because the
     # source is not a DBF file but from a json.loads() call.
     # Assume any encoding problems caused the json.loads() call to fail.
 
@@ -853,7 +848,7 @@ def copy_single_ecf_club_post_2020_rules(results, ecfdata=None, **kwargs):
             assoc_code = ""
         ecfrec = ecfrecord.ECFrefDBrecordECFclub()
         record = ecfcursor.nearest(keybyteify(club_code))
-        if record is None:
+        if record == None:
             ecfrec.key.recno = None
             ecfrec.value.ECFcode = club_code
             ecfrec.value.ECFactive = True
@@ -898,10 +893,9 @@ def copy_single_ecf_players_post_2020_rules(results, ecfdata=None, **kwargs):
     the list of clubs 'played-for'.
 
     """
-    del kwargs
-    keybyteify = results.keybyteify
+    keybyteify = results._keybyteify
 
-    # The strify method of the Database instance is not needed because the
+    # The _strify method of the Database instance is not needed because the
     # source is not a DBF file but from a json.loads() call.
     # Assume any encoding problems caused the json.loads() call to fail.
     results.start_transaction()
@@ -911,25 +905,25 @@ def copy_single_ecf_players_post_2020_rules(results, ecfdata=None, **kwargs):
         filespec.ECFPLAYER_FILE_DEF, filespec.ECFPLAYERCODE_FIELD_DEF
     )
     try:
-        ecf_code = ecfdata["ECF_code"]
-        if ecf_code is None:
-            ecf_code = ""
+        ECF_code = ecfdata["ECF_code"]
+        if ECF_code is None:
+            ECF_code = ""
         full_name = ecfdata["full_name"]
         if full_name is None:
             full_name = ""
         clubcodes = [str(ecfdata["club_code"]).zfill(4)]
         ecfrec = ecfrecord.ECFrefDBrecordECFplayer()
-        record = ecfcursor.nearest(keybyteify(ecf_code))
-        if record is None:
+        record = ecfcursor.nearest(keybyteify(ECF_code))
+        if record == None:
             ecfrec.key.recno = None
-            ecfrec.value.ECFcode = ecf_code
+            ecfrec.value.ECFcode = ECF_code
             ecfrec.value.ECFactive = False
             ecfrec.value.ECFname = full_name
             ecfrec.value.ECFclubcodes = clubcodes
             ecfrec.put_record(results, filespec.ECFPLAYER_FILE_DEF)
-        elif record[0] != ecf_code:
+        elif record[0] != ECF_code:
             ecfrec.key.recno = None
-            ecfrec.value.ECFcode = ecf_code
+            ecfrec.value.ECFcode = ECF_code
             ecfrec.value.ECFactive = False
             ecfrec.value.ECFname = full_name
             ecfrec.value.ECFclubcodes = clubcodes

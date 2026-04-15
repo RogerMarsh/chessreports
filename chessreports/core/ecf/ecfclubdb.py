@@ -10,10 +10,15 @@ from os.path import split
 from solentware_base.core.record import KeydBaseIII, Value, RecorddBaseIII
 
 from ...minorbases.dbaseapi import (
-    DBaseapi,
+    dBaseapi,
+    FOLDER,
     FIELDS,
     FILE,
     C,
+    N,
+    L,
+    D,
+    F,
     LENGTH,
     TYPE,
     START,
@@ -22,12 +27,12 @@ from ...minorbases.dbaseapi import (
 CLUBS = "clubs"
 
 # The RECTYPE values on an ECF club update file and interpretation
-ADDCLUB = "A"  # add a new club
-UPDATECLUB = "U"  # update details of existing club
-DELETECLUB = "D"  # delete a club
+_addclub = "A"  # add a new club
+_updateclub = "U"  # update details of existing club
+_deleteclub = "D"  # delete a club
 
 
-class ECFclubsDB(DBaseapi):
+class ECFclubsDB(dBaseapi):
     """Access a club master file published by ECF."""
 
     def __init__(self, DBpath):
@@ -48,10 +53,10 @@ class ECFclubsDB(DBaseapi):
             },
         }
 
-        DBaseapi.__init__(self, dbnames, d)
+        dBaseapi.__init__(self, dbnames, d)
 
 
-class ECFclubsUpdateDB(DBaseapi):
+class ECFclubsUpdateDB(dBaseapi):
     """Access a club update file published by ECF."""
 
     def __init__(self, DBpath):
@@ -73,11 +78,13 @@ class ECFclubsUpdateDB(DBaseapi):
             },
         }
 
-        DBaseapi.__init__(self, dbnames, d)
+        dBaseapi.__init__(self, dbnames, d)
 
 
 class ECFclubsDBkey(KeydBaseIII):
     """Club key."""
+
+    pass
 
 
 class ECFclubsDBvalue(Value):
@@ -85,7 +92,7 @@ class ECFclubsDBvalue(Value):
 
     # def load(self, value):
     #    """Convert bytes values from dbaseIII record to string"""
-    #    super().load(value)
+    #    super(ECFclubsDBvalue, self).load(value)
     #    for a in self.__dict__:
     #        self.__dict__[a] = self.__dict__[a]
 
@@ -95,4 +102,4 @@ class ECFclubsDBrecord(RecorddBaseIII):
 
     def __init__(self, keyclass=ECFclubsDBkey, valueclass=ECFclubsDBvalue):
         """Customise RecorddBaseIII with ECFclubsDBkey and ECFclubsDBvalue."""
-        super().__init__(keyclass, valueclass)
+        super(ECFclubsDBrecord, self).__init__(keyclass, valueclass)

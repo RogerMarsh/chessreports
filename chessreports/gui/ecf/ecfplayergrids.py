@@ -4,6 +4,8 @@
 
 """Results database datagrid classes for assigning ECF codes to players."""
 
+import tkinter
+
 from solentware_grid.core import dataclient
 
 from . import ecfrow
@@ -20,7 +22,7 @@ class NewPersonGrid(ECFPlayerGrid):
     """Grid for players with no ECF grading code recorded."""
 
     def __init__(self, **kwargs):
-        """Customise record selection widget and note sibling grids."""
+        """Extend, customise record selection widget, and note sibling grids."""
         super().__init__(**kwargs)
         self.make_header(ecfmaprow.ECFmapDBrowNewPerson.header_specification)
         ds = dataclient.DataSource(
@@ -34,27 +36,25 @@ class NewPersonGrid(ECFPlayerGrid):
             self, self.on_data_change
         )
 
-    def encode_navigate_grid_key(self, key, encoding="utf8"):
+    def encode_navigate_grid_key(self, key):
         """Return key after formatting and delegating encoding to superclass.
 
-        This method is used to process text entered by the user.  It is not
-        used by the standard navigation functions (page up and so on).
+        This method is used to process text entered by the user.
+        It is not used by the standard navigation functions (page up and so on).
 
         This method converts key to look like the start of a <key> held on the
         database after a repr(<key>) call.
 
         """
         k = repr((key,))
-        return super().encode_navigate_grid_key(
-            k[: k.index(key) + len(key)], encoding=encoding
-        )
+        return super().encode_navigate_grid_key(k[: k.index(key) + len(key)])
 
 
 class PersonGrid(ECFPlayerGrid):
     """Grid for players linked to ECF grading code."""
 
     def __init__(self, **kwargs):
-        """Customise record selection widget and note sibling grids."""
+        """Extend, customise record selection widget, and note sibling grids."""
         super().__init__(**kwargs)
         self.make_header(ecfmaprow.ECFmapDBrowPerson.header_specification)
         ds = dataclient.DataSource(
@@ -68,27 +68,25 @@ class PersonGrid(ECFPlayerGrid):
             self, self.on_data_change
         )
 
-    def encode_navigate_grid_key(self, key, encoding="utf8"):
+    def encode_navigate_grid_key(self, key):
         """Return key after formatting and delegating encoding to superclass.
 
-        This method is used to process text entered by the user.  It is not
-        used by the standard navigation functions (page up and so on).
+        This method is used to process text entered by the user.
+        It is not used by the standard navigation functions (page up and so on).
 
         This method converts key to look like the start of a <key> held on the
         database after a repr(<key>) call.
 
         """
         k = repr((key,))
-        return super().encode_navigate_grid_key(
-            k[: k.index(key) + len(key)], encoding=encoding
-        )
+        return super().encode_navigate_grid_key(k[: k.index(key) + len(key)])
 
 
 class ECFPersonGrid(ECFPlayerGrid):
     """Grid for players on master list with ECF grading codes."""
 
     def __init__(self, **kwargs):
-        """Customise record selection widget and note sibling grids."""
+        """Extend, customise record selection widget, and note sibling grids."""
         super().__init__(**kwargs)
         self.make_header(ecfrow.ECFrefDBrowECFPlayer.header_specification)
         ds = dataclient.DataSource(
@@ -107,7 +105,7 @@ class NewPlayerClubGrid(ECFPlayerGrid):
     """Grid for players with no ECF club affiliation recorded."""
 
     def __init__(self, **kwargs):
-        """Customise record selection widget and note sibling grids."""
+        """Extend, customise record selection widget, and note sibling grids."""
         super().__init__(**kwargs)
         self.make_header(ecfmaprow.ECFmapDBrowNewPlayer.header_specification)
         ds = dataclient.DataSource(
@@ -121,27 +119,25 @@ class NewPlayerClubGrid(ECFPlayerGrid):
             self, self.on_data_change
         )
 
-    def encode_navigate_grid_key(self, key, encoding="utf8"):
+    def encode_navigate_grid_key(self, key):
         """Return key after formatting and delegating encoding to superclass.
 
-        This method is used to process text entered by the user.  It is not
-        used by the standard navigation functions (page up and so on).
+        This method is used to process text entered by the user.
+        It is not used by the standard navigation functions (page up and so on).
 
         This method converts key to look like the start of a <key> held on the
         database after a repr(<key>) call.
 
         """
         k = repr((key,))
-        return super().encode_navigate_grid_key(
-            k[: k.index(key) + len(key)], encoding=encoding
-        )
+        return super().encode_navigate_grid_key(k[: k.index(key) + len(key)])
 
 
 class PlayerECFDetailGrid(ECFPlayerGrid):
     """Grid for ECF detail of identified players."""
 
     def __init__(self, **kwargs):
-        """Customise record selection widget and note sibling grids."""
+        """Extend, customise record selection widget, and note sibling grids."""
         super().__init__(**kwargs)
         self.make_header(ecfmaprow.ECFmapDBrowPlayer.header_specification)
         ds = dataclient.DataSource(
@@ -160,7 +156,7 @@ class ECFClubCodeGrid(ECFPlayerGrid):
     """Grid for ECF clubs available for affiliation."""
 
     def __init__(self, **kwargs):
-        """Customise record selection widget and note sibling grids."""
+        """Extend, customise record selection widget, and note sibling grids."""
         super().__init__(**kwargs)
         self.make_header(ecfrow.ECFrefDBrowECFClub.header_specification)
         ds = dataclient.DataSource(

@@ -38,8 +38,10 @@ from . import constants
 class TakeonSeasonError(Exception):
     """Exception class for takeonseason module."""
 
+    pass
 
-class TakeonSeason:
+
+class TakeonSeason(object):
     """Default management of source and derived data files for an event.
 
     Assume that the initial schedule and results files are empty and that
@@ -85,9 +87,10 @@ class TakeonSeason:
         files that should exist.
 
         """
-        with open(config, "r", encoding="utf8") as outcf:
-            lines = [s.strip().split("=", 1) for s in outcf.readlines()]
-        srcfiles = {}
+        cf = open(config, "r")
+        lines = [s.strip().split("=", 1) for s in cf.readlines()]
+        cf.close()
+        srcfiles = dict()
         for sf in self._sourcefiles:
             srcfiles[sf] = None
         for s in lines:
@@ -102,10 +105,10 @@ class TakeonSeason:
 
         Each folder containing a file with take-on data will have a file named
         takeon_conf (constants.TAKEON_ECF_FORMAT) or league_database_data.txt
-        (constants.LEAGUE_DATABASE_DATA). LEAGUE_DATABASE_DATA will be in
-        folder but TAKEON_ECF_FORMAT may be in subdirectories of folder as
-        well or instead. The files containing the take-on data for
-        TAKEON_ECF_FORMAT will be named <take-on>/<take-on>.txt (perhaps .TXT).
+        (constants.LEAGUE_DATABASE_DATA). LEAGUE_DATABASE_DATA will be in folder
+        but TAKEON_ECF_FORMAT may be in subdirectories of folder as well or
+        instead. The files containing the take-on data for TAKEON_ECF_FORMAT
+        will be named <take-on>/<take-on>.txt (perhaps .TXT).
         LEAGUE_DATABASE_DATA is the data file.
 
         """
@@ -154,9 +157,9 @@ class TakeonSeason:
         a format convenient for comparison with existing contents of results
         database and subsequent updates.
         """
-        if self._collation is None:
+        if self._collation == None:
             self.get_schedule_from_file(TakeonSchedule)
-            textlines = list(difflib.restore(self.results, 2))
+            textlines = [t for t in difflib.restore(self.results, 2)]
             if (
                 len(self.takeonfiles.files) == 1
                 and os.path.join(self.folder, constants.LEAGUE_DATABASE_DATA)
@@ -189,7 +192,7 @@ class TakeonSeason:
     def open_documents(self, parent):
         """Override, extract data from text files and return True if ok."""
         merge = self.get_folder_contents_for_merge(self.folder)
-        if not merge.files:
+        if not len(merge.files):
             tkinter.messagebox.showinfo(
                 parent=parent,
                 message=" ".join(
@@ -202,7 +205,7 @@ class TakeonSeason:
                 ),
                 title="Open results take-on data",
             )
-            return None
+            return
         if not merge.translate_results_format():
             tkinter.messagebox.showerror(
                 parent=parent,
@@ -214,23 +217,24 @@ class TakeonSeason:
                     )
                 ),
             )
-            return None
+            return
 
         config = os.path.join(self.folder, self.config)
         if not os.path.exists(config):
-            with open(config, "w", encoding="utf8") as outcf:
-                for sf in self._sourcefiles:
-                    outcf.writelines(
-                        (
-                            "".join((sf, "=")),
-                            os.path.join(
-                                "".join(
-                                    (sf, os.path.basename(self.folder), ".txt")
-                                )
-                            ),
-                            os.linesep,
-                        )
+            cf = open(config, "w")
+            for sf in self._sourcefiles:
+                cf.writelines(
+                    (
+                        "".join((sf, "=")),
+                        os.path.join(
+                            "".join(
+                                (sf, os.path.basename(self.folder), ".txt")
+                            )
+                        ),
+                        os.linesep,
                     )
+                )
+            cf.close()
 
             tkinter.messagebox.showinfo(
                 parent=parent,
@@ -254,7 +258,7 @@ class TakeonSeason:
         # Get the fixtures
         schedule = srcfiles[constants.TAKEON_SCHEDULE]
         fixtures = self.get_difference_file(
-            list(merge.matchnames),
+            [mn for mn in merge.matchnames],
             schedule,
             "Schedule Files",
             parent,
@@ -291,7 +295,7 @@ class TakeonSeason:
         """
         ok = True
         for s in sourcefiles:
-            if sourcefiles[s] is None:
+            if sourcefiles[s] == None:
                 ok = False
                 tkinter.messagebox.showinfo(
                     parent=parent,
@@ -306,7 +310,7 @@ class TakeonSeason:
 
     # Copy code from original season.py instead of delegating to superclass
     def extract_schedule(self, newfixtures):
-        """Update Schedule object getfixtures from newfixtures text lines."""
+        """Update the Schedule object getfixtures from newfixtures text lines."""
         oldfixtures = list(difflib.restore(self.fixtures, 1))
         self.fixtures = list(difflib.ndiff(oldfixtures, newfixtures))
         self.fixture_schedule = None
@@ -331,10 +335,16 @@ class TakeonSeason:
         self.fixtures = list(difflib.ndiff(oldfixtures, newfixtures))
         oldresults = list(difflib.restore(self.results, 1))
         self.results = list(difflib.ndiff(oldresults, newresults))
-        with open(self.fixturesfile, "wb") as outff:
-            outff.write("\n".join(self.fixtures).encode("utf8"))
-        with open(self.resultsfile, "wb") as outfr:
-            outfr.write("\n".join(self.results).encode("utf8"))
+        try:
+            ff = open(self.fixturesfile, "wb")
+            ff.write("\n".join(self.fixtures).encode("utf8"))
+        finally:
+            ff.close()
+        try:
+            fr = open(self.resultsfile, "wb")
+            fr.write("\n".join(self.results).encode("utf8"))
+        finally:
+            fr.close()
 
     def extract_results(self, newresults):
         """Call get_results_from_file method to process newresults text lines.
@@ -382,8 +392,9 @@ class TakeonSeason:
         """
         if not os.path.exists(diff):
             difflines = list(difflib.ndiff(lines, lines))
-            with open(diff, "wb") as outfo:
-                outfo.write("\n".join(difflines).encode("utf8"))
+            fo = open(diff, "wb")
+            fo.write("\n".join(difflines).encode("utf8"))
+            fo.close()
             if len(lines):
                 tkinter.messagebox.showinfo(
                     parent=parent,
@@ -399,77 +410,78 @@ class TakeonSeason:
                     title=dlgcaption,
                 )
             return difflines
-        with open(diff, "rb") as infd:
-            diffbytes = infd.read()
-        # Early versions of program did not use utf-8 and in practice
-        # assumed iso-8859-1 encoding.
-        try:
-            difflines = diffbytes.decode("utf8").splitlines()
-        except UnicodeDecodeError:
-            difflines = diffbytes.decode("iso-8859-1").splitlines()
-        origlines = list(difflib.restore(difflines, 1))
-        if len(origlines) > len(lines):
-            tkinter.messagebox.showinfo(
-                parent=parent,
-                message="".join(
-                    [
-                        orig,
-                        ", ignoring editing since creation, contains ",
-                        "more data than the source documents.",
-                        os.linesep,
-                        "To use the new data delete ",
-                        diff,
-                        os.linesep,
-                        "(losing any editing done), or provide source ",
-                        "documents consistent with earlier versions.",
-                    ]
-                ),
-                title=dlgcaption,
-            )
-            return False
-        if origlines != lines[: len(origlines)]:
-            tkinter.messagebox.showinfo(
-                parent=parent,
-                message="".join(
-                    [
-                        orig,
-                        ", ignoring editing since creation, is not ",
-                        "consistent with the new source documents.",
-                        os.linesep,
-                        "To use the new data delete ",
-                        diff,
-                        os.linesep,
-                        "(losing any editing done), or provide source ",
-                        "documents consistent with earlier versions.",
-                    ]
-                ),
-                title=dlgcaption,
-            )
-            return False
-        if len(lines) > len(origlines):
-            # pycodestyle E203 whitespace before ':'.
-            # black formatting insists on the space.
-            newlines = lines[len(origlines) :]
-            newdifflines = difflib.ndiff(newlines, newlines)
-            difflines.extend(newdifflines)
-            with open(diff, "wb") as outfd:
-                outfd.write("\n".join(difflines).encode("utf8"))
-            tkinter.messagebox.showinfo(
-                parent=parent,
-                message="".join(
-                    [
-                        "Extended source documents consistent with ",
-                        "earlier versions have been supplied.",
-                        os.linesep,
-                        orig,
-                        " is extended and previous edits have been ",
-                        "retained.",
-                    ]
-                ),
-                title=dlgcaption,
-            )
-            return difflines
-        return difflines
+        else:
+            fd = open(diff, "rb")
+            diffbytes = fd.read()
+            fd.close()
+            # Early versions of program did not use utf-8 and in practice
+            # assumed iso-8859-1 encoding.
+            try:
+                difflines = diffbytes.decode("utf8").splitlines()
+            except UnicodeDecodeError:
+                difflines = diffbytes.decode("iso-8859-1").splitlines()
+            origlines = list(difflib.restore(difflines, 1))
+            if len(origlines) > len(lines):
+                tkinter.messagebox.showinfo(
+                    parent=parent,
+                    message="".join(
+                        [
+                            orig,
+                            ", ignoring editing since creation, contains more ",
+                            "data than the source documents.",
+                            os.linesep,
+                            "To use the new data delete ",
+                            diff,
+                            os.linesep,
+                            "(losing any editing done), or provide source ",
+                            "documents consistent with earlier versions.",
+                        ]
+                    ),
+                    title=dlgcaption,
+                )
+                return False
+            elif origlines != lines[: len(origlines)]:
+                tkinter.messagebox.showinfo(
+                    parent=parent,
+                    message="".join(
+                        [
+                            orig,
+                            ", ignoring editing since creation, is not ",
+                            "consistent with the new source documents.",
+                            os.linesep,
+                            "To use the new data delete ",
+                            diff,
+                            os.linesep,
+                            "(losing any editing done), or provide source ",
+                            "documents consistent with earlier versions.",
+                        ]
+                    ),
+                    title=dlgcaption,
+                )
+                return False
+            elif len(lines) > len(origlines):
+                fd = open(diff, "wb")
+                newlines = lines[len(origlines) :]
+                newdifflines = difflib.ndiff(newlines, newlines)
+                difflines.extend(newdifflines)
+                fd.write("\n".join(difflines).encode("utf8"))
+                fd.close()
+                tkinter.messagebox.showinfo(
+                    parent=parent,
+                    message="".join(
+                        [
+                            "Extended source documents consistent with earlier ",
+                            "versions have been supplied.",
+                            os.linesep,
+                            orig,
+                            " is extended and previous edits have been retained.",
+                        ]
+                    ),
+                    title=dlgcaption,
+                )
+                return difflines
+            else:
+                return difflines
 
     def get_schedule_from_file(self, getfixtures):
         """Extract schedule from text file using getfixtures.build_schedule.
@@ -477,7 +489,7 @@ class TakeonSeason:
         getfixtures - the Schedule class or a subclass
 
         """
-        if self.fixture_schedule is None:
+        if self.fixture_schedule == None:
             f = list(difflib.restore(self.fixtures, 2))
             self.fixture_schedule = getfixtures()
             self.fixture_schedule.build_schedule(f)

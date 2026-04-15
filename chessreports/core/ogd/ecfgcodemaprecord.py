@@ -20,14 +20,16 @@ from .. import filespec
 class ECFmapOGDkeyPlayer(KeyData):
     """Primary key of player."""
 
+    pass
+
 
 class ECFmapOGDvaluePlayer(ValueList):
     """ECF name and grading code for player in event."""
 
-    attributes = {
-        "playerkey": None,
-        "playercode": None,
-    }
+    attributes = dict(
+        playerkey=None,
+        playercode=None,
+    )
     _attribute_order = (
         "playercode",  # ecf grading code from ecf online grading database
         "playerkey",  # internal key for player on current database
@@ -35,8 +37,6 @@ class ECFmapOGDvaluePlayer(ValueList):
 
     def empty(self):
         """(Re)Initialize value attribute."""
-        # Attributes set by ValueList.__init__() method.
-        # pylint: disable=attribute-defined-outside-init
         self.playerkey = ""
         # self.playername = ''
         self.playercode = None
@@ -44,7 +44,7 @@ class ECFmapOGDvaluePlayer(ValueList):
 
     def pack(self):
         """Extend, return player to ECF grading code record and index data."""
-        v = super().pack()
+        v = super(ECFmapOGDvaluePlayer, self).pack()
         index = v[1]
         index[filespec.OGDPERSONID_FIELD_DEF] = [self.playerkey]
         index[filespec.OGDPERSONCODE_FIELD_DEF] = [self.playercode]
@@ -65,7 +65,7 @@ class ECFmapOGDrecordPlayer(Record):
         self, keyclass=ECFmapOGDkeyPlayer, valueclass=ECFmapOGDvaluePlayer
     ):
         """Customise Record with ECFmapOGDkeyPlayer, ECFmapOGDvaluePlayer."""
-        super().__init__(keyclass, valueclass)
+        super(ECFmapOGDrecordPlayer, self).__init__(keyclass, valueclass)
 
 
 def get_grading_code_for_person(database, person):
@@ -102,7 +102,6 @@ def get_person(database, key):
         ar = ECFmapOGDrecordPlayer()
         ar.load_record(a)
         return ar
-    return None
 
 
 def get_person_for_grading_code(database, code):
@@ -125,7 +124,6 @@ def get_person_for_grading_code(database, code):
             pr = ECFmapOGDrecordPlayer()
             pr.load_record(p)
             return pr
-    return None
 
 
 def get_person_for_player(database, code):
@@ -148,4 +146,3 @@ def get_person_for_player(database, code):
             pr = ECFmapOGDrecordPlayer()
             pr.load_record(p)
             return pr
-    return None

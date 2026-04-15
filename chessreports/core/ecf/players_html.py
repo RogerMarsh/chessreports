@@ -15,9 +15,13 @@ _ecf_membership_number_re = re.compile(r"^\d{6}$")
 class PlayersHTMLfeedMethodNotCalled(Exception):
     """Exception raised if feed method has not been called when expected."""
 
+    pass
+
 
 class PlayersHTMLTooManyECFCodes(Exception):
     """Exception raised if more than one ECF code found for a player."""
+
+    pass
 
 
 class PlayersHTML(HTMLParser):
@@ -63,11 +67,15 @@ class PlayersHTML(HTMLParser):
         if tag.strip() in {"script", "style"}:
             self._ignore_data -= 1
 
-    def handle_data(self, data):
+    def handle_startendtag(self, tag, attrs):
+        """Delegate to HTMLParser method."""
+        super().handle_startendtag(tag, attrs)
+
+    def handle_data(self, tag):
         """Override HTMLParser method which does nothing."""
         if self._ignore_data:
             return
-        ts = data.strip()
+        ts = tag.strip()
         if not ts:
             self._data_row = []
             return
@@ -96,23 +104,29 @@ class PlayersHTML(HTMLParser):
         self._data_row = []
         return
 
-    def handle_entityref(self, name):
+    def handle_entityref(self, tag):
         """Override HTMLParser method which does nothing."""
+        pass
 
-    def handle_charref(self, name):
+    def handle_charref(self, tag):
         """Override HTMLParser method which does nothing."""
+        pass
 
-    def handle_comment(self, data):
+    def handle_comment(self, tag):
         """Override HTMLParser method which does nothing."""
+        pass
 
-    def handle_decl(self, decl):
+    def handle_decl(self, tag):
         """Override HTMLParser method which does nothing."""
+        pass
 
-    def handle_pi(self, data):
+    def handle_pi(self, tag):
         """Override HTMLParser method which does nothing."""
+        pass
 
     def handle_unknown_decl(self, tag):
         """Override HTMLParser method which does nothing."""
+        pass
 
     def get_ecf_code(self):
         """Return ECF code associated with ECF membership number.
@@ -134,8 +148,7 @@ class PlayersHTML(HTMLParser):
             raise PlayersHTMLTooManyECFCodes(
                 " ".join(
                     (
-                        "More than one ECF code found for",
-                        "ECF membership number",
+                        "More than one ECF code found for ECF membership number",
                         self._ecf_membership_number,
                     )
                 )

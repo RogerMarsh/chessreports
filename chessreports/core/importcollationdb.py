@@ -27,6 +27,8 @@ from .importreports import get_event_from_player
 class ImportCollationDBError(Exception):
     """Exception class for importcollationdb module."""
 
+    pass
+
 
 class ImportCollationDB(collationdb.CollationDB):
     """Update results database from games in a CollationEvents instance."""
@@ -37,14 +39,14 @@ class ImportCollationDB(collationdb.CollationDB):
 
         self.collation = collation
         self.dbplayer = set()
-        self.dbplayermerge = {}
-        self.mergeplausible = {}
+        self.dbplayermerge = dict()
+        self.mergeplausible = dict()
 
     def export_players_on_database(self):
         """Return list of players on database."""
         # get all aliases on importing database
         # note identity with embedded keys translated and merge structure
-        players = {}
+        players = dict()
         gai = resultsrecord.get_alias_identity
         pr = resultsrecord.ResultsDBrecordPlayer()
         pk = pr.key
@@ -71,18 +73,17 @@ class ImportCollationDB(collationdb.CollationDB):
         main_alias_values = {type(True), type(False), type(None)}
         exportdata = []
         for pi, pm, pa, paff in players.values():
-            del paff
             if type(pm) in main_alias_values:
                 for a in pa:
                     exportdata.extend(
                         convert_alias_to_transfer_format(
-                            players[a][0], constants.PLAYER
+                            players[a][0], constants._player
                         )
                     )
                 exportdata.extend(
-                    convert_alias_to_transfer_format(pi, constants.PLAYER)
+                    convert_alias_to_transfer_format(pi, constants._player)
                 )
-                exportdata.append("=".join((constants.ALIASES, repr(pm))))
+                exportdata.append("=".join((constants._aliases, repr(pm))))
 
         return exportdata
 
@@ -94,6 +95,7 @@ class ImportCollationDB(collationdb.CollationDB):
         """
         ir = self.collation.importreport
         for p, ps in ir.get_game_players().items():
+            gefp = get_event_from_player(p)
             pr = resultsrecord.get_alias_for_player_import(
                 self._database, p, ir.localevents[get_event_from_player(p)]
             )
@@ -152,9 +154,10 @@ class ImportCollationDB(collationdb.CollationDB):
             )  # es, ps, rec.value.pin)
             if pi in aliases:
                 return True
-            if pi in ir.localplayer:
+            elif pi in ir.localplayer:
                 return pi
-            return False
+            else:
+                return False
 
         def get_person(am):
             ar = resultsrecord.get_alias_for_player_import(
@@ -162,7 +165,6 @@ class ImportCollationDB(collationdb.CollationDB):
             )
             if ar:
                 return resultsrecord.get_person_from_alias(self._database, ar)
-            return None
 
         ir = self.collation.importreport
         checked = set()
@@ -201,7 +203,6 @@ class ImportCollationDB(collationdb.CollationDB):
             )
             if ar:
                 return resultsrecord.get_person_from_alias(self._database, ar)
-            return None
 
         def get_person(am):
             ar = resultsrecord.get_alias_for_player_import(
@@ -209,7 +210,6 @@ class ImportCollationDB(collationdb.CollationDB):
             )
             if ar:
                 return resultsrecord.get_person_from_alias(self._database, ar)
-            return None
 
         ir = self.collation.importreport
         for gp in ir.gameplayer:
@@ -232,11 +232,11 @@ class ImportCollationDB(collationdb.CollationDB):
                 if dbgp.value.merge == dbp.key.recno:
                     # assume a previous run has done the record edits
                     continue
-                if gp in ir.known_to_new:
+                elif gp in ir.known_to_new:
                     # let exporter defined merges loop process record
                     # {in case the import file is reprocessed (by mistake)}
                     continue
-                if dbp.key == dbgp.key:
+                elif dbp.key == dbgp.key:
                     # assume new player or exporter defined merge
                     # (mainalias = gp path taken above)
                     continue
@@ -244,15 +244,11 @@ class ImportCollationDB(collationdb.CollationDB):
                 dbpc = dbp.clone()
                 try:
                     alias = set(dbpc.value.alias)
-                except TypeError as exc:
+                except TypeError:
                     if dbpc.value.alias not in {None, True, False}:
-                        raise ImportCollationDBError(
-                            "Record alias value"
-                        ) from exc
-                    if dbgpc.value.merge != dbpc.value.alias:
-                        raise ImportCollationDBError(
-                            "Record merge value"
-                        ) from exc
+                        raise ImportCollationDBError("Record alias value")
+                    elif dbgpc.value.merge != dbpc.value.alias:
+                        raise ImportCollationDBError("Record merge value")
                     alias = set()
                 alias.add(dbgpc.key.recno)
                 dbpc.value.alias = sorted(alias)
@@ -322,7 +318,6 @@ class ImportCollationDB(collationdb.CollationDB):
             )
             if ar:
                 return resultsrecord.get_person_from_alias(self._database, ar)
-            return None
 
         def get_person(am):
             ar = resultsrecord.get_alias_for_player_import(
@@ -330,7 +325,6 @@ class ImportCollationDB(collationdb.CollationDB):
             )
             if ar:
                 return resultsrecord.get_person_from_alias(self._database, ar)
-            return None
 
         inconsistent = set()
         ir = self.collation.importreport

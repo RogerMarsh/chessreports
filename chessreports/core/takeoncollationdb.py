@@ -39,28 +39,27 @@ class TakeonCollationDB(collationdb.CollationDB):
         # used in native league player identifiers.  Thus section has to be
         # modified if losing pin would generate duplicate player identifiers.
         namemanager = collationdb.NameManager(self._database)
-        affiliations = {}
+        affiliations = dict()
         for s, gms in self._games.items():
             if s[0] == "Event Matches":
                 for g in gms.games:
                     for p in g.homeplayer, g.awayplayer:
-                        identity = p.get_player_identity()
-                        if identity not in affiliations:
-                            affiliations[identity] = p.affiliation
+                        if p._identity not in affiliations:
+                            affiliations[p._identity] = p.affiliation
         duplicates = set()
         names = set()
         for pg in self.merges.values():
             for player in pg:
-                if player[4] == constants.EVENT_MATCHES:
+                if player[4] == constants._event_matches:
                     identifier = player[:-1]
                     if identifier in names:
                         duplicates.add(identifier)
                     names.add(identifier)
         del names
-        lookup = {}
+        lookup = dict()
         for pg in self.merges.values():
             ip = None
-            ap = {}
+            ap = dict()
             for player, gamecount in pg.items():
                 identifier = player[:-1]
                 section = identifier[-1]
@@ -69,13 +68,13 @@ class TakeonCollationDB(collationdb.CollationDB):
                     ips = section
                     ipg = gamecount
                 elif (
-                    ips == constants.EVENT_MATCHES
-                    and section != constants.EVENT_MATCHES
+                    ips == constants._event_matches
+                    and section != constants._event_matches
                 ):
                     ap[player] = None
                 elif (
-                    ips != constants.EVENT_MATCHES
-                    and section == constants.EVENT_MATCHES
+                    ips != constants._event_matches
+                    and section == constants._event_matches
                 ):
                     ap[ip] = None
                     ip = player
@@ -110,7 +109,7 @@ class TakeonCollationDB(collationdb.CollationDB):
                                 str(newap.value.pin).join(("(", ")")),
                             )
                         )
-                if p[4] == constants.EVENT_MATCHES:
+                if p[4] == constants._event_matches:
                     namemanager.unset_name(newap.value.section)
                     namemanager.set_name(affiliations[p])
                     newap.value.section = namemanager.get_code(affiliations[p])
@@ -129,7 +128,7 @@ class TakeonCollationDB(collationdb.CollationDB):
                             str(newipr.value.pin).join(("(", ")")),
                         )
                     )
-            if ips == constants.EVENT_MATCHES:
+            if ips == constants._event_matches:
                 namemanager.unset_name(newipr.value.section)
                 namemanager.set_name(affiliations[ip])
                 newipr.value.section = namemanager.get_code(affiliations[ip])
