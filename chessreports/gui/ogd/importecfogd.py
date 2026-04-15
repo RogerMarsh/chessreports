@@ -48,9 +48,10 @@ class ImportECFOGD(logpanel.WidgetAndLogPanel):
 
             This method is designed to be passed as the maketaskwidget argument
             to a WidgetAndLogPanel(...) call.
-
             """
 
+            # pydocstyle D202: No blank lines after function docstring ...
+            # black 25.1.0 insists on the blank line.
             # Added when DataGridBase changed to assume a popup menu is
             # available when right-click done on empty part of data drid frame.
             # The popup is used to show all navigation available from grid: but
