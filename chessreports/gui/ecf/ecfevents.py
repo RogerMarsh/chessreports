@@ -195,17 +195,19 @@ class ECFEvents(panel.PanelGridSelector):
         db.start_read_only_transaction()
         try:
             for e in ebkm:
-                submit_events[
-                    e[-1]
-                ] = resultsrecord.get_event_from_record_value(
-                    db.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
+                submit_events[e[-1]] = (
+                    resultsrecord.get_event_from_record_value(
+                        db.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
+                    )
                 )
             for e in esel:
                 if e not in ebkm:
-                    submit_events[
-                        e[-1]
-                    ] = resultsrecord.get_event_from_record_value(
-                        db.get_primary_record(filespec.EVENT_FILE_DEF, e[-1])
+                    submit_events[e[-1]] = (
+                        resultsrecord.get_event_from_record_value(
+                            db.get_primary_record(
+                                filespec.EVENT_FILE_DEF, e[-1]
+                            )
+                        )
                     )
         finally:
             db.end_read_only_transaction()

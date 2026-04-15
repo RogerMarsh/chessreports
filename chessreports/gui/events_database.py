@@ -1011,19 +1011,23 @@ class Events(panel.PanelGridSelector):
             for e in events
         }
         teams = {
-            t: resultsrecord.get_name_from_record_value(
-                database.get_primary_record(filespec.NAME_FILE_DEF, t)
-            ).value.name
-            if t
-            else ""
+            t: (
+                resultsrecord.get_name_from_record_value(
+                    database.get_primary_record(filespec.NAME_FILE_DEF, t)
+                ).value.name
+                if t
+                else ""
+            )
             for t in teams
         }
         sections = {
-            s: resultsrecord.get_name_from_record_value(
-                database.get_primary_record(filespec.NAME_FILE_DEF, s)
-            ).value.name
-            if s
-            else ""
+            s: (
+                resultsrecord.get_name_from_record_value(
+                    database.get_primary_record(filespec.NAME_FILE_DEF, s)
+                ).value.name
+                if s
+                else ""
+            )
             for s in sections
         }
 
@@ -1077,12 +1081,16 @@ class Events(panel.PanelGridSelector):
                     g.value.round if g.value.round else "",
                     g.value.date if g.value.date else "",
                     g.value.board if g.value.board else "",
-                    ecfplayers[g.value.homeplayer]
-                    if g.value.homeplayer in ecfplayers
-                    else "",
-                    ecfplayers[g.value.awayplayer]
-                    if g.value.awayplayer in ecfplayers
-                    else "",
+                    (
+                        ecfplayers[g.value.homeplayer]
+                        if g.value.homeplayer in ecfplayers
+                        else ""
+                    ),
+                    (
+                        ecfplayers[g.value.awayplayer]
+                        if g.value.awayplayer in ecfplayers
+                        else ""
+                    ),
                     players[g.value.homeplayer],
                     players[g.value.awayplayer],
                     gameresults.displayresult.get(g.value.result, ""),

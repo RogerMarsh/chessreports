@@ -7,7 +7,7 @@
 Display the 'players_ratings' download and offer the option to update the open
 database.
 
-Player's names, ecf_codes, and club_codes, are taken from the download. 
+Player's names, ecf_codes, and club_codes, are taken from the download.
 
 Assume that all clubs referenced in the download are in the 'active_clubs'
 download, and any club not referenced in the download is absent from the

@@ -151,9 +151,9 @@ class CollationDB(object):
                     if pid not in playersamend:
                         playersamend[pid] = players[pid].clone()
                         if change_affiliation:
-                            playersamend[
-                                pid
-                            ].value.affiliation = new_affiliation
+                            playersamend[pid].value.affiliation = (
+                                new_affiliation
+                            )
                         if change_reported_codes:
                             playersamend[pid].value.reported_codes = list(
                                 player.reported_codes

@@ -823,9 +823,9 @@ def get_alias_for_player_import(database, player, sections, lookupevent=None):
                     )
                     if lookupevent:
                         if alias:
-                            lookupevent[
-                                (name, startdate, enddate, s)
-                            ] = pv.event
+                            lookupevent[(name, startdate, enddate, s)] = (
+                                pv.event
+                            )
                     return alias
 
 
