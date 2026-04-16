@@ -168,7 +168,7 @@ class CollationDB(object):
                 if a is not None:
                     namemanager.unset_name(a)
                 pe = eventskey[pr.value.event]
-                if pr.value.section:
+                if isinstance(pr.value.section, int):
                     ps = namemanager.unset_name(pr.value.section)
                 else:
                     ps = pr.value.section
