@@ -64,6 +64,8 @@ packages = [
     "chessreports.vedis",
     "chessreports.tools",
     "chessreports.chesscalc_legacy",
+    "chessreports.chesscalc_legacy.core",
+    "chessreports.chesscalc_legacy.gui",
 ]
 
 [tool.setuptools.package-data]
