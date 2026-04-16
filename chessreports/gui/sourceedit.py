@@ -9,6 +9,8 @@ import tkinter.messagebox
 import os
 import csv
 
+from solentware_misc.gui import dialogue
+
 from chessvalidate.gui import sourceedit
 from chessvalidate.core.gameobjects import (
     get_game_rows_for_csv_format,
