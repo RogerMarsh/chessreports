@@ -9,6 +9,7 @@ import tkinter
 from solentware_grid.datagrid import DataGridReadOnly
 from solentware_grid.core import dataclient
 from solentware_grid.gui import gridbindings
+from solentware_grid.gui.eventspec import EventSpec
 
 from solentware_misc.core.utilities import AppSysPersonNameParts
 
@@ -23,6 +24,10 @@ class PlayerGrid(gridbindings.SelectorGridBindings, DataGridReadOnly):
         """Extend and bind grid navigation within page commands to events."""
         super().__init__(**kwargs)
         self.bindings(function=self.on_focus_in)
+        self.menupopup.delete(EventSpec.launch_show_dialog[1])
+
+    def show_dialog_event(self, event):
+        """Override, do nothing."""
 
     def show_popup_menu_no_row(self, event=None):
         """Override superclass to do nothing."""

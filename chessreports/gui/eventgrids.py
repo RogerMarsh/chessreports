@@ -9,6 +9,7 @@ import tkinter
 from solentware_grid.datagrid import DataGridReadOnly
 from solentware_grid.core.dataclient import DataSource
 from solentware_grid.gui import gridbindings
+from solentware_grid.gui.eventspec import EventSpec
 
 from .resultsrow import ResultsDBrowEvent
 from ..core import filespec
@@ -21,6 +22,10 @@ class EventBaseGrid(gridbindings.GridBindings, DataGridReadOnly):
         """Extend and bind grid navigation within page commands to events."""
         super().__init__(**kwargs)
         self.bindings()
+        self.menupopup.delete(EventSpec.launch_show_dialog[1])
+
+    def show_dialog_event(self, event):
+        """Override, do nothing."""
 
     def show_popup_menu_no_row(self, event=None):
         """Override superclass to do nothing."""
