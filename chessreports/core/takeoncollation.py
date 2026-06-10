@@ -3,6 +3,7 @@
 # Licence: See LICENCE (BSD licence)
 
 """Class to reconcile event schedule (fixture list) with reported results."""
+
 from chessvalidate.core import gameobjects
 
 from . import importcollation, constants

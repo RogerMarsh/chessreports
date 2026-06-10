@@ -3,6 +3,7 @@
 # Licence: See LICENCE (BSD licence)
 
 """Display chess player population map analysis."""
+
 import tkinter
 
 from solentware_misc.gui.reports import AppSysReport

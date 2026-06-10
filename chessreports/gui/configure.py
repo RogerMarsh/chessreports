@@ -3,6 +3,7 @@
 # Licence: See LICENCE (BSD licence)
 
 """Describe the emails and attachments containing event results."""
+
 from chessvalidate.gui import configure
 
 from ..core import configuration

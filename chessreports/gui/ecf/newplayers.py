@@ -14,6 +14,7 @@ ChessReports, for use with the ECF monthly rating system.  Between these
 versions it customised newplayers_lite.
 
 """
+
 import tkinter
 import tkinter.messagebox
 import re

@@ -9,6 +9,7 @@ identifications are returned to the new player page so that identification
 can be corrected.
 
 """
+
 import tkinter
 import tkinter.messagebox
 

@@ -3,6 +3,7 @@
 # Licence: See LICENCE (BSD licence)
 
 """Create widgets that display various sets of player details."""
+
 # class names need to be tidied up
 
 import tkinter

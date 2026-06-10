@@ -13,6 +13,7 @@ is offered, which will cause the same ECF grading code to be used to report
 results for the current event.
 
 """
+
 import tkinter.messagebox
 
 from solentware_misc.gui import panel

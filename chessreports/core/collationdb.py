@@ -11,6 +11,7 @@ The collated results from the results report replace any existing results on
 the database for the reported events.
 
 """
+
 from chessvalidate.core.gameresults import ecfresult
 from chessvalidate.core.gameobjects import (
     Game,

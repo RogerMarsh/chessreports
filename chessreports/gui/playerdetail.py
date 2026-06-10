@@ -8,6 +8,7 @@ Show all identities for a player, derived from event competitions, and ECF
 code if available.
 
 """
+
 import tkinter
 import tkinter.messagebox
 

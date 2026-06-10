@@ -3,6 +3,7 @@
 # Licence: See LICENCE (BSD licence)
 
 """Chess results database."""
+
 from solentware_base.core.constants import (
     BERKELEYDB_MODULE,
     BSDDB3_MODULE,

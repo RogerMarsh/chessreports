@@ -3,6 +3,7 @@
 # Licence: See LICENCE (BSD licence)
 
 """Display chess performance calculation by iteration for selected events."""
+
 import tkinter
 
 from solentware_misc.gui.reports import AppSysReport

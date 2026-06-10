@@ -3,6 +3,7 @@
 # Licence: See LICENCE (BSD licence)
 
 """Create widgets to display player details with Online Grading List data."""
+
 # class names need to be tidied up
 
 import tkinter

@@ -14,6 +14,7 @@ The newplayers module now customises newplayers_database for use with the ECF
 monthly rating system.
 
 """
+
 import tkinter
 import tkinter.messagebox
 

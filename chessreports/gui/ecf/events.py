@@ -3,6 +3,7 @@
 # Licence: See LICENCE (BSD licence)
 
 """Results database Event panel class."""
+
 import tkinter.messagebox
 
 from ...core.ecf import ecfmaprecord

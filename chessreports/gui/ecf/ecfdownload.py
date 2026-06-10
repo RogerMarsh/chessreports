@@ -7,6 +7,7 @@
 The extract can be direct or from previously downloaded files.
 
 """
+
 from solentware_misc.gui.dialogue import ModalDialogueGo
 
 DOWNLOAD = "Download"

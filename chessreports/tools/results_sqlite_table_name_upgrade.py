@@ -4,7 +4,6 @@
 
 """Convert Results table names to convention used in solenrware_base."""
 
-
 if __name__ == "__main__":
     from solentware_base.tools.sqlite_table_name_upgrade import (
         SqliteTableNameUpgrade,

@@ -3,6 +3,7 @@
 # Licence: See LICENCE (BSD licence)
 
 """Extract results from a file in this applications export format."""
+
 from chessvalidate.core.gameresults import displayresult
 
 from . import constants

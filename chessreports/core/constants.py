@@ -8,6 +8,7 @@ Constants shared with the ChessResultsReport version are imported from
 the chessreports.core.constants module.
 
 """
+
 from chessvalidate.core.constants import (
     LOSS,
     DRAWN,
