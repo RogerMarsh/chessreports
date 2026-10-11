@@ -10,16 +10,16 @@ line-length = 79
 
 [project]
 name = "chessreports"
-version = "7.1.15"
+version = "7.1.16"
 authors = [
   { name="Roger Marsh", email="roger.marsh@solentware.co.uk" },
 ]
 description = "Results database for chess games."
 classifiers = [
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent",
     "Topic :: Games/Entertainment :: Board Games",
     "Intended Audience :: End Users/Desktop",
@@ -30,7 +30,7 @@ license-files = ["LICENCE"]
 readme = "README"
 dependencies = [
     "chessvalidate==2.0.7",
-    "solentware-base==5.5.1",
+    "solentware-base==5.5.2",
     "solentware-grid==3.0.3",
 ]
 
