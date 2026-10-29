@@ -63,13 +63,17 @@ class ResultsDatabase(database.Database, dpt_database.Database):
         The file remains closed if an error message is given.
         """
         super().open_database(files=files)
-        fistat = dict()
+        fistat = []
         for dbo in self.table.values():
-            fistat[dbo] = dbo.get_file_parameters(self.dbenv)["FISTAT"]
-        for dbo in self.table.values():
-            if fistat[dbo][0] != 0:
-                break
-        else:
+            parameters = dbo.get_file_parameters(self.dbenv)
+            fistat.extend(
+                [(k, v) for k, v in parameters.items() if k[1] == "FISTAT"]
+            )
+        fistat_errors = []
+        for item in fistat:
+            if item[1][0] != 0:
+                fistat_errors.append("\t".join((item[0][0], item[1][1])))
+        if not fistat_errors:
             self.increase_database_size(files=None)
             return ""
 
